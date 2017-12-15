@@ -49,7 +49,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        if ($exception instanceof AuthException) { # papad exceptions
+        if ($exception instanceof IOTException) { # papad exceptions
             $response = $this->CustomException($exception);
         } else { # other exceptions
             $response = $this->otherExceptions($request, $exception);

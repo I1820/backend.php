@@ -6,11 +6,11 @@
  * Time: 9:18 AM
  */
 
-namespace app\Exceptions;
+namespace App\Exceptions;
 
 use Exception;
 
-class AuthException extends Exception
+class AuthException extends IOTException
 {
     # Exception Codes list
     const C_GE = 600;
@@ -38,7 +38,7 @@ class AuthException extends Exception
     const M_NA = 'Account is not active';
 
     /**
-     * PapadException constructor.
+     * AuthException constructor.
      * @param string $message
      * @param int $code
      */

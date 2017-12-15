@@ -31,11 +31,10 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-//        AuthValidation::register($request);
+        //AuthValidation::register($request);
 
-        $request->merge($request->json()->all());
 
-        $this->userService->validateUser($request);
+        $this->userService->validateRegisterUser($request);
 
         $user = $this->userService->insertUser($request);
 

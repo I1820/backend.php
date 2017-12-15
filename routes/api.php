@@ -13,12 +13,13 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function() use ($router) {
+Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) {
     Route::post('/register', 'AuthController@register');
     Route::post('/login', 'AuthController@login');
     Route::put('/refresh', 'AuthController@refresh');
 
-    Route::group(['prefix' => 'stat','middleware'=>['auth.jwt']], function() {
+    Route::group(['prefix' => 'user', 'middleware' => ['auth.jwt']], function () {
+        Route::patch('/update', 'UserController@update');
     });
 });
 
