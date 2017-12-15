@@ -31,6 +31,6 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token','active','_id','updated_at','created_at'
+        'password', 'remember_token','active','_id','updated_at','created_at','files'
     ];
 }

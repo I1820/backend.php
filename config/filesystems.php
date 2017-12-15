@@ -47,7 +47,11 @@ return [
             'driver' => 'local',
             'root' => storage_path('app'),
         ],
+        'cdn' => [
+            'driver' => 'local',
+            'root' => env('APP_CDN', base_path() . '/../iot_cdn'),
 
+        ],
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
