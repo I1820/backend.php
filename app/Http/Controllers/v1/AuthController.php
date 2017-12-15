@@ -87,4 +87,16 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
     }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function logout(Request $request)
+    {
+        $token = JWTAuth::getToken();
+        JWTAuth::invalidate($token);
+        $message = "با موفقیت خارج شدید";
+        return Response::body($message);
+    }
 }

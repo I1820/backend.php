@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) {
     Route::post('/register', 'AuthController@register');
     Route::post('/login', 'AuthController@login');
+    Route::post('/logout', 'AuthController@logout');
     Route::put('/refresh', 'AuthController@refresh');
 
     Route::group(['prefix' => 'user', 'middleware' => ['auth.jwt']], function () {
