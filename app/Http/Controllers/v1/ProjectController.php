@@ -63,4 +63,25 @@ class ProjectController extends Controller
             return Response::body(compact('project'));
         abort(404);
     }
+
+
+    /**
+     * @param Project $project
+     * @param Request $request
+     * @return array
+     * @throws ProjectException
+     */
+    public function update(Request $request, Project $project)
+    {
+        $user = Auth::user();
+        if ($project->user_id != $user->id)
+            abort(404);
+
+        $this->projectService->validateUpdateProject($request);
+
+        $project = $this->projectService->updateProject($request, $project);
+
+
+        return Response::body(compact('project'));
+    }
 }

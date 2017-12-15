@@ -149,22 +149,5 @@ trait UpdateUser
         $user->save();
 
         return $user;
-
-        return User::create([
-            'legal' => true,
-            'active' => false,
-            'email' => $request->get('email'),
-            'password' => bcrypt($request->get('password')),
-            'other_info' => $request->only([
-                'org_interface_name',
-                'org_interface_last_name',
-                'org_interface_phone',
-                'org_interface_mobile',
-                'type',
-                'org_name',
-                'reg_number',
-                'ec_code'
-            ])
-        ]);
     }
 }
