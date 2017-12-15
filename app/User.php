@@ -33,4 +33,10 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
     protected $hidden = [
         'password', 'remember_token','active','_id','updated_at','created_at','files'
     ];
+
+
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
 }

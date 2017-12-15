@@ -24,6 +24,12 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::get('/', 'UserController@profile');
         Route::post('/upload', 'UserController@upload');
     });
+
+    Route::group(['prefix' => 'project', 'middleware' => ['auth.jwt']], function () {
+        Route::get('/', 'ProjectController@list');
+        Route::post('/', 'ProjectController@create');
+        Route::get('/{project_id}', 'ProjectController@get');
+    });
 });
 
 
