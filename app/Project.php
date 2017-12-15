@@ -23,7 +23,7 @@ class Project extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'things','_id','updated_at','created_at','user_id'
+        'things','updated_at','created_at','user_id'
     ];
 
     public function user()
