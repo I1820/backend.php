@@ -35,6 +35,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
     Route::group(['prefix' => 'thing', 'middleware' => ['auth.jwt']], function () {
         Route::get('/', 'ThingController@all');
         Route::post('/', 'ThingController@create');
+        Route::get('/{thing}', 'ThingController@get');
         Route::patch('/{thing}', 'ThingController@update');
     });
 });

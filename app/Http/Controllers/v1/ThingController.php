@@ -50,6 +50,20 @@ class ThingController extends Controller
 
     /**
      * @param Thing $thing
+     * @return array
+     */
+    public function get(Thing $thing)
+    {
+        $user = Auth::user();
+        if ($thing['user_id'] != $user->id)
+            abort(404);
+        $thing->load(['user', 'project']);
+
+        return Response::body(compact('thing'));
+    }
+
+    /**
+     * @param Thing $thing
      * @param Request $request
      * @return array
      * @throws ThingException
