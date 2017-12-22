@@ -18,7 +18,7 @@ class Project extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'description'
+        'name', 'description', 'active'
     ];
     protected $appends = ['owner'];
 
@@ -48,4 +48,5 @@ class Project extends Eloquent
                 return $role['user'];
         return null;
     }
+
 }

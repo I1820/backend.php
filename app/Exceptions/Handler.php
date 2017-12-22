@@ -68,6 +68,7 @@ class Handler extends ExceptionHandler
             AuthException::C_TE,
             AuthException::C_TI,
             AuthException::C_IC,
+            AuthException::C_UNF,
         ];
 
         if (in_array($e->getCode(), $unauthorized))

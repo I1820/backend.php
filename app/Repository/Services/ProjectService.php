@@ -49,6 +49,7 @@ class ProjectService
         return Project::create([
             'name' => $request->get('name'),
             'description' => $request->get('description'),
+            'active' => true
         ]);
     }
 
