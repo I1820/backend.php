@@ -5,6 +5,10 @@ namespace App;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property mixed name
+ * @property mixed description
+ */
 class Project extends Eloquent
 {
 
@@ -24,12 +28,17 @@ class Project extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'things', 'updated_at', 'created_at', 'user_id', 'roles'
+        'updated_at', 'created_at', 'user_id', 'roles'
     ];
 
     public function roles()
     {
         return $this->hasMany(Role::class)->with('user');
+    }
+
+    public function things()
+    {
+        return $this->hasMany(Thing::class)->with('user');
     }
 
     public function getOwnerAttribute($value)

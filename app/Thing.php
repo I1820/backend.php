@@ -5,16 +5,23 @@ namespace App;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Model;
 
-
-class Role extends Eloquent
+/**
+ * @property mixed loc
+ * @property mixed period
+ * @property mixed description
+ * @property mixed name
+ */
+class Thing extends Eloquent
 {
+
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'permissions'
+        'name', 'loc', 'description', 'period'
     ];
 
     /**
@@ -23,16 +30,17 @@ class Role extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'updated_at', 'created_at', 'user_id', '_id', 'project_id'
+        'updated_at', 'created_at', 'user_id', 'id', 'project_id'
     ];
 
-    public function project()
-    {
-        return $this->belongsTo(Project::class);
-    }
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
     }
 }

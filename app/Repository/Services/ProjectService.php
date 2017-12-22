@@ -11,6 +11,7 @@ namespace App\Repository\Services;
 
 use App\Exceptions\ProjectException;
 use App\Project;
+use App\Thing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -79,12 +80,18 @@ class ProjectService
      */
     public function updateProject(Request $request, Project $project)
     {
-        if($request->get('name'))
+        if ($request->get('name'))
             $project->name = $request->get('name');
-        if($request->get('description'))
+        if ($request->get('description'))
             $project->description = $request->get('description');
         $project->save();
 
         return $project;
+    }
+
+
+    public function addThing(Project $project, Thing $thing)
+    {
+        $project->things()->save($thing);
     }
 }

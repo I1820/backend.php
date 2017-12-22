@@ -22,7 +22,7 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'other_info', 'active','legal'
+        'name', 'email', 'password', 'other_info', 'active', 'legal'
     ];
 
     /**
@@ -31,11 +31,16 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token','active','_id','updated_at','created_at','files'
+        'password', 'remember_token', 'active', '_id', 'updated_at', 'created_at', 'files'
     ];
 
     public function roles()
     {
         return $this->hasMany(Role::class);
+    }
+
+    public function things()
+    {
+        return $this->hasMany(Thing::class);
     }
 }

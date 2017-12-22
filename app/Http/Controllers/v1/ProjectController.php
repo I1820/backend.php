@@ -7,6 +7,7 @@ use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\ProjectService;
 use App\Role;
+use App\Thing;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -62,9 +63,11 @@ class ProjectController extends Controller
     public function get(Project $project)
     {
         $user = Auth::user();
-        if ($project['owner']['id'] == $user->id)
-            return Response::body(compact('project'));
-        abort(404);
+        if ($project['owner']['id'] != $user->id)
+            abort(404);
+        $project->load('things');
+
+        return Response::body(compact('project'));
     }
 
 
@@ -87,4 +90,22 @@ class ProjectController extends Controller
 
         return Response::body(compact('project'));
     }
+
+    /**
+     * @param Project $project
+     * @param Thing $thing
+     * @return array
+     */
+    public function addThing(Project $project, Thing $thing)
+    {
+        $user = Auth::user();
+        if ($project['owner']['id'] != $user->id || $thing['user_id'] != $user->id)
+            abort(404);
+
+        $this->projectService->addThing($project, $thing);
+
+        return Response::body(compact('project'));
+    }
+
+
 }
