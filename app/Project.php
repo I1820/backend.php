@@ -16,6 +16,7 @@ class Project extends Eloquent
     protected $fillable = [
         'name', 'description'
     ];
+    protected $appends = ['owner'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -23,11 +24,19 @@ class Project extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'things','updated_at','created_at','user_id'
+        'things', 'updated_at', 'created_at', 'user_id', 'roles'
     ];
 
-    public function user()
+    public function roles()
     {
-        return $this->belongsTo('User');
+        return $this->hasMany(Role::class)->with('user');
+    }
+
+    public function getOwnerAttribute($value)
+    {
+        foreach ($this->roles as $role)
+            if (isset($role['permissions']['owner']))
+                return $role['user'];
+        return null;
     }
 }

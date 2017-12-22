@@ -34,9 +34,8 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
         'password', 'remember_token','active','_id','updated_at','created_at','files'
     ];
 
-
-    public function projects()
+    public function roles()
     {
-        return $this->hasMany(Project::class);
+        return $this->hasMany(Role::class);
     }
 }

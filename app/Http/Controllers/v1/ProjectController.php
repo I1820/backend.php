@@ -6,6 +6,7 @@ use App\Exceptions\ProjectException;
 use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\ProjectService;
+use App\Role;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -35,8 +36,10 @@ class ProjectController extends Controller
         $this->projectService->validateCreateProject($request);
 
         $project = $this->projectService->insertProject($request);
+        $role = Role::create(['permissions' => ['owner' => '']]);
+        $project->roles()->save($role);
+        $user->roles()->save($role);
 
-        $user->projects()->save($project);
         return Response::body(compact('project'));
     }
 
@@ -45,9 +48,9 @@ class ProjectController extends Controller
      */
     public function all()
     {
-        $projects = Auth::user()->projects()->get();
+        $projects = collect(Auth::user()->roles()->with(['project.roles'])->get());
         $projects = $projects->map(function ($item) {
-            return $item->only(['_id', 'name']);
+            return $item['project'];
         });
         return Response::body(compact('projects'));
     }
@@ -59,7 +62,7 @@ class ProjectController extends Controller
     public function get(Project $project)
     {
         $user = Auth::user();
-        if ($project->user_id == $user->id)
+        if ($project['owner']['id'] == $user->id)
             return Response::body(compact('project'));
         abort(404);
     }
@@ -74,7 +77,7 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project)
     {
         $user = Auth::user();
-        if ($project->user_id != $user->id)
+        if ($project['owner']['id'] != $user->id)
             abort(404);
 
         $this->projectService->validateUpdateProject($request);
