@@ -100,7 +100,7 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
         if ($project['owner']['id'] != $user->id)
-            abort(404);
+            return Response::body([$project['owner']['id'] => $user->id]);
         if ($thing['user_id'] != $user->id)
             abort(500);
 
