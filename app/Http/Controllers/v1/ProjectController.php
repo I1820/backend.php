@@ -100,7 +100,7 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
         if ($project['owner']['id'] != $user->id || $thing['user_id'] != $user->id)
-            abort(404);
+            abort(500);
 
         $this->projectService->addThing($project, $thing);
 
