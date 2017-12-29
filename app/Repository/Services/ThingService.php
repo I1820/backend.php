@@ -117,6 +117,8 @@ class ThingService
                 'long' => $request->get('long')
             ];
 
+        $thing->save();
+
         return $thing;
     }
 }
