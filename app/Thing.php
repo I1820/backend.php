@@ -21,7 +21,7 @@ class Thing extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'loc', 'description', 'period'
+        'name', 'loc', 'description', 'period','mac_address'
     ];
 
     /**
@@ -45,6 +45,6 @@ class Thing extends Eloquent
     }
 
     public function data(){
-        return $this->hasMany(ThingData::class,'thingid','name');
+        return $this->hasMany(ThingData::class,'thingid','mac_address');
     }
 }

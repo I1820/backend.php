@@ -23,6 +23,6 @@ class ThingData extends Eloquent
 
     public function thing()
     {
-        return $this->belongsTo(Thing::class, 'thingid', 'name');
+        return $this->belongsTo(Thing::class, 'thingid', 'mac_address');
     }
 }

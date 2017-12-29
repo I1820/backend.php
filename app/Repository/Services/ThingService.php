@@ -27,7 +27,8 @@ class ThingService
     {
         $messages = [
             'name.required' => 'لطفا نام شی را وارد کنید',
-            'name.unique' => 'این شی قبلا اضافه شده',
+            'mac_address.unique' => 'این شی قبلا اضافه شده',
+            'mac_address.required' => 'ادرس فیزیکی شی را وارد کنید',
             'lat.numeric' => 'لطفا محل سنسور را درست وارد کنید',
             'lat.required' => 'لطفا محل سنسور را درست کنید',
             'long.numeric' => 'لطفا محل سنسور را درست وارد کنید',
@@ -37,7 +38,8 @@ class ThingService
         ];
 
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:things|string|max:255',
+            'name' => 'required|string|max:255',
+            'mac_address' => 'required|unique:things',
             'description' => 'string',
             'lat' => 'required|numeric',
             'long' => 'required|numeric',
@@ -57,6 +59,7 @@ class ThingService
         return Thing::create([
             'name' => $request->get('name'),
             'description' => $request->get('description'),
+            'mac_address' => $request->get('mac_address'),
             'period' => $request->get('period'),
             'loc' => [
                 'lat' => $request->get('lat'),
