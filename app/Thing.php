@@ -43,4 +43,8 @@ class Thing extends Eloquent
     {
         return $this->belongsTo(Project::class);
     }
+
+    public function data(){
+        return $this->hasMany(ThingData::class,'thingid','name');
+    }
 }

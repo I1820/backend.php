@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Repository\Helper\Response;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Exceptions\ThingException;
@@ -80,5 +81,24 @@ class ThingController extends Controller
 
 
         return Response::body(compact('thing'));
+    }
+
+    /**
+     * @param Request $request
+     * @param Thing $thing
+     * @return array
+     */
+    public function data(Request $request, Thing $thing)
+    {
+        $user = Auth::user();
+        if ($thing['user_id'] != $user->id)
+            abort(404);
+
+        $offset = $request->get('offset') ? Carbon::createFromTimestamp($request->get('offset')) : Carbon::yesterday();
+        $count = $request->get('count') ?: 100;
+
+        $data = $thing->data()->where('timestamp', '>', $offset)->take((int)$count)->get();
+
+        return Response::body(compact('data'));
     }
 }

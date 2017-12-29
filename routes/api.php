@@ -36,6 +36,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::get('/', 'ThingController@all');
         Route::post('/', 'ThingController@create');
         Route::get('/{thing}', 'ThingController@get');
+        Route::get('/{thing}/data', 'ThingController@data');
         Route::patch('/{thing}', 'ThingController@update');
     });
 });

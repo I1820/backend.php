@@ -49,6 +49,17 @@ return [
                 'database' => 'admin' // sets the authentication database required by mongo 3
             ]
         ],
+        'mongodb_data' => [
+            'driver'   => 'mongodb',
+            'host'     => env('DB_DATA_HOST', 'localhost'),
+            'port'     => env('DB_DATA_PORT', 27017),
+            'database' => env('DB_DATA_DATABASE'),
+            'username' => env('DB_DATA_USERNAME'),
+            'password' => env('DB_DATA_PASSWORD'),
+            'options'  => [
+                'database' => 'admin' // sets the authentication database required by mongo 3
+            ]
+        ],
         'mysql' => [
             'driver' => 'mysql',
             'host' => env('DB_HOST', '127.0.0.1'),
