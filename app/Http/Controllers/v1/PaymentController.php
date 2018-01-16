@@ -13,6 +13,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Ixudra\Curl\Facades\Curl;
 use Illuminate\Http\Response;
+use Illuminate\Http\Request;
+use Validator;
 
 class PaymentController extends Controller
 {
@@ -33,6 +35,28 @@ class PaymentController extends Controller
         $user = Auth::user();
         if ($user != null) {
             $url = $this->base_url."/GetPackage/";
+            return Curl::to($url)->get();
+        }
+        return response()->json(["result" => "forbidden"],403);
+    }
+
+    function getUserPackages(Request $request)
+    {
+        $user = Auth::user();
+        if ($user != null) {
+            $validator = Validator::make($request->all(),
+                [
+                'range' => 'required|int',
+                'page' =>  'required|int'
+                ]);
+            if($validator->fails()) {
+                return response()->json(['result' => 'bad request'], 400);
+            }
+
+            $validatedData = $validator->valid();
+            $url = $this->base_url."/GetUserPackages/" .$user->id
+                                    ."/".$validatedData['page']
+                                    ."/".$validatedData['range'];
             return Curl::to($url)->get();
         }
         return response()->json(["result" => "forbidden"],403);
