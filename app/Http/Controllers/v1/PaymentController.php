@@ -15,5 +15,10 @@ use Ixudra\Curl\Facades\Curl;
 
 class PaymentController extends Controller
 {
-
+    function google(){
+        $response = Curl::to('https://www.google.com/')
+            ->get();
+//        $response = 'hello';
+        return $response;
+    }
 }
