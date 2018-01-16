@@ -46,8 +46,8 @@ class PaymentController extends Controller
         if ($user != null) {
             $validator = Validator::make($request->all(),
                 [
-                'range' => 'required|int',
-                'page' =>  'required|int'
+                'range' => 'required|integer',
+                'page' =>  'required|integer'
                 ]);
             if($validator->fails()) {
                 return response()->json(['result' => 'bad request'], 400);
@@ -57,6 +57,32 @@ class PaymentController extends Controller
             $url = $this->base_url."/GetUserPackages/" .$user->id
                                     ."/".$validatedData['page']
                                     ."/".$validatedData['range'];
+            return Curl::to($url)->get();
+        }
+        return response()->json(["result" => "forbidden"],403);
+    }
+
+    function updatePackage(Request $request){
+        $user = Auth::user();
+        if ($user != null) {
+            $validator = Validator::make($request->all(),
+                [
+                    'package_type' => 'required|string',
+                    'cost' =>  'required|integer',
+                    'time' =>  'required|integer',
+                    'sensor' =>  'required|integer',
+
+                ]);
+            if($validator->fails()) {
+                return response()->json(['result' => 'bad request'], 400);
+            }
+
+            $validatedData = $validator->valid();
+            $url = $this->base_url."/UpdatePackage/" .$user->id
+                ."/".$validatedData['package_type']
+                ."/".$validatedData['cost']
+                ."/".$validatedData['time']
+                ."/".$validatedData['sensor'];
             return Curl::to($url)->get();
         }
         return response()->json(["result" => "forbidden"],403);

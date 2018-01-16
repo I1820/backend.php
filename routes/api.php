@@ -43,7 +43,9 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
     Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt']], function () {
         Route::get('/user/new', 'PaymentController@setNewUser');
         Route::post('/user/packages', 'PaymentController@getUserPackages');
+
         Route::get('/packages', 'PaymentController@getPackages');
+        Route::post('/package/update', 'PaymentController@updatePackage');
 //        Route::post('/', 'ThingController@create');
 //        Route::get('/{thing}', 'ThingController@get');
 //        Route::get('/{thing}/data', 'ThingController@data');
