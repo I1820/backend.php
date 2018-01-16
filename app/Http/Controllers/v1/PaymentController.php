@@ -12,13 +12,29 @@ namespace App\Http\Controllers\v1;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Ixudra\Curl\Facades\Curl;
+use Illuminate\Http\Response;
 
 class PaymentController extends Controller
 {
-    function google(){
-        $response = Curl::to('https://www.google.com/')
-            ->get();
-//        $response = 'hello';
-        return $response;
+    private $base_url = "https://www.google.com";
+
+    function setNewUser()
+    {
+        $user = Auth::user();
+        if ($user != null) {
+            $url = $this->base_url."/".$user->id;
+            return Curl::to($url)->get();
+        }
+        return response()->json(["result" => "unauthorized"],401);
+    }
+
+    function getPackages()
+    {
+        $user = Auth::user();
+        if ($user != null) {
+            $url = $this->base_url."/GetPackage/";
+            return Curl::to($url)->get();
+        }
+        return response()->json(["result" => "forbidden"],403);
     }
 }

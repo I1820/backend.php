@@ -40,12 +40,13 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::patch('/{thing}', 'ThingController@update');
     });
 
-    Route::group(['prefix' => 'payment'/*, 'middleware' => ['auth.jwt']*/], function () {
-        Route::get('/', 'PaymentController@google');
-        Route::post('/', 'ThingController@create');
-        Route::get('/{thing}', 'ThingController@get');
-        Route::get('/{thing}/data', 'ThingController@data');
-        Route::patch('/{thing}', 'ThingController@update');
+    Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt']], function () {
+        Route::get('/user/new', 'PaymentController@setNewUser');
+        Route::get('/packages', 'PaymentController@getPackages');
+//        Route::post('/', 'ThingController@create');
+//        Route::get('/{thing}', 'ThingController@get');
+//        Route::get('/{thing}/data', 'ThingController@data');
+//        Route::patch('/{thing}', 'ThingController@update');
     });
 });
 
