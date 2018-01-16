@@ -54,7 +54,8 @@ class PaymentController extends Controller
             }
 
             $validatedData = $validator->valid();
-            $url = $this->base_url."/GetUserPackages/" .$user->id
+            $url = $this->base_url."/GetUserPackages"
+                                    ."/".$user->id
                                     ."/".$validatedData['page']
                                     ."/".$validatedData['range'];
             return Curl::to($url)->get();
@@ -78,11 +79,90 @@ class PaymentController extends Controller
             }
 
             $validatedData = $validator->valid();
-            $url = $this->base_url."/UpdatePackage/" .$user->id
+            $url = $this->base_url."/UpdatePackage"
                 ."/".$validatedData['package_type']
                 ."/".$validatedData['cost']
                 ."/".$validatedData['time']
                 ."/".$validatedData['sensor'];
+            return Curl::to($url)->get();
+        }
+        return response()->json(["result" => "forbidden"],403);
+    }
+
+    function updatePackageStatus(Request $request){
+        $user = Auth::user();
+        if ($user != null) {
+            $validator = Validator::make($request->all(),
+                [
+                    'status' => 'required|string',
+                ]);
+            if($validator->fails()) {
+                return response()->json(['result' => 'bad request'], 400);
+            }
+
+            $validatedData = $validator->valid();
+            $url = $this->base_url."/UpdatePackageStatus"
+                ."/".$user->id
+                ."/".$validatedData['status'];
+            return Curl::to($url)->get();
+        }
+        return response()->json(["result" => "forbidden"],403);
+    }
+
+    function getLastPackageStatus(){
+        $user = Auth::user();
+        if ($user != null) {
+            $url = $this->base_url."/GetLastPackageStatus"
+                ."/".$user->id;
+            return Curl::to($url)->get();
+        }
+        return response()->json(["result" => "forbidden"],403);
+    }
+
+    function getUserPackagesByStatus(Request $request){
+        $user = Auth::user();
+        if ($user != null) {
+            $validator = Validator::make($request->all(),
+                [
+                    'status' => 'required|string',
+                ]);
+            if($validator->fails()) {
+                return response()->json(['result' => 'bad request'], 400);
+            }
+
+            $validatedData = $validator->valid();
+            $url = $this->base_url."/GetUserDataByStatus"
+                ."/".$user->id
+                ."/".$validatedData['status'];
+            return Curl::to($url)->get();
+        }
+        return response()->json(["result" => "forbidden"],403);
+    }
+
+    function getUserTransactions(){
+        $user = Auth::user();
+        if ($user != null) {
+            $url = $this->base_url."/GetUserTransacrion"
+                ."/".$user->id;
+            return Curl::to($url)->get();
+        }
+        return response()->json(["result" => "forbidden"],403);
+    }
+
+    function deletePackage(Request $request){
+        $user = Auth::user();
+        if ($user != null) {
+            $validator = Validator::make($request->all(),
+                [
+                    'package_type' => 'required|string',
+                ]);
+            if($validator->fails()) {
+                return response()->json(['result' => 'bad request'], 400);
+            }
+
+            $validatedData = $validator->valid();
+            $url = $this->base_url."/DeletePackage"
+                ."/".$validatedData['package_type'];
             return Curl::to($url)->get();
         }
         return response()->json(["result" => "forbidden"],403);
