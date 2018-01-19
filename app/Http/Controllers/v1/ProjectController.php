@@ -60,6 +60,15 @@ class ProjectController extends Controller
      * @param Project $project
      * @return array
      */
+    public function things(Project $project){
+        $things = $project->things()->get();
+        return Response::body(compact('things'));
+    }
+
+    /**
+     * @param Project $project
+     * @return array
+     */
     public function get(Project $project)
     {
         $user = Auth::user();

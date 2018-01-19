@@ -41,6 +41,11 @@ class Project extends Eloquent
         return $this->hasMany(Thing::class)->with('user');
     }
 
+    public function codecs()
+    {
+        return $this->hasMany(Codec::class)->with('user');
+    }
+
     public function getOwnerAttribute($value)
     {
         foreach ($this->roles as $role)

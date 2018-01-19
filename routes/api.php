@@ -30,7 +30,12 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::post('/', 'ProjectController@create');
         Route::patch('/{project}', 'ProjectController@update');
         Route::get('/{project}', 'ProjectController@get');
+        Route::get('/{project}/things', 'ProjectController@things');
         Route::get('/{project}/things/{thing}', 'ProjectController@addThing');
+
+        Route::post('/{project}/codec', 'CodecController@create');
+        Route::get('/{project}/codec', 'CodecController@get');
+        Route::patch('/{project}/codec', 'CodecController@update');
     });
     Route::group(['prefix' => 'thing', 'middleware' => ['auth.jwt']], function () {
         Route::get('/', 'ThingController@all');

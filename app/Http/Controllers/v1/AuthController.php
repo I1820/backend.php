@@ -52,9 +52,9 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->merge($request->json()->all());
-
-        if ($this->loginValidator($request)->fails()) {
-            throw new AuthException(AuthException::M_ER, AuthException::C_ER);
+        $validator = $this->loginValidator($request);
+        if ($validator->fails()) {
+            throw new AuthException($validator->errors()->first(), AuthException::C_ER);
         }
 
         $token = $this->userService->generateToken($request);
@@ -67,7 +67,6 @@ class AuthController extends Controller
 
     /**
      * @return array
-     * @throws AuthException
      */
     public function refresh()
     {
@@ -79,12 +78,17 @@ class AuthController extends Controller
         return Response::body(compact('token'));
     }
 
+    /*
+     * @return Validator
+     */
     public function loginValidator($request)
     {
-        $data = $request->only(['email', 'password']);
+        $captcha = env('CAPTCHA_ENABLE', 0);
+        $data = $request->only(['email', 'password', 'g-recaptcha-response']);
         return Validator::make($data, [
             'email' => 'required|string|email',
             'password' => 'required|string',
+            'g-recaptcha-response' => $captcha ? 'required|captcha' : ''
         ]);
     }
 
