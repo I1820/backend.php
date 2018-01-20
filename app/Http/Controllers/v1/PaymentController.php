@@ -168,4 +168,37 @@ class PaymentController extends Controller
         }
         return response()->json(["result" => "forbidden"],403);
     }
+
+    function paymentRequest(Request $request){
+        $user = Auth::user();
+        if ($user != null) {
+            $validator = Validator::make($request->all(),
+                [
+                    'payment_gate' => 'required|string',
+                    'merchant_id' => 'required|string',
+                    'amount' => 'required|string',
+                    'package_type' => 'required|string',
+                    'description' => 'required|string',
+                    'email' => 'required|string|email',
+                    'mobile' => 'required|string',
+                    'callback_url' => 'required|string',
+                ]);
+            if($validator->fails()) {
+                return response()->json(['result' => 'bad request'], 400);
+            }
+
+            $validatedData = $validator->valid();
+            $url = $this->base_url."/PaymentRequest"
+                ."/".$validatedData['payment_gate']
+                ."/".$validatedData['merchant_id']
+                ."/".$validatedData['amount']
+                ."/".$validatedData['package_type']
+                ."/".$validatedData['description']
+                ."/".$validatedData['email']
+                ."/".$validatedData['mobile']
+                ."/".$validatedData['callback_url'];
+            return Curl::to($url)->post();
+        }
+        return response()->json(["result" => "forbidden"],403);
+    }
 }
