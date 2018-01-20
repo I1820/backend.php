@@ -18,14 +18,15 @@ use Validator;
 
 class PaymentController extends Controller
 {
-    private $base_url = "https://www.google.com";
+    private $base_url = "172.25.224.78:8090/PaymentServices.svc/rest";
 
     function setNewUser()
     {
         $user = Auth::user();
         if ($user != null) {
-            $url = $this->base_url."/".$user->id;
-            return Curl::to($url)->get();
+            $url = $this->base_url."/SetNewUser"
+                ."/".$user->id;
+            return Curl::to($url)->post();
         }
         return response()->json(["result" => "unauthorized"],401);
     }
@@ -84,7 +85,7 @@ class PaymentController extends Controller
                 ."/".$validatedData['cost']
                 ."/".$validatedData['time']
                 ."/".$validatedData['sensor'];
-            return Curl::to($url)->get();
+            return Curl::to($url)->post();
         }
         return response()->json(["result" => "forbidden"],403);
     }
@@ -104,7 +105,7 @@ class PaymentController extends Controller
             $url = $this->base_url."/UpdatePackageStatus"
                 ."/".$user->id
                 ."/".$validatedData['status'];
-            return Curl::to($url)->get();
+            return Curl::to($url)->post();
         }
         return response()->json(["result" => "forbidden"],403);
     }
@@ -142,7 +143,7 @@ class PaymentController extends Controller
     function getUserTransactions(){
         $user = Auth::user();
         if ($user != null) {
-            $url = $this->base_url."/GetUserTransacrion"
+            $url = $this->base_url."/GetUserTransaction"
                 ."/".$user->id;
             return Curl::to($url)->get();
         }
@@ -163,7 +164,7 @@ class PaymentController extends Controller
             $validatedData = $validator->valid();
             $url = $this->base_url."/DeletePackage"
                 ."/".$validatedData['package_type'];
-            return Curl::to($url)->get();
+            return Curl::to($url)->post();
         }
         return response()->json(["result" => "forbidden"],403);
     }
