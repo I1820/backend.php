@@ -18,7 +18,7 @@ use Validator;
 
 class PaymentController extends Controller
 {
-    private $base_url = "172.25.224.78:8090/PaymentServices.svc/rest";
+    private $base_url = "172.25.224.90:8090/PaymentServices.svc/rest";
 
     function setNewUser()
     {
@@ -85,6 +85,7 @@ class PaymentController extends Controller
                 ."/".$validatedData['cost']
                 ."/".$validatedData['time']
                 ."/".$validatedData['sensor'];
+
             return Curl::to($url)->post();
         }
         return response()->json(["result" => "forbidden"],403);
@@ -142,6 +143,7 @@ class PaymentController extends Controller
 
     function getUserTransactions(){
         $user = Auth::user();
+        return $user;
         if ($user != null) {
             $url = $this->base_url."/GetUserTransaction"
                 ."/".$user->id;
