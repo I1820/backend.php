@@ -58,7 +58,9 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::post('/user/packages', 'PaymentController@getUserPackages');
         Route::post('/user/package/status', 'PaymentController@updatePackageStatus');
         Route::get('/user/package/status', 'PaymentController@getLastPackageStatus');
+        Route::post('/user/package/buy', 'PaymentController@paymentRequest');
         Route::post('/user/packages/status', 'PaymentController@getUserPackagesByStatus');
+
         Route::get('/user/transactions', 'PaymentController@getUserTransactions');
 
         Route::get('/packages', 'PaymentController@getPackages');

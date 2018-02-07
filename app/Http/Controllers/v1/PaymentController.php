@@ -18,14 +18,15 @@ use Validator;
 
 class PaymentController extends Controller
 {
-    private $base_url = "https://www.google.com";
+    private $base_url = "172.25.224.90:8090/PaymentServices.svc/rest";
 
     function setNewUser()
     {
         $user = Auth::user();
         if ($user != null) {
-            $url = $this->base_url."/".$user->id;
-            return Curl::to($url)->get();
+            $url = $this->base_url."/SetNewUser"
+                ."/".$user->id;
+            return Curl::to($url)->post();
         }
         return response()->json(["result" => "unauthorized"],401);
     }
@@ -84,7 +85,8 @@ class PaymentController extends Controller
                 ."/".$validatedData['cost']
                 ."/".$validatedData['time']
                 ."/".$validatedData['sensor'];
-            return Curl::to($url)->get();
+
+            return Curl::to($url)->post();
         }
         return response()->json(["result" => "forbidden"],403);
     }
@@ -104,7 +106,7 @@ class PaymentController extends Controller
             $url = $this->base_url."/UpdatePackageStatus"
                 ."/".$user->id
                 ."/".$validatedData['status'];
-            return Curl::to($url)->get();
+            return Curl::to($url)->post();
         }
         return response()->json(["result" => "forbidden"],403);
     }
@@ -141,8 +143,9 @@ class PaymentController extends Controller
 
     function getUserTransactions(){
         $user = Auth::user();
+        return $user;
         if ($user != null) {
-            $url = $this->base_url."/GetUserTransacrion"
+            $url = $this->base_url."/GetUserTransaction"
                 ."/".$user->id;
             return Curl::to($url)->get();
         }
@@ -163,7 +166,40 @@ class PaymentController extends Controller
             $validatedData = $validator->valid();
             $url = $this->base_url."/DeletePackage"
                 ."/".$validatedData['package_type'];
-            return Curl::to($url)->get();
+            return Curl::to($url)->post();
+        }
+        return response()->json(["result" => "forbidden"],403);
+    }
+
+    function paymentRequest(Request $request){
+        $user = Auth::user();
+        if ($user != null) {
+            $validator = Validator::make($request->all(),
+                [
+                    'payment_gate' => 'required|string',
+                    'merchant_id' => 'required|string',
+                    'amount' => 'required|string',
+                    'package_type' => 'required|string',
+                    'description' => 'required|string',
+                    'email' => 'required|string|email',
+                    'mobile' => 'required|string',
+                    'callback_url' => 'required|string',
+                ]);
+            if($validator->fails()) {
+                return response()->json(['result' => 'bad request'], 400);
+            }
+
+            $validatedData = $validator->valid();
+            $url = $this->base_url."/PaymentRequest"
+                ."/".$validatedData['payment_gate']
+                ."/".$validatedData['merchant_id']
+                ."/".$validatedData['amount']
+                ."/".$validatedData['package_type']
+                ."/".$validatedData['description']
+                ."/".$validatedData['email']
+                ."/".$validatedData['mobile']
+                ."/".$validatedData['callback_url'];
+            return Curl::to($url)->post();
         }
         return response()->json(["result" => "forbidden"],403);
     }
