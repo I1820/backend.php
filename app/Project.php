@@ -18,7 +18,7 @@ class Project extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'description', 'active'
+        'name', 'description', 'active', 'container'
     ];
     protected $appends = ['owner'];
 
@@ -28,12 +28,14 @@ class Project extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'updated_at', 'created_at', 'user_id', 'roles'
+        'updated_at', 'created_at', 'user_id', 'permissions'
     ];
 
-    public function roles()
+    public function permissions()
     {
-        return $this->hasMany(Role::class)->with('user');
+        return $this->hasMany(Permission::class, 'item_id')
+            ->where('item_type', 'project')
+            ->with('user');
     }
 
     public function things()
@@ -48,9 +50,9 @@ class Project extends Eloquent
 
     public function getOwnerAttribute($value)
     {
-        foreach ($this->roles as $role)
-            if (isset($role['permissions']['owner']))
-                return $role['user'];
+        foreach ($this->permissions as $permissions)
+            if ($permissions['name'] == 'PROJECT-OWNER')
+                return $permissions['user'];
         return null;
     }
 

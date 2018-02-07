@@ -6,15 +6,16 @@ use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Model;
 
 
-class Role extends Eloquent
+class Permission extends Eloquent
 {
+    protected $collection = 'users_permissions';
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'permissions'
+        'name', 'item_type', 'permission_id'
     ];
 
     /**
@@ -23,13 +24,8 @@ class Role extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'updated_at', 'created_at', 'user_id', '_id', 'project_id'
+        'updated_at', 'created_at', 'user_id', '_id', 'item_id'
     ];
-
-    public function project()
-    {
-        return $this->belongsTo(Project::class);
-    }
 
     public function user()
     {

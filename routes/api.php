@@ -13,11 +13,18 @@ use Illuminate\Http\Request;
 |
 */
 
+Route::get('/itest', 'TestController@index');
 Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) {
     Route::post('/register', 'AuthController@register');
     Route::post('/login', 'AuthController@login');
     Route::post('/logout', 'AuthController@logout');
     Route::put('/refresh', 'AuthController@refresh');
+
+
+    Route::group(['prefix' => 'authorization', 'middleware' => ['auth.jwt']], function () {
+        Route::get('/permissions', 'PermissionController@permissionsList');
+        Route::get('/roles', 'PermissionController@rolesList');
+    });
 
     Route::group(['prefix' => 'user', 'middleware' => ['auth.jwt']], function () {
         Route::patch('/update', 'UserController@update');
@@ -29,6 +36,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::get('/', 'ProjectController@all');
         Route::post('/', 'ProjectController@create');
         Route::patch('/{project}', 'ProjectController@update');
+        Route::get('/{project}/stop', 'ProjectController@stop');
         Route::get('/{project}', 'ProjectController@get');
         Route::get('/{project}/things', 'ProjectController@things');
         Route::get('/{project}/things/{thing}', 'ProjectController@addThing');

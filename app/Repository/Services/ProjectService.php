@@ -18,6 +18,13 @@ use Illuminate\Support\Facades\Validator;
 
 class ProjectService
 {
+    protected $coreService;
+
+
+    public function __construct(CoreService $coreService)
+    {
+        $this->coreService = $coreService;
+    }
 
     /**
      * @param Request $request
@@ -43,13 +50,16 @@ class ProjectService
     /**
      * @param Request $request
      * @return $this|\Illuminate\Database\Eloquent\Model
+     * @throws \App\Exceptions\GeneralException
      */
     public function insertProject(Request $request)
     {
+        $container = $this->coreService->postProject(collect($request->only('name')));
         return Project::create([
             'name' => $request->get('name'),
             'description' => $request->get('description'),
-            'active' => true
+            'active' => true,
+            'container' => $container
         ]);
     }
 
@@ -62,11 +72,12 @@ class ProjectService
     {
         $messages = [
             'name.filled' => 'لطفا نام پروژه را وارد کنید',
+            'name.unique' => 'این پرژوه قبلا وجود دارد',
             'description.filled' => 'لطفا توضیحات را درست وارد کنید',
         ];
 
         $validator = Validator::make($request->all(), [
-            'name' => 'filled|string|max:255',
+            'name' => 'filled|string|unique:projects|max:255',
             'description' => 'filled|string',
         ], $messages);
 
@@ -94,5 +105,6 @@ class ProjectService
     public function addThing(Project $project, Thing $thing)
     {
         $project->things()->save($thing);
+        $this->coreService->postThing($project, $thing);
     }
 }

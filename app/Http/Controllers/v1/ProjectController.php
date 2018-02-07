@@ -5,8 +5,10 @@ namespace App\Http\Controllers\v1;
 use App\Exceptions\ProjectException;
 use App\Project;
 use App\Repository\Helper\Response;
+use App\Repository\Services\CoreService;
+use App\Repository\Services\PermissionService;
 use App\Repository\Services\ProjectService;
-use App\Role;
+use App\Permission;
 use App\Thing;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -15,14 +17,34 @@ use Illuminate\Support\Facades\Auth;
 class ProjectController extends Controller
 {
     protected $projectService;
+    protected $permissionService;
+    protected $coreService;
 
     /**
      * ProjectController constructor.
      * @param ProjectService $projectService
+     * @param PermissionService $permissionService
+     * @param CoreService $coreService
      */
-    public function __construct(ProjectService $projectService)
+    public function __construct(ProjectService $projectService,
+                                PermissionService $permissionService,
+                                CoreService $coreService)
     {
         $this->projectService = $projectService;
+        $this->permissionService = $permissionService;
+        $this->coreService = $coreService;
+    }
+
+
+    /**
+     * @param Project $project
+     * @return array
+     * @throws \App\Exceptions\GeneralException
+     */
+    public function stop(Project $project)
+    {
+        $response = $this->coreService->deleteProject($project->container->name);
+        return Response::body(compact('response'));
     }
 
 
@@ -30,6 +52,7 @@ class ProjectController extends Controller
      * @param Request $request
      * @return array
      * @throws ProjectException
+     * @throws \App\Exceptions\GeneralException
      */
     public function create(Request $request)
     {
@@ -37,9 +60,14 @@ class ProjectController extends Controller
         $this->projectService->validateCreateProject($request);
 
         $project = $this->projectService->insertProject($request);
-        $role = Role::create(['permissions' => ['owner' => '']]);
-        $project->roles()->save($role);
-        $user->roles()->save($role);
+        $owner_permission = $this->permissionService->get('PROJECT-OWNER');
+        $permission = Permission::create([
+            'name' => $owner_permission['name'],
+            'permission_id' => (string)$owner_permission['_id'],
+            'item_type' => 'project',
+        ]);
+        $project->permissions()->save($permission);
+        $user->permissions()->save($permission);
 
         return Response::body(compact('project'));
     }
@@ -49,7 +77,7 @@ class ProjectController extends Controller
      */
     public function all()
     {
-        $projects = collect(Auth::user()->roles()->with(['project.roles'])->get());
+        $projects = collect(Auth::user()->permissions()->with(['project.permissions'])->get());
         $projects = $projects->map(function ($item) {
             return $item['project'];
         });
@@ -60,7 +88,8 @@ class ProjectController extends Controller
      * @param Project $project
      * @return array
      */
-    public function things(Project $project){
+    public function things(Project $project)
+    {
         $things = $project->things()->get();
         return Response::body(compact('things'));
     }

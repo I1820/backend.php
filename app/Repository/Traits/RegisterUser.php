@@ -104,6 +104,7 @@ trait RegisterUser
     private function insertRealUser(Request $request)
     {
         return User::create([
+            'legal' => false,
             'active' => true,
             'name' => $request->get('name'),
             'email' => $request->get('email'),

@@ -17,6 +17,14 @@ use Illuminate\Support\Facades\Validator;
 
 class ThingService
 {
+    protected $loraService;
+    protected $coreService;
+
+    public function __construct(LoraService $loraService, CoreService $coreService)
+    {
+        $this->loraService = $loraService;
+        $this->coreService = $coreService;
+    }
 
     /**
      * @param Request $request
@@ -27,8 +35,7 @@ class ThingService
     {
         $messages = [
             'name.required' => 'لطفا نام شی را وارد کنید',
-            'mac_address.unique' => 'این شی قبلا اضافه شده',
-            'mac_address.required' => 'ادرس فیزیکی شی را وارد کنید',
+            'type.required' => 'نوع اینترفیس شی را وارد کنید',
             'lat.numeric' => 'لطفا محل سنسور را درست وارد کنید',
             'lat.required' => 'لطفا محل سنسور را درست کنید',
             'long.numeric' => 'لطفا محل سنسور را درست وارد کنید',
@@ -39,7 +46,7 @@ class ThingService
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'mac_address' => 'required|unique:things',
+            'type' => 'required|',
             'description' => 'string',
             'lat' => 'required|numeric',
             'long' => 'required|numeric',
@@ -53,18 +60,22 @@ class ThingService
     /**
      * @param Request $request
      * @return $this|\Illuminate\Database\Eloquent\Model
+     * @throws \App\Exceptions\LoraException
      */
     public function insertThing(Request $request)
     {
+        $device_profile_id = $this->loraService->postDeviceProfile(collect($request->all()))->deviceProfileID;
+
+        $device = $this->loraService->postDevice(collect($request->all())->merge(['deviceProfileID' => $device_profile_id]));
         return Thing::create([
             'name' => $request->get('name'),
             'description' => $request->get('description'),
-            'mac_address' => $request->get('mac_address'),
+            'interface' => $device->toArray(),
             'period' => $request->get('period'),
             'loc' => [
-                'lat' => $request->get('lat'),
-                'long' => $request->get('long'),
-            ]
+                'type' => 'Point',
+                'coordinates' => [$request->get('lat'), $request->get('long')]
+            ],
         ]);
     }
 
@@ -121,4 +132,5 @@ class ThingService
 
         return $thing;
     }
+
 }
