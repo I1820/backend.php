@@ -41,7 +41,7 @@ class CoreService
         $response = $this->send($url, $data, 'post');
         if ($response->status == 200)
             return $response->content;
-        throw new GeneralException($response->content ?: '', $response->status);
+        throw new GeneralException($response->content->error ?: '', $response->status);
     }
 
     /**
@@ -55,7 +55,7 @@ class CoreService
         $response = $this->send($url, [], 'delete');
         if ($response->status == 200)
             return $response->content;
-        throw new GeneralException($response->content ?: '', $response->status);
+        throw new GeneralException($response->content->error ?: '', $response->status);
     }
 
 
@@ -74,7 +74,7 @@ class CoreService
         $response = $this->send($url, $data, 'post');
         if ($response->status == 200)
             return $response->content;
-        throw new GeneralException($response->content ?: '', $response->status);
+        throw new GeneralException($response->content->error ?: '', $response->status);
         return $response;
     }
 
