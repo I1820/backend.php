@@ -28,16 +28,16 @@ class CoreService
     }
 
     /**
-     * @param Collection $data
-     * @throws GeneralException
+     * @param $id
      * @return string
+     * @throws GeneralException
      */
-    public function postProject(Collection $data)
+    public function postProject($id)
     {
         $url = $this->base_url . '/api/project';
-        $data = $data->only([
-            'name',
-        ]);
+        $data = [
+            'name' => (string)$id,
+        ];
         $response = $this->send($url, $data, 'post');
         if ($response->status == 200)
             return $response->content;
@@ -45,13 +45,13 @@ class CoreService
     }
 
     /**
-     * @param $project_name
+     * @param $project_id
      * @return string
      * @throws GeneralException
      */
-    public function deleteProject($project_name)
+    public function deleteProject($project_id)
     {
-        $url = $this->base_url . '/api/project/' . $project_name;
+        $url = $this->base_url . '/api/project/' . $project_id;
         $response = $this->send($url, [], 'delete');
         if ($response->status == 200)
             return $response->content;

@@ -15,6 +15,7 @@ use App\Thing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use MongoDB\BSON\ObjectId;
 
 class ProjectService
 {
@@ -54,13 +55,16 @@ class ProjectService
      */
     public function insertProject(Request $request)
     {
-        $container = $this->coreService->postProject(collect($request->only('name')));
-        return Project::create([
+        $id = new ObjectId();
+        $container = $this->coreService->postProject($id);
+        $project = Project::create([
+            '_id' => $id,
             'name' => $request->get('name'),
             'description' => $request->get('description'),
             'active' => true,
             'container' => $container
         ]);
+        return $project;
     }
 
     /**
