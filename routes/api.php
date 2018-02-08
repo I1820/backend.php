@@ -41,9 +41,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::get('/{project}/things', 'ProjectController@things');
         Route::get('/{project}/things/{thing}', 'ProjectController@addThing');
 
-        Route::post('/{project}/codec', 'CodecController@create');
-        Route::get('/{project}/codec', 'CodecController@get');
-        Route::patch('/{project}/codec', 'CodecController@update');
+
     });
     Route::group(['prefix' => 'thing', 'middleware' => ['auth.jwt']], function () {
         Route::get('/', 'ThingController@all');
@@ -51,6 +49,10 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::get('/{thing}', 'ThingController@get');
         Route::get('/{thing}/data', 'ThingController@data');
         Route::patch('/{thing}', 'ThingController@update');
+
+        Route::post('/{thing}/codec', 'CodecController@create');
+        Route::get('/{thing}/codec', 'CodecController@get');
+        Route::patch('/{thing}/codec', 'CodecController@update');
     });
 
     Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt']], function () {

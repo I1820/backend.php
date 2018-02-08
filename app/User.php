@@ -49,4 +49,9 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
     {
         return $this->hasMany(Permission::class, 'user_id');
     }
+
+    public function codecs()
+    {
+        return $this->hasMany(Codec::class, 'user_id');
+    }
 }

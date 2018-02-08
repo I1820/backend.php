@@ -21,7 +21,7 @@ class Thing extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'loc', 'description', 'period','interface'
+        'name', 'loc', 'description', 'period', 'interface'
     ];
 
     /**
@@ -44,8 +44,9 @@ class Thing extends Eloquent
         return $this->belongsTo(Project::class);
     }
 
-    public function data(){
-        return $this->hasMany(ThingData::class,'thingid','mac_address');
+    public function data()
+    {
+        return $this->hasMany(ThingData::class, 'thingid', 'mac_address');
     }
 
     public function permissions()
@@ -53,5 +54,10 @@ class Thing extends Eloquent
         return $this->hasMany(Permission::class, 'item_id')
             ->where('item_type', 'thing')
             ->with('user');
+    }
+
+    public function codec()
+    {
+        return $this->hasOne(Codec::class);
     }
 }

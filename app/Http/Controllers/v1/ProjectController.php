@@ -133,15 +133,16 @@ class ProjectController extends Controller
      * @param Project $project
      * @param Thing $thing
      * @return array
+     * @throws \App\Exceptions\GeneralException
      */
     public function addThing(Project $project, Thing $thing)
     {
         $user = Auth::user();
         if ($project['owner']['id'] != $user->id || $thing['user_id'] != $user->id)
             abort(404);
-
-        $this->projectService->addThing($project, $thing);
-
+        $codec = $thing->codec()->first();
+        $project->things()->save($thing);
+        $this->projectService->addThing($project, $thing, $codec);
         return Response::body(compact('project'));
     }
 

@@ -9,6 +9,7 @@
 namespace App\Repository\Services;
 
 
+use App\Codec;
 use App\Exceptions\ProjectException;
 use App\Project;
 use App\Thing;
@@ -106,9 +107,16 @@ class ProjectService
     }
 
 
-    public function addThing(Project $project, Thing $thing)
+    /**
+     * @param Project $project
+     * @param Thing $thing
+     * @param Codec $codec
+     * @throws \App\Exceptions\GeneralException
+     */
+    public function addThing(Project $project, Thing $thing, Codec $codec)
     {
-        $project->things()->save($thing);
         $this->coreService->postThing($project, $thing);
+        $this->coreService->sendCodec($project, $thing, $codec->code);
+        $project->things()->save($thing);
     }
 }

@@ -8,7 +8,8 @@ return [
         'networkServerID' => '1',
     ],
     'core' => [
-        'serverBaseUrl' => env('CORE_BASE_URL','172.23.132.50:8080'),
+        'serverBaseUrl' => env('CORE_BASE_URL','172.23.132.50'),
+        'port' => '8080'
     ],
 
 ];

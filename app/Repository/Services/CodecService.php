@@ -12,6 +12,7 @@ namespace App\Repository\Services;
 use App\Codec;
 use App\Exceptions\CodecException;
 use App\Project;
+use App\Thing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -22,27 +23,20 @@ class CodecService
 
     /**
      * @param Request $request
-     * @param Project $project
      * @return void
      * @throws CodecException
      */
-    public function validateCreateCodec(Request $request, Project $project)
+    public function validateCreateCodec(Request $request)
     {
         $messages = [
             'name.required' => 'لطفا نام کدک را وارد کنید',
             'name.required' => 'لطفا نام کدک را وارد کنید',
-            'name.unique' => 'نام قبلا وجود دارد',
 
         ];
 
         $validator = Validator::make($request->all(), [
             'code' => 'required',
-            'name' => [
-                'required', 'string', 'max:255',
-                Rule::unique('codecs')->where(function ($query) use ($project) {
-                    return $query->where('project_id', $project->id);
-                })
-            ]
+            'name' => 'required', 'string', 'max:255'
         ], $messages);
 
         if ($validator->fails())
@@ -51,17 +45,21 @@ class CodecService
 
     /**
      * @param Request $request
-     * @param Project $project
-     * @return $this|\Illuminate\Database\Eloquent\Model
+     * @param Thing $thing
+     * @return void
      */
-    public function insertCodec(Request $request, Project $project)
+    public function insertCodec(Request $request, Thing $thing)
     {
-        return Codec::create([
+        $user = Auth::user();
+        $codec = Codec::create([
             'name' => $request->get('name'),
-            'code' => $request->get('code'),
-            'project_id' => $project->id,
-            'user_id' => Auth::user()->id,
+            'code' => $request->get('code')
         ]);
+        $thing->codec()->save($codec);
+        $user->codecs()->save($codec);
+        $codec->thing()->associate($thing);
+        $codec->user()->associate($user);
+        return $codec;
     }
 
     /**
@@ -87,14 +85,14 @@ class CodecService
 
     /**
      * @param Request $request
-     * @param Project $project
+     * @param Thing $thing
      * @return $this|\Illuminate\Database\Eloquent\Model
      * @throws CodecException
      */
-    public function updateCodec(Request $request, Project $project)
+    public function updateCodec(Request $request, Thing $thing)
     {
         $data = $request->only(['name', 'code']);
-        $codec = $project->codecs()->where('name', $data['name'])->first();
+        $codec = $thing->codec()->first();
         if (!$codec)
             throw new CodecException('Codec Not Found', CodecException::C_GE);
         $codec->code = $data['code'];

@@ -25,9 +25,9 @@ class Codec extends Eloquent
         'updated_at', 'created_at', 'project_id', 'user_id'
     ];
 
-    public function project()
+    public function thing()
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(Thing::class);
     }
 
     public function user()
