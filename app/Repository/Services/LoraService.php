@@ -40,6 +40,8 @@ class LoraService
      */
     public function postDevice(Collection $data)
     {
+        if (env('TEST_MODE'))
+            return collect(['deviceProfileID' => 'test']);
         $this->authenticate();
         $url = $this->base_url . '/api/devices';
         $data = $data->only([
@@ -64,7 +66,8 @@ class LoraService
      */
     public function postDeviceProfile(Collection $data)
     {
-
+        if (env('TEST_MODE'))
+            return (object)['deviceProfileID' => 'test'];
         $url = $this->base_url . '/api/device-profiles';
         $response = $this->send($url, $this->prepareDeviceProfileData($data), 'post');
         if ($response->status == 200)
@@ -78,6 +81,8 @@ class LoraService
      */
     public function deleteDevice(string $devEUI)
     {
+        if (env('TEST_MODE'))
+            return;
         $url = $this->base_url . '/api/devices/' . $devEUI;
         $this->send($url, [], 'delete');
         return;

@@ -34,6 +34,8 @@ class CoreService
      */
     public function postProject($id)
     {
+        if (env('TEST_MODE'))
+            return (object)['test' => 'testValue'];
         $url = $this->base_url . '/api/project';
         $data = [
             'name' => (string)$id,
@@ -51,6 +53,8 @@ class CoreService
      */
     public function deleteProject($project_id)
     {
+        if (env('TEST_MODE'))
+            return (object)['test' => 'testValue'];
         $url = $this->base_url . '/api/project/' . $project_id;
         $response = $this->send($url, [], 'delete');
         if ($response->status == 200)
@@ -67,6 +71,8 @@ class CoreService
      */
     public function postThing(Project $project, Thing $thing)
     {
+        if (env('TEST_MODE'))
+            return (object)['test' => 'testValue'];
         $url = $this->base_url . '/api/project/' . $project['container']['name'] . '/things/';
         $data = [
             'name' => $thing['interface']['devEUI'],

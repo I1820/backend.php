@@ -31,4 +31,14 @@ class Permission extends Eloquent
     {
         return $this->belongsTo(User::class);
     }
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class,'item_id');
+    }
+
+    public function thing()
+    {
+        return $this->belongsTo(Thing::class,'item_id');
+    }
 }

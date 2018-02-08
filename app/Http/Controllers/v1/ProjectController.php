@@ -77,7 +77,7 @@ class ProjectController extends Controller
      */
     public function all()
     {
-        $projects = collect(Auth::user()->projects()->with(['permissions'])->get());
+        $projects = collect(Auth::user()->projects()->get());
         $projects = $projects->map(function ($item) {
             return $item['project'];
         });

@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('/itest', 'TestController@index');
+Route::get('/itest', 'TestController@index')->middleware('auth.jwt');
 Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) {
     Route::post('/register', 'AuthController@register');
     Route::post('/login', 'AuthController@login');
