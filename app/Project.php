@@ -38,10 +38,6 @@ class Project extends Eloquent
             ->with('user');
     }
 
-    public function things()
-    {
-        return $this->hasMany(Thing::class)->with('user');
-    }
 
     public function codecs()
     {

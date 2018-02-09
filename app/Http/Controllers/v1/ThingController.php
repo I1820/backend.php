@@ -65,7 +65,7 @@ class ThingController extends Controller
      */
     public function all()
     {
-        $things = Auth::user()->things()->with('project')->get();
+        $things = Auth::user()->things()->get();
         $things = $things->map(function ($item) {
             return $item['thing'];
         });

@@ -142,6 +142,7 @@ class ProjectController extends Controller
             abort(404);
         $codec = $thing->codec()->first();
         $thing->project()->associate($project);
+        $thing->save();
         $this->projectService->addThing($project, $thing, $codec);
         return Response::body(compact('project'));
     }
