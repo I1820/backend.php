@@ -62,40 +62,20 @@ class CodecService
         return $codec;
     }
 
-    /**
-     * @param Request $request
-     * @return void
-     * @throws CodecException
-     */
-    public function validateUpdateCodec(Request $request)
-    {
-        $messages = [
-            'name.required' => 'لطفا نام کدک را وارد کنید',
-            'code.required' => 'لطفا کدک را وارد کنید',
-        ];
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'code' => 'required',
-        ], $messages);
-
-        if ($validator->fails())
-            throw new  CodecException($validator->errors()->first(), CodecException::C_GE);
-    }
 
     /**
      * @param Request $request
      * @param Thing $thing
      * @return $this|\Illuminate\Database\Eloquent\Model
-     * @throws CodecException
      */
     public function updateCodec(Request $request, Thing $thing)
     {
         $data = $request->only(['name', 'code']);
         $codec = $thing->codec()->first();
         if (!$codec)
-            throw new CodecException('Codec Not Found', CodecException::C_GE);
+            return $this->insertCodec($request, $thing);
         $codec->code = $data['code'];
+        $codec->name = $data['name'];
         $codec->save();
         return $codec;
     }

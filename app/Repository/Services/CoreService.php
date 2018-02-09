@@ -100,6 +100,7 @@ class CoreService
             return (object)['test' => 'testValue'];
         $url = '/api/codec/' . $thing['interface']['devEUI'];
         $response = $this->send($url, $codec, 'post', $project['container']['runner']['port'], 0);
+        dd($response);
         if ($response->status == 200)
             return $response->content;
         throw new GeneralException($response->content->error ?: '', $response->status);
@@ -130,6 +131,9 @@ class CoreService
             default:
                 $new_response = $response->get();
                 break;
+        }
+        if ($new_response->status == 0) {
+            throw new GeneralException($new_response->error, 0);
         }
         return $new_response;
     }

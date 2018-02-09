@@ -36,12 +36,14 @@ class CodecController extends Controller
         $user = Auth::user();
         if ($thing->user()->first()['id'] != $user->id)
             abort(404);
-        if ($thing->codec()->first())
-            return $this->update($thing, $request);
         $this->codecService->validateCreateCodec($request, $thing);
+        if ($thing->codec()->first())
+            $codec = $this->codecService->updateCodec($request, $thing);
+        else
+            $codec = $this->codecService->insertCodec($request, $thing);
 
-        $codec = $this->codecService->insertCodec($request, $thing);
-
+        if($thing->project()->first())
+            $this->coreService->sendCodec($thing->project()->first(), $thing, $codec->code);
         return Response::body(compact('codec'));
     }
 
@@ -59,27 +61,5 @@ class CodecController extends Controller
 
         return Response::body(compact('codecs'));
     }
-
-
-    /**
-     * @param Request $request
-     * @param Thing $thing
-     * @return array
-     * @throws CodecException
-     * @throws \App\Exceptions\GeneralException
-     */
-    public function update(Thing $thing, Request $request)
-    {
-        $user = Auth::user();
-        if ($thing->user()->first()['id'] != $user->id)
-            abort(404);
-        $this->codecService->validateUpdateCodec($request);
-
-        $codec = $this->codecService->updateCodec($request, $thing);
-        $this->coreService->sendCodec($thing->project()->first(), $thing, $codec->code);
-
-        return Response::body(compact('codec'));
-    }
-
 
 }
