@@ -30,7 +30,7 @@ class CodecService
     {
         $messages = [
             'name.required' => 'لطفا نام کدک را وارد کنید',
-            'name.required' => 'لطفا نام کدک را وارد کنید',
+            'code.required' => 'لطفا کدک را وارد کنید',
 
         ];
 

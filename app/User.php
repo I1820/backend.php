@@ -36,12 +36,17 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
 
     public function projects()
     {
-        return $this->permissions()->where('item_type', 'project')->with('project','project.things');
+        return $this->permissions()->where('item_type', 'project')->with('project', 'project.things');
+    }
+
+    public function scenarios()
+    {
+        return $this->hasMany(Scenario::class);
     }
 
     public function things()
     {
-        return $this->permissions()->where('item_type', 'thing')->with(['thing','thing.project']);
+        return $this->permissions()->where('item_type', 'thing')->with(['thing', 'thing.project']);
     }
 
 

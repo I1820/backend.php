@@ -12,7 +12,7 @@ class Codec extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'code','user_id', 'project_id'
+        'name', 'code','user_id', 'thing_id'
     ];
     protected $appends = [];
 
@@ -22,7 +22,7 @@ class Codec extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'updated_at', 'created_at', 'project_id', 'user_id'
+        'updated_at', 'created_at', 'thing_id', 'user_id'
     ];
 
     public function thing()

@@ -12,6 +12,7 @@ namespace App\Repository\Services;
 use App\Exceptions\GeneralException;
 use App\Exceptions\LoraException;
 use App\Project;
+use App\Scenario;
 use App\Thing;
 use Illuminate\Support\Collection;
 use Ixudra\Curl\CurlService;
@@ -128,6 +129,26 @@ class CoreService
         throw new GeneralException($response->content->error ?: '', $response->status);
         return $response;
     }
+
+
+    /**
+     * @param Project $project
+     * @param Scenario $scenario
+     * @return string
+     * @throws GeneralException
+     */
+    public function sendScenario(Project $project, Scenario $scenario)
+    {
+        if (env('TEST_MODE'))
+            return (object)['test' => 'testValue'];
+        $url = '/api/scenario/' . $project['container']['name'];
+        $response = $this->send($url, $scenario->code, 'post', $project['container']['runner']['port'], 0);
+        if ($response->status == 200)
+            return $response->content;
+        throw new GeneralException($response->content->error ?: '', $response->status);
+        return $response;
+    }
+
 
     private function send($url, $data, $method = 'get', $port = '', $json_request = 1)
     {

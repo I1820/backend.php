@@ -42,6 +42,9 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::get('/{project}/things/{thing}', 'ProjectController@addThing');
 
 
+        Route::post('/{project}/scenario', 'ScenarioController@create');
+        Route::get('/{project}/scenario', 'ScenarioController@list');
+        Route::get('/{project}/scenario/{scenario}', 'ScenarioController@get');
     });
     Route::group(['prefix' => 'thing', 'middleware' => ['auth.jwt']], function () {
         Route::get('/', 'ThingController@all');

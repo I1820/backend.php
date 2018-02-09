@@ -44,6 +44,16 @@ class Project extends Eloquent
         return $this->hasMany(Thing::class)->with('user');
     }
 
+    public function scenarios()
+    {
+        return $this->hasMany(Scenario::class);
+    }
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
 
     public function getOwnerAttribute($value)
@@ -52,6 +62,20 @@ class Project extends Eloquent
             if ($permissions['name'] == 'PROJECT-OWNER')
                 return $permissions['user'];
         return null;
+    }
+
+    public function activeScenario(Scenario $scenario)
+    {
+        $other_scenarios = $scenario->project()->first()->scenarios()->get();
+        foreach ($other_scenarios as $s) {
+            if ($s['is_active'] == true) {
+                $s['is_active'];
+                $s['is_active'] = false;
+                $s->save();
+            }
+        }
+        $scenario['is_active'] = true;
+        $scenario->save();
     }
 
 }
