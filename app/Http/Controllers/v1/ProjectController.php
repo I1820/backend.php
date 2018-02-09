@@ -103,7 +103,13 @@ class ProjectController extends Controller
         $user = Auth::user();
         if ($project['owner']['id'] != $user->id)
             abort(404);
-        $project->load('things');
+        $project->load(['things', 'scenarios']);
+        foreach ($project['scenarios'] as $scenario)
+            if ($scenario['is_active'] == true) {
+                $project['scenario'] = $scenario;
+                unset($project['scenarios']);
+                break;
+            }
 
         return Response::body(compact('project'));
     }

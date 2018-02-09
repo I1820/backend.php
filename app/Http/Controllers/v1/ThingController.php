@@ -81,7 +81,7 @@ class ThingController extends Controller
         $user = Auth::user();
         if ($thing['user_id'] != $user->id)
             abort(404);
-        $thing->load(['user', 'project']);
+        $thing->load(['user', 'project','codec']);
 
         return Response::body(compact('thing'));
     }
