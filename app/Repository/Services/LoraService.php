@@ -76,8 +76,9 @@ class LoraService
     }
 
     /**
-     * @param $devEUI
+     * @param string $devEUI
      * @return string
+     * @throws LoraException
      */
     public function deleteDevice(string $devEUI)
     {
@@ -166,6 +167,9 @@ class LoraService
                     $new_response = $response->get();
                     break;
             }
+        }
+        if ($new_response->status == 0) {
+            throw new LoraException($new_response->error, 0);
         }
         return $new_response;
     }

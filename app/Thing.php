@@ -44,11 +44,6 @@ class Thing extends Eloquent
         return $this->belongsTo(Project::class);
     }
 
-    public function data()
-    {
-        return $this->hasMany(ThingData::class, 'thingid', 'mac_address');
-    }
-
     public function permissions()
     {
         return $this->hasMany(Permission::class, 'item_id')

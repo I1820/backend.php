@@ -9,7 +9,8 @@ return [
     ],
     'core' => [
         'serverBaseUrl' => env('CORE_BASE_URL','172.23.132.50'),
-        'port' => '8080'
+        'port' => '8080',
+        'dmPort' => '1372'
     ],
 
 ];

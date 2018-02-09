@@ -20,12 +20,14 @@ class CoreService
 {
     protected $base_url;
     protected $port;
+    protected $dmPort;
     protected $curlService;
 
     public function __construct(CurlService $curlService)
     {
         $this->base_url = config('iot.core.serverBaseUrl');
         $this->port = config('iot.core.port');
+        $this->dmPort = config('iot.core.dmPort');
         $this->curlService = $curlService;
     }
 
@@ -44,6 +46,7 @@ class CoreService
             'name' => $id,
         ];
         $response = $this->send($url, $data, 'post');
+
         if ($response->status == 200)
             return $response->content;
         throw new GeneralException($response->content->error ?: '', $response->status);
@@ -81,6 +84,7 @@ class CoreService
             'name' => $thing['interface']['devEUI'],
         ];
         $response = $this->send($url, $data, 'post');
+        dd($response);
         if ($response->status == 200)
             return $response->content;
         throw new GeneralException($response->content->error ?: '', $response->status);
@@ -100,9 +104,28 @@ class CoreService
             return (object)['test' => 'testValue'];
         $url = '/api/codec/' . $thing['interface']['devEUI'];
         $response = $this->send($url, $codec, 'post', $project['container']['runner']['port'], 0);
-        dd($response);
         if ($response->status == 200)
             return $response->content;
+        throw new GeneralException($response->content->error ?: '', $response->status);
+        return $response;
+    }
+
+    /**
+     * @param Thing $thing
+     * @param $offset
+     * @param $limit
+     * @return string
+     * @throws GeneralException
+     */
+    public function getDeviceData(Thing $thing, $offset, $limit)
+    {
+        if (env('TEST_MODE'))
+            return ['test' => 'testValue'];
+        $url = '/api/things/' . $thing['interface']['devEUI'];
+        $response = $this->send($url, ['offset' => $offset->timestamp, 'limit' => $limit], 'get', $this->dmPort);
+        if ($response->status == 200)
+            return $response->content;
+
         throw new GeneralException($response->content->error ?: '', $response->status);
         return $response;
     }
@@ -120,7 +143,7 @@ class CoreService
         $new_response = null;
         switch ($method) {
             case 'get':
-                $new_response = $response->get();
+                $new_response = $response->asJsonResponse()->get();
                 break;
             case 'post':
                 $new_response = $response->post();

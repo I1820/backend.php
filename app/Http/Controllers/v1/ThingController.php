@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\Permission;
 use App\Repository\Helper\Response;
+use App\Repository\Services\CoreService;
 use App\Repository\Services\PermissionService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -17,16 +18,21 @@ class ThingController extends Controller
 {
     protected $thingService;
     protected $permissionService;
+    protected $coreService;
 
     /**
      * ProjectController constructor.
      * @param ThingService $thingService
      * @param PermissionService $permissionService
+     * @param CoreService $coreService
      */
-    public function __construct(ThingService $thingService, PermissionService $permissionService)
+    public function __construct(ThingService $thingService,
+                                PermissionService $permissionService,
+                                CoreService $coreService)
     {
         $this->thingService = $thingService;
         $this->permissionService = $permissionService;
+        $this->coreService = $coreService;
     }
 
 
@@ -104,6 +110,7 @@ class ThingController extends Controller
      * @param Request $request
      * @param Thing $thing
      * @return array
+     * @throws \App\Exceptions\GeneralException
      */
     public function data(Request $request, Thing $thing)
     {
@@ -111,10 +118,10 @@ class ThingController extends Controller
         if ($thing['user_id'] != $user->id)
             abort(404);
 
-        $offset = $request->get('offset') ? Carbon::createFromTimestamp($request->get('offset')) : Carbon::yesterday();
+        $offset = $request->get('offset') ? Carbon::createFromTimestamp($request->get('offset')) : 0;
         $count = $request->get('count') ?: 100;
-
-        $data = $thing->data()->where('timestamp', '>', $offset)->take((int)$count)->get();
+        $data = $this->coreService->getDeviceData($thing, $offset, $count);
+        //$data = $thing->data()->where('timestamp', '>', $offset)->take((int)$count)->get();
 
         return Response::body(compact('data'));
     }
