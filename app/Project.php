@@ -39,10 +39,12 @@ class Project extends Eloquent
     }
 
 
-    public function codecs()
+    public function things()
     {
-        return $this->hasMany(Codec::class)->with('user');
+        return $this->hasMany(Thing::class)->with('user');
     }
+
+
 
     public function getOwnerAttribute($value)
     {

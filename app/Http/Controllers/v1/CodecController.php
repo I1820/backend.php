@@ -49,17 +49,17 @@ class CodecController extends Controller
 
 
     /**
-     * @param Project $project
+     * @param Thing $thing
      * @return array
      */
-    public function get(Project $project)
+    public function get(Thing $thing)
     {
         $user = Auth::user();
-        if ($project['owner']['id'] != $user->id)
+        if ($thing->user()->first()['id'] != $user->id)
             abort(404);
-        $codecs = $project->codecs()->get();
+        $codec = $thing->codec()->first();
 
-        return Response::body(compact('codecs'));
+        return Response::body(compact('codec'));
     }
 
 }
