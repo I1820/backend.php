@@ -118,6 +118,5 @@ class ProjectService
         $this->coreService->postThing($project, $thing);
         if($codec)
             $this->coreService->sendCodec($project, $thing, $codec->code);
-        $project->things()->save($thing);
     }
 }

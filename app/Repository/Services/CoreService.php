@@ -84,7 +84,6 @@ class CoreService
             'name' => $thing['interface']['devEUI'],
         ];
         $response = $this->send($url, $data, 'post');
-        dd($response);
         if ($response->status == 200)
             return $response->content;
         throw new GeneralException($response->content->error ?: '', $response->status);

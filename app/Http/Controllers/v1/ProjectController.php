@@ -141,7 +141,7 @@ class ProjectController extends Controller
         if ($project['owner']['id'] != $user->id || $thing['user_id'] != $user->id)
             abort(404);
         $codec = $thing->codec()->first();
-        $project->things()->save($thing);
+        $thing->project()->associate($project);
         $this->projectService->addThing($project, $thing, $codec);
         return Response::body(compact('project'));
     }
