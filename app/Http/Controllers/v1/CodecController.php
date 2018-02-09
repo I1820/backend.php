@@ -29,6 +29,7 @@ class CodecController extends Controller
      * @param Thing $thing
      * @return array
      * @throws CodecException
+     * @throws \App\Exceptions\GeneralException
      */
     public function create(Request $request, Thing $thing)
     {
@@ -36,7 +37,7 @@ class CodecController extends Controller
         if ($thing->user()->first()['id'] != $user->id)
             abort(404);
         if ($thing->codec()->first())
-            return Response::body('قبلا آپلود شده است.', '300');
+            return $this->update($thing, $request);
         $this->codecService->validateCreateCodec($request, $thing);
 
         $codec = $this->codecService->insertCodec($request, $thing);
