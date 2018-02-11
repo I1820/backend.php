@@ -192,7 +192,8 @@ class ThingController extends Controller
     {
         $row = $row->toArray();
         $row['type'] = 'lora';
-        $row['factoryPresetFreqs'] = $row['factoryPresetFreqs'] ? [$row['factoryPresetFreqs']] : [];
+        dd($row);
+        $row['factoryPresetFreqs'] = isset($row['factoryPresetFreqs']) ? [$row['factoryPresetFreqs']] : [];
         return collect($row);
 
     }
