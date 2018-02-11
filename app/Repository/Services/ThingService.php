@@ -72,7 +72,7 @@ class ThingService
         ];
 
         $validator = Validator::make($request->all(), [
-            'things' => 'required|mimes:csv,txt|file|max:255',
+            'things' => 'required|mimes:text,csv,plain,application,vnd.ms-excel,x-csv|file|max:255',
         ], $messages);
 
         if ($validator->fails())
