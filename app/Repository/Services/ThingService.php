@@ -27,11 +27,11 @@ class ThingService
     }
 
     /**
-     * @param Request $request
+     * @param $request
      * @return void
      * @throws ThingException
      */
-    public function validateCreateThing(Request $request)
+    public function validateCreateThing($request)
     {
         $messages = [
             'name.required' => 'لطفا نام شی را وارد کنید',
@@ -57,12 +57,34 @@ class ThingService
             throw new  ThingException($validator->errors()->first(), ThingException::C_GE);
     }
 
+
     /**
      * @param Request $request
+     * @return void
+     * @throws ThingException
+     */
+    public function validateExcel(Request $request)
+    {
+
+        $messages = [
+            'things.required' => 'لطفا فایل را انتخاب کنید',
+            'things.mimes' => 'نوع فایل را درست وارد کنید',
+        ];
+
+        $validator = Validator::make($request->all(), [
+            'things' => 'required|mimes:csv,txt|file|max:255',
+        ], $messages);
+
+        if ($validator->fails())
+            throw new  ThingException($validator->errors()->first(), ThingException::C_GE);
+    }
+
+    /**
+     * @param $request
      * @return $this|\Illuminate\Database\Eloquent\Model
      * @throws \App\Exceptions\LoraException
      */
-    public function insertThing(Request $request)
+    public function insertThing($request)
     {
         $device_profile_id = $this->loraService->postDeviceProfile(collect($request->all()))->deviceProfileID;
 

@@ -75,19 +75,6 @@ class LoraService
         throw new LoraException($response->content->error, $response->content->code);
     }
 
-    /**
-     * @param string $devEUI
-     * @return string
-     * @throws LoraException
-     */
-    public function deleteDevice(string $devEUI)
-    {
-        if (env('TEST_MODE'))
-            return;
-        $url = $this->base_url . '/api/devices/' . $devEUI;
-        $this->send($url, [], 'delete');
-        return;
-    }
 
     private function prepareDeviceProfileData(Collection $data)
     {
@@ -128,6 +115,38 @@ class LoraService
         return $res;
     }
 
+    /**
+     * @param $deviceProfileId
+     * @return string
+     * @throws LoraException
+     */
+    public function deleteDeviceProfile($deviceProfileId)
+    {
+        if (env('TEST_MODE'))
+            return (object)['test' => 'testValue'];
+        $url = $url = $this->base_url . '/api/device-profiles/' . $deviceProfileId;
+        $response = $this->send($url, [], 'delete');
+        if ($response->status == 200)
+            return $response->content;
+        throw new LoraException($response->content->error ?: '', $response->status);
+    }
+
+    /**
+     * @param $deviceId
+     * @return string
+     * @throws LoraException
+     */
+    public function deleteDevice($deviceId)
+    {
+        if (env('TEST_MODE'))
+            return (object)['test' => 'testValue'];
+        $url = $url = $this->base_url . '/api/devices/' . $deviceId;
+        $response = $this->send($url, [], 'delete');
+        if ($response->status == 200)
+            return $response->content;
+        throw new LoraException($response->content->error ?: '', $response->status);
+    }
+
     private function send($url, $data, $method = 'get')
     {
         $response = $this->curlService->to($url)
@@ -138,16 +157,16 @@ class LoraService
         $new_response = null;
         switch ($method) {
             case 'get':
-                $new_response = $response->get();
+                $new_response = $response->asJsonResponse()->get();
                 break;
             case 'post':
                 $new_response = $response->asJson()->post();
                 break;
             case 'delete':
-                $new_response = $response->delete();
+                $new_response = $response->asJsonResponse()->delete();
                 break;
             default:
-                $new_response = $response->get();
+                $new_response = $response->asJsonResponse()->get();
                 break;
         }
         if ($new_response->status == 401) {
@@ -155,16 +174,16 @@ class LoraService
             $response = $response->withHeader('Authorization: ' . $this->token);
             switch ($method) {
                 case 'get':
-                    $new_response = $response->get();
+                    $new_response = $response->asJsonResponse()->get();
                     break;
                 case 'post':
                     $new_response = $response->asJson()->post();
                     break;
                 case 'delete':
-                    $new_response = $response->asJson()->delete();
+                    $new_response = $response->asJsonResponse()->asJson()->delete();
                     break;
                 default:
-                    $new_response = $response->get();
+                    $new_response = $response->asJsonResponse()->get();
                     break;
             }
         }

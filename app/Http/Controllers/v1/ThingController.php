@@ -5,6 +5,7 @@ namespace App\Http\Controllers\v1;
 use App\Permission;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
+use App\Repository\Services\LoraService;
 use App\Repository\Services\PermissionService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -13,26 +14,31 @@ use App\Exceptions\ThingException;
 use App\Repository\Services\ThingService;
 use App\Thing;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ThingController extends Controller
 {
     protected $thingService;
     protected $permissionService;
     protected $coreService;
+    protected $loraService;
 
     /**
      * ProjectController constructor.
      * @param ThingService $thingService
      * @param PermissionService $permissionService
      * @param CoreService $coreService
+     * @param LoraService $loraService
      */
     public function __construct(ThingService $thingService,
                                 PermissionService $permissionService,
-                                CoreService $coreService)
+                                CoreService $coreService,
+                                LoraService $loraService)
     {
         $this->thingService = $thingService;
         $this->permissionService = $permissionService;
         $this->coreService = $coreService;
+        $this->loraService = $loraService;
     }
 
 
@@ -81,7 +87,7 @@ class ThingController extends Controller
         $user = Auth::user();
         if ($thing['user_id'] != $user->id)
             abort(404);
-        $thing->load(['user', 'project','codec']);
+        $thing->load(['user', 'project', 'codec']);
 
         return Response::body(compact('thing'));
     }
@@ -125,4 +131,71 @@ class ThingController extends Controller
 
         return Response::body(compact('data'));
     }
+
+    /**
+     * @param Request $request
+     * @return array
+     * @throws ThingException
+     */
+    public function fromExcel(Request $request)
+    {
+        $this->thingService->validateExcel($request);
+        $file = $request->file('things');
+        $res = [];
+        Excel::load($file, function ($reader) use (&$res) {
+            $user = Auth::user();
+            $results = $reader->all();
+            foreach ($results as $row) {
+                $data = $this->prepareRow($row);
+                try {
+                    $this->thingService->validateCreateThing($data);
+                    $thing = $this->thingService->insertThing($data);
+                    $user->things()->save($thing);
+                    $owner_permission = $this->permissionService->get('THING-OWNER');
+                    $permission = Permission::create([
+                        'name' => $owner_permission['name'],
+                        'permission_id' => (string)$owner_permission['_id'],
+                        'item_type' => 'thing'
+                    ]);
+                    $thing->permissions()->save($permission);
+                    $user->permissions()->save($permission);
+                    $res[$data['devEUI']] = $thing;
+                } catch (\Exception $e) {
+                    if (isset($data['devEUI']))
+                        $res[$data['devEUI']] = 'Error';
+                }
+            }
+
+        });
+
+        return Response::body(compact('res'));
+    }
+
+    /**
+     * @param Thing $thing
+     * @return array
+     * @throws \App\Exceptions\LoraException
+     * @throws \Exception
+     */
+    public function delete(Thing $thing)
+    {
+
+        $thing;
+        $this->loraService->deleteDevice($thing['interface']['devEUI']);
+        $this->loraService->deleteDeviceProfile($thing['interface']['deviceProfileID']);
+        $thing->delete();
+        return Response::body(['success' => 'true']);
+    }
+
+
+    private function prepareRow($row)
+    {
+        $row = $row->toArray();
+        $row['type'] = 'lora';
+        $row['factoryPresetFreqs'] = $row['factoryPresetFreqs'] ? [$row['factoryPresetFreqs']] : [];
+        return collect($row);
+
+    }
+
+
 }

@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 
+Route::get('/delete-all-things', 'TestController@delete')->middleware('auth.jwt');
 Route::get('/itest', 'TestController@index')->middleware('auth.jwt');
 Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) {
     Route::post('/register', 'AuthController@register');
@@ -49,9 +50,11 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
     Route::group(['prefix' => 'thing', 'middleware' => ['auth.jwt']], function () {
         Route::get('/', 'ThingController@all');
         Route::post('/', 'ThingController@create');
+        Route::post('/from-excel', 'ThingController@fromExcel');
         Route::get('/{thing}', 'ThingController@get');
         Route::get('/{thing}/data', 'ThingController@data');
         Route::patch('/{thing}', 'ThingController@update');
+        Route::delete('/{thing}', 'ThingController@delete');
 
         Route::post('/{thing}/codec', 'CodecController@create');
         Route::get('/{thing}/codec', 'CodecController@get');

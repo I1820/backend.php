@@ -130,7 +130,7 @@ class ProjectController extends Controller
         $this->projectService->validateUpdateProject($request);
 
         $project = $this->projectService->updateProject($request, $project);
-
+        $project->load('things');
 
         return Response::body(compact('project'));
     }
