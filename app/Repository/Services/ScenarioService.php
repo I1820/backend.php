@@ -32,13 +32,13 @@ class ScenarioService
     {
         $messages = [
             'name.required' => 'لطفا نام سناریو را وارد کنید',
-            'name.code' => 'لطفا سناریو را وارد کنید',
+            'code.required' => 'لطفا سناریو را وارد کنید',
 
         ];
 
         $validator = Validator::make($request->all(), [
             'code' => 'required',
-            'name' => 'required', 'string', 'max:255'
+            'name' => 'required|max:255'
         ], $messages);
 
         if ($validator->fails())

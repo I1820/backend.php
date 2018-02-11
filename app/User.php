@@ -22,7 +22,7 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'other_info', 'active', 'legal'
+        'name', 'email', 'password', 'other_info', 'active', 'legal', 'mobile'
     ];
 
     /**
@@ -53,6 +53,11 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
     public function permissions()
     {
         return $this->hasMany(Permission::class, 'user_id');
+    }
+
+    public function gateways()
+    {
+        return $this->hasMany(Gateway::class,'user_id');
     }
 
     public function codecs()

@@ -147,6 +147,22 @@ class LoraService
         throw new LoraException($response->content->error ?: '', $response->status);
     }
 
+    /**
+     * @param $data
+     * @return string
+     * @throws LoraException
+     */
+    public function sendNetworkServer($data)
+    {
+        if (env('TEST_MODE'))
+            return (object)['test' => 'testValue'];
+        $url = $url = $this->base_url . '/api/network-servers';
+        $response = $this->send($url, $data, 'post');
+        if ($response->status == 200)
+            return $response->content;
+        throw new LoraException($response->content->error ?: '', $response->status);
+    }
+
     private function send($url, $data, $method = 'get')
     {
         $response = $this->curlService->to($url)

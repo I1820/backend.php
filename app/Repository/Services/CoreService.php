@@ -11,6 +11,7 @@ namespace App\Repository\Services;
 
 use App\Exceptions\GeneralException;
 use App\Exceptions\LoraException;
+use App\Gateway;
 use App\Project;
 use App\Scenario;
 use App\Thing;
@@ -22,6 +23,7 @@ class CoreService
     protected $base_url;
     protected $port;
     protected $dmPort;
+    protected $gmPort;
     protected $curlService;
 
     public function __construct(CurlService $curlService)
@@ -29,6 +31,7 @@ class CoreService
         $this->base_url = config('iot.core.serverBaseUrl');
         $this->port = config('iot.core.port');
         $this->dmPort = config('iot.core.dmPort');
+        $this->gmPort = config('iot.core.gmPort');
         $this->curlService = $curlService;
     }
 
@@ -149,15 +152,32 @@ class CoreService
         return $response;
     }
 
+    /**
+     * @param $data
+     * @return string
+     * @throws GeneralException
+     */
+    public function sendGateway($data)
+    {
+        if (env('TEST_MODE'))
+            return (object)['test' => 'testValue'];
+        $url = '/api/gateway';
+        $response = $this->send($url, $data, 'post', $this->gmPort);
+        if ($response->status == 200)
+            return $response->content;
+        throw new GeneralException($response->content->error ?: '', $response->status);
+        return $response;
+    }
 
     private function send($url, $data, $method = 'get', $port = '', $json_request = 1)
     {
         $port = $port == '' ? $this->port : $port;
         $url = $this->base_url . ':' . $port . $url;
+
         $response = $this->curlService->to($url)
             ->withData($data)
             ->withOption('SSL_VERIFYHOST', false)
-            ->returnResponseObject();
+            ->returnResponseObject()->withTimeout('5');
         if ($method == 'post' && $json_request)
             $response = $response->asJson();
         $new_response = null;

@@ -61,6 +61,11 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::patch('/{thing}/codec', 'CodecController@update');
     });
 
+    Route::group(['prefix' => 'gateway', 'middleware' => ['auth.jwt']], function () {
+        Route::post('/', 'GatewayController@create');
+        Route::get('/', 'GatewayController@list');
+    });
+
     Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt']], function () {
         Route::get('/user/new', 'PaymentController@setNewUser');
         Route::post('/user/packages', 'PaymentController@getUserPackages');

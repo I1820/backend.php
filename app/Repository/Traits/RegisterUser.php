@@ -5,9 +5,11 @@
  * Date: 12/15/17
  * Time: 12:28 PM
  */
+
 namespace App\Repository\Traits;
 
 use App\Exceptions\AuthException;
+use App\Repository\Helper\MobileFactory;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -77,6 +79,9 @@ trait RegisterUser
             'reg_number.required' => 'لطفا شماره ثبت را وارد کنید',
             'ec_code.required' => 'لطفا کد اقتصادی را وارد کنید',
 
+            'mobile.required' => 'لطفا شماره موبایل را وارد کنید',
+            'mobile.regex' => 'لطفا شماره موبایل را درست وارد کنید',
+            'mobile.unique' => ' شماره موبایل قبلا وجود دارد',
             'email.email' => 'لطفا ایمیل را درست وارد کنید',
             'email.unique' => 'این ایمیل قبلا ثبت شده است',
             'password.required' => 'لطفا رمزعبور را وارد کنید',
@@ -94,6 +99,7 @@ trait RegisterUser
             'ec_code' => 'required',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
+            'mobile' => 'regex:/^\d{11}$/|unique:users|required',
         ], $messages);
 
         if ($validator->fails())
@@ -103,9 +109,11 @@ trait RegisterUser
 
     private function insertRealUser(Request $request)
     {
+        MobileFactory::sendWelcome($request->get('mobile'));
         return User::create([
             'legal' => false,
-            'active' => true,
+            'active' => false,
+            'mobile' => $request->get('mobile'),
             'name' => $request->get('name'),
             'email' => $request->get('email'),
             'password' => bcrypt($request->get('password')),
