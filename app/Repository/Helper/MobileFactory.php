@@ -17,13 +17,14 @@ class MobileFactory
 
     public static function sendWelcome($mobile)
     {
-
-        $kavenegar = new KavenegarApi(env('KAVENEGAR_API_KEY'));
-        $kavenegar->Send('',$mobile,'به سامانه اینترنت اشیای دانشگاه امیرکبیر خوش آمدید', null, null);
-        return [
-            'success' => 0,
-            'message' => ''
-        ];
+        try{
+            $kavenegar = new KavenegarApi(env('KAVENEGAR_API_KEY'));
+            $kavenegar->Send('',$mobile,'به سامانه اینترنت اشیای دانشگاه امیرکبیر خوش آمدید', null, null);
+            return [
+                'success' => 0,
+                'message' => ''
+            ];
+        }catch (\Exception $e){}
     }
 
 
