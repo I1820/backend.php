@@ -239,7 +239,7 @@ class PaymentController extends Controller
     // must change
     function paymentRequest(Request $request)
     {
-        $cb_url_base = 'http://82.102.11.166:5555/api/payment/user/package/verification';
+        $cb_url_base = 'http://82.102.11.166:5050/api/payment/verification';
         $auth_url = 'https://sandbox.zarinpal.com/pg/StartPay/';
         $user = Auth::user();
         if ($user != null) {
@@ -275,32 +275,55 @@ class PaymentController extends Controller
             $validatedData['description'] = urlencode($validatedData['description']);
 
             $cb_url = $cb_url_base
-                .'/'.$user->id
-                .'/'.$validatedData['merchant_id']
-                .'/'.$user->id;
-            $cb_url = urlencode($cb_url_base);
+                . '/' . $user->id
+                . '/' . $validatedData['merchant_id']
+                . '/' . $validatedData['amount']
+                . '/' . $validatedData['package_type'];
+//            $cb_url = $cb_url_base;
 
-            $url = $this->base_url . "/PaymentRequest"
-                . "/" . $user->id
-                . "/" . $validatedData['payment_gate']
-                . "/" . $validatedData['merchant_id']
-                . "/" . $validatedData['amount']
-                . "/" . $validatedData['package_type']
-                . "/" . $validatedData['description']
-                . "/" . $validatedData['email']
-                . "/" . $validatedData['mobile']
-                . "/" . $cb_url;
+//            $url = $this->base_url . "/PaymentRequest"
+//                . "/" . $user->id
+//                . "/" . $validatedData['payment_gate']
+//                . "/" . $validatedData['merchant_id']
+//                . "/" . $validatedData['amount']
+//                . "/" . $validatedData['package_type']
+//                . "/" . $validatedData['description']
+//                . "/" . $validatedData['email']
+//                . "/" . $validatedData['mobile']
+//                . "/" . 'sal';
 
             try {
-                return $url;
-                $resp = Curl::to($url)->post();
-                return $resp;
-                $xmlResponse = simplexml_load_string($resp);
-                $json_resp = json_decode(json_encode($xmlResponse), true);;
 
-                if ($json_resp['PaymentRequestResult'] == 100) {
-                    $redirect_url = $auth_url . $json_resp['Authority'];
-                    return $redirect_url;
+//                return $url;
+//                $resp = Curl::to($url)
+//                    ->withData(array('callback'=> $cb_url))
+//                    ->asJson()
+//                    ->post();
+                $client = new \SoapClient('http://172.25.224.90:8090/PaymentServices.svc?wsdl', ['encoding' => 'UTF-8']);
+                $resp = $client->PaymentRequest(
+                    [
+                        'userid' => $user->id,
+                        'PaymentGate' => $validatedData['payment_gate'],
+                        'MerchantID' => $validatedData['merchant_id'],
+                        'Amount' => $validatedData['amount'],
+                        'packageType' => $validatedData['package_type'],
+                        'Description' => $validatedData['description'],
+                        'Email' => $validatedData['email'],
+                        'Mobile' => $validatedData['mobile'],
+                        'CallbackURL' => $cb_url,
+                    ]
+                );
+
+//                $resp = json_encode($resp);
+//                $resp = json_decode($resp);
+//                dd($resp);
+//                return $resp['PaymentRequestResult'];
+//                $xmlResponse = simplexml_load_string($resp);
+//                $json_resp = json_decode(json_encode($xmlResponse), true);;
+
+                if ($resp->PaymentRequestResult == 100) {
+                    $redirect_url = $auth_url . $resp->Authority;
+                    return $redirect_url . '//' . $user->id;
                     return redirect($redirect_url);
                 } else {
                     return response()->json(["result" => "payment failed"], 417);
@@ -313,8 +336,41 @@ class PaymentController extends Controller
         return response()->json(["result" => "forbidden"], 403);
     }
 
-    function paymentVerification(Request $request, $userId, $merchantId, $authority, $amount,$packageType){
-        return $request->input('Status');
-        return 'hi';
+    function paymentVerification(Request $request, $userId, $merchantId, $amount, $packageType)
+    {
+        $status = $request->input('Status');
+        $authority = $request->input('Authority');
+        if ($status == 'OK') {
+            $url = $this->base_url . "/PaymentVerification"
+                . '/' . $userId
+                . '/' . $merchantId
+                . '/' . $authority
+                . '/' . $amount
+                . '/' . $packageType;
+
+            $resp = Curl::to($url)->post();
+
+            $xmlResponse = simplexml_load_string($resp);
+            $json_resp = json_decode(json_encode($xmlResponse), true);
+
+            if ($json_resp['RefID'] == 0) {
+                $json_resp['result'] = 'transaction failed';
+                return response()->json($json_resp, 402);
+            } else if ($json_resp['RefID'] == -1) {
+                return response()->json(["result" => "not exist"], 404);
+            } else {
+                $url = $this->base_url . "/BuyNewPackage"
+                    . '/' . $userId
+                    . '/' . $packageType
+                    . '/' . $authority;
+
+                $resp = Curl::to($url)->post();
+                $json_resp['BuyNewPackage'] = $resp;
+                return response()->json($json_resp, 200);
+            }
+
+        } else {
+            return response()->json(["result" => "user canceled"], 406);
+        }
     }
 }
