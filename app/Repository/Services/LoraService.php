@@ -10,6 +10,7 @@ namespace App\Repository\Services;
 
 
 use App\Exceptions\LoraException;
+use App\Thing;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Ixudra\Curl\CurlService;
@@ -102,7 +103,7 @@ class LoraService
                     'supports32bitFCnt' => $data->get('supports32bitFCnt') ? true : false,
                     'supportsClassB' => $data->get('supportsClassB') ? true : false,
                     'supportsClassC' => $data->get('supportsClassC') ? true : false,
-                    'supportsJoin' => $data->get('supports32bitFCnt') ? true : false
+                    'supportsJoin' => $data->get('supportsJoin') === 1 ? true : false
                 ],
                 'name' => $data->get('name'),
                 'networkServerID' => $this->networkServerID,
@@ -157,6 +158,22 @@ class LoraService
         if (env('TEST_MODE'))
             return (object)['test' => 'testValue'];
         $url = $url = $this->base_url . '/api/network-servers';
+        $response = $this->send($url, $data, 'post');
+        if ($response->status == 200)
+            return $response->content;
+        throw new LoraException($response->content->error ?: '', $response->status);
+    }
+
+    /**
+     * @param $data
+     * @return string
+     * @throws LoraException
+     */
+    public function activateDevice($data)
+    {
+        if (env('TEST_MODE'))
+            return (object)['test' => 'testValue'];
+        $url = $url = $this->base_url . '/api/devices/' . $data['devEUI'] . '/activate';
         $response = $this->send($url, $data, 'post');
         if ($response->status == 200)
             return $response->content;
