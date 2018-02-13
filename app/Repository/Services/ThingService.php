@@ -97,7 +97,7 @@ class ThingService
             "fCntDown" => 0,
             "fCntUp" => 0,
             "nwkSKey" => "2b7e151628aed2a6abf7158809cf4f3c",
-            "skipFCntCheck" => true
+            "skipFCntCheck" => false
         ];
         $info = $this->loraService->activateDevice($fakeData);
         return Thing::create([
