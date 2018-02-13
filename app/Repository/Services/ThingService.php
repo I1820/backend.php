@@ -91,12 +91,12 @@ class ThingService
         $device = $this->loraService->postDevice(collect($request->all())->merge(['deviceProfileID' => $device_profile_id]));
         // TODO
         $fakeData = [
-            "appSKey" => "1F86B74560C1A9D13845F8BB132FFC57",
-            "devAddr" => "2601128C",
+            "appSKey" => "2b7e151628aed2a6abf7158809cf4f3c",
+            "devAddr" => "00000035",
             "devEUI" => $request->get('devEUI'),
             "fCntDown" => 0,
             "fCntUp" => 0,
-            "nwkSKey" => "896BF7D3D097C996958C8012CAC1C0DB",
+            "nwkSKey" => "2b7e151628aed2a6abf7158809cf4f3c",
             "skipFCntCheck" => true
         ];
         $info = $this->loraService->activateDevice($fakeData);
