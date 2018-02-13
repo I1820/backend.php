@@ -92,7 +92,7 @@ class ThingService
         // TODO
         $fakeData = [
             "appSKey" => "2b7e151628aed2a6abf7158809cf4f3c",
-            "devAddr" => "00000035",
+            "devAddr" => "00000037",
             "devEUI" => $request->get('devEUI'),
             "fCntDown" => 0,
             "fCntUp" => 0,
