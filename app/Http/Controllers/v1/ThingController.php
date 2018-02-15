@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\v1;
 
+use App\Exceptions\GeneralException;
+use App\Exceptions\LoraException;
 use App\Permission;
+use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
 use App\Repository\Services\LoraService;
@@ -43,16 +46,18 @@ class ThingController extends Controller
 
 
     /**
+     * @param Project $project
      * @param Request $request
      * @return array
      * @throws ThingException
-     * @throws \App\Exceptions\LoraException
+     * @throws GeneralException
+     * @throws LoraException
      */
-    public function create(Request $request)
+    public function create(Project $project, Request $request)
     {
         $user = Auth::user();
         $this->thingService->validateCreateThing($request);
-        $thing = $this->thingService->insertThing($request);
+        $thing = $this->thingService->insertThing($request, $project);
         $user->things()->save($thing);
         $owner_permission = $this->permissionService->get('THING-OWNER');
         $permission = Permission::create([
@@ -67,38 +72,39 @@ class ThingController extends Controller
     }
 
     /**
+     * @param Project $project
      * @return array
      */
-    public function all()
+    public function all(Project $project)
     {
-        $things = Auth::user()->things()->get();
-        $things = $things->map(function ($item) {
-            return $item['thing'];
-        });
+        $things = $project->things()->get();
         return Response::body(compact('things'));
     }
 
     /**
+     * @param Project $project
      * @param Thing $thing
      * @return array
      */
-    public function get(Thing $thing)
+    public function get(Project $project, Thing $thing)
     {
         $user = Auth::user();
         if ($thing['user_id'] != $user->id)
             abort(404);
+        if($project->things()->where('_id',$thing['_id'])->first())
         $thing->load(['user', 'project', 'codec']);
 
         return Response::body(compact('thing'));
     }
 
     /**
+     * @param Project $project
      * @param Thing $thing
      * @param Request $request
      * @return array
      * @throws ThingException
      */
-    public function update(Request $request, Thing $thing)
+    public function update(Project $project, Thing $thing, Request $request)
     {
         $user = Auth::user();
         if ($thing['user_id'] != $user->id)
@@ -113,12 +119,13 @@ class ThingController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param Project $project
      * @param Thing $thing
+     * @param Request $request
      * @return array
      * @throws \App\Exceptions\GeneralException
      */
-    public function data(Request $request, Thing $thing)
+    public function data(Project $project, Thing $thing, Request $request)
     {
         $user = Auth::user();
         if ($thing['user_id'] != $user->id)
@@ -133,11 +140,12 @@ class ThingController extends Controller
     }
 
     /**
+     * @param Project $project
      * @param Request $request
      * @return array
      * @throws ThingException
      */
-    public function fromExcel(Request $request)
+    public function fromExcel(Project $project, Request $request)
     {
         $this->thingService->validateExcel($request);
         $file = $request->file('things');
@@ -172,21 +180,19 @@ class ThingController extends Controller
     }
 
     /**
+     * @param Project $project
      * @param Thing $thing
      * @return array
      * @throws \App\Exceptions\LoraException
      * @throws \Exception
      */
-    public function delete(Thing $thing)
+    public function delete(Project $project, Thing $thing)
     {
-
-        $thing;
         $this->loraService->deleteDevice($thing['interface']['devEUI']);
-        $this->loraService->deleteDeviceProfile($thing['interface']['deviceProfileID']);
+        $thing->permissions()->delete();
         $thing->delete();
         return Response::body(['success' => 'true']);
     }
-
 
     private function prepareRow($row)
     {

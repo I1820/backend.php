@@ -9,7 +9,10 @@
 namespace App\Repository\Services;
 
 
+use App\Exceptions\GeneralException;
+use App\Exceptions\LoraException;
 use App\Exceptions\ThingException;
+use App\Project;
 use App\Thing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,11 +22,15 @@ class ThingService
 {
     protected $loraService;
     protected $coreService;
+    protected $projectService;
 
-    public function __construct(LoraService $loraService, CoreService $coreService)
+    public function __construct(LoraService $loraService,
+                                CoreService $coreService,
+                                ProjectService $projectService)
     {
         $this->loraService = $loraService;
         $this->coreService = $coreService;
+        $this->projectService = $projectService;
     }
 
     /**
@@ -42,6 +49,7 @@ class ThingService
             'long.required' => 'لطفا محل سنسور را وارد کنید',
             'period.required' => 'لطفا بازه ارسال داده سنسور را وارد کنید',
             'period.numeric' => 'لطفا بازه ارسال داده سنسور را درست وارد کنید',
+            'thing_profile_slug.required' => 'لطفا شناسه پروفایل شی را وارد کنید',
         ];
 
         $validator = Validator::make($request->all(), [
@@ -51,6 +59,7 @@ class ThingService
             'lat' => 'required|numeric',
             'long' => 'required|numeric',
             'period' => 'required|numeric',
+            'thing_profile_slug' => 'required',
         ], $messages);
 
         if ($validator->fails())
@@ -81,26 +90,17 @@ class ThingService
 
     /**
      * @param $request
-     * @return $this|\Illuminate\Database\Eloquent\Model
-     * @throws \App\Exceptions\LoraException
+     * @param Project $project
+     * @return void
+     * @throws GeneralException
+     * @throws LoraException
      */
-    public function insertThing($request)
+    public function insertThing($request, Project $project)
     {
-        $device_profile_id = $this->loraService->postDeviceProfile(collect($request->all()))->deviceProfileID;
 
-        $device = $this->loraService->postDevice(collect($request->all())->merge(['deviceProfileID' => $device_profile_id]));
-        // TODO
-        $fakeData = [
-            "appSKey" => "2b7e151628aed2a6abf7158809cf4f3c",
-            "devAddr" => "00000037",
-            "devEUI" => $request->get('devEUI'),
-            "fCntDown" => 0,
-            "fCntUp" => 0,
-            "nwkSKey" => "2b7e151628aed2a6abf7158809cf4f3c",
-            "skipFCntCheck" => false
-        ];
-        $info = $this->loraService->activateDevice($fakeData);
-        return Thing::create([
+        $device = $this->loraService->postDevice(collect($request->all()), $project['application_id']);
+
+        $thing = Thing::create([
             'name' => $request->get('name'),
             'description' => $request->get('description'),
             'interface' => $device->toArray(),
@@ -110,6 +110,24 @@ class ThingService
                 'coordinates' => [$request->get('lat'), $request->get('long')]
             ],
         ]);
+        $this->addToProject($project, $thing);
+        return $thing;
+    }
+
+
+    public function activate($request, Thing $thing)
+    {
+        $data = $request->only([
+            "appSKey",
+            "devAddr",
+            "fCntDown",
+            "fCntUp",
+            "nwkSKey",
+            "skipFCntCheck"
+        ]);
+        $data['devEUI'] = $thing['interface']['devEUI'];
+        $info = $this->loraService->activateDevice($data);
+        return $info;
     }
 
     /**
@@ -164,6 +182,19 @@ class ThingService
         $thing->save();
 
         return $thing;
+    }
+
+
+    /**
+     * @param Project $project
+     * @param Thing $thing
+     * @throws GeneralException
+     */
+    public function addToProject(Project $project, Thing $thing)
+    {
+        $thing->project()->associate($project);
+        $thing->save();
+        $this->coreService->postThing($project, $thing);
     }
 
 }

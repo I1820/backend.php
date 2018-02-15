@@ -40,25 +40,32 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::get('/{project}/stop', 'ProjectController@stop');
         Route::get('/{project}', 'ProjectController@get');
         Route::get('/{project}/things', 'ProjectController@things');
-        Route::get('/{project}/things/{thing}', 'ProjectController@addThing');
-
 
         Route::post('/{project}/scenario', 'ScenarioController@create');
         Route::get('/{project}/scenario', 'ScenarioController@list');
         Route::get('/{project}/scenario/{scenario}', 'ScenarioController@get');
-    });
-    Route::group(['prefix' => 'thing', 'middleware' => ['auth.jwt']], function () {
-        Route::get('/', 'ThingController@all');
-        Route::post('/', 'ThingController@create');
-        Route::post('/from-excel', 'ThingController@fromExcel');
-        Route::get('/{thing}', 'ThingController@get');
-        Route::get('/{thing}/data', 'ThingController@data');
-        Route::patch('/{thing}', 'ThingController@update');
-        Route::delete('/{thing}', 'ThingController@delete');
 
-        Route::post('/{thing}/codec', 'CodecController@create');
-        Route::get('/{thing}/codec', 'CodecController@get');
-        Route::patch('/{thing}/codec', 'CodecController@update');
+        Route::group(['prefix' => '/{project}/things', 'middleware' => ['auth.jwt']], function () {
+            Route::get('/', 'ThingController@all');
+            Route::post('/', 'ThingController@create');
+            Route::post('/from-excel', 'ThingController@fromExcel');
+            Route::get('/{thing}', 'ThingController@get');
+            Route::get('/{thing}/data', 'ThingController@data');
+            Route::patch('/{thing}', 'ThingController@update');
+            Route::delete('/{thing}', 'ThingController@delete');
+
+            Route::post('/{thing}/codec', 'CodecController@create');
+            Route::get('/{thing}/codec', 'CodecController@get');
+            Route::patch('/{thing}/codec', 'CodecController@update');
+        });
+    });
+
+
+    Route::group(['prefix' => 'thing-profile', 'middleware' => ['auth.jwt']], function () {
+        Route::get('/', 'ThingProfileController@all');
+        Route::post('/', 'ThingProfileController@create');
+        Route::delete('/{thing_profile}', 'ThingProfileController@delete');
+
     });
 
     Route::group(['prefix' => 'gateway', 'middleware' => ['auth.jwt']], function () {

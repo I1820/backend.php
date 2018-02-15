@@ -10,6 +10,8 @@ namespace App\Repository\Services;
 
 
 use App\Codec;
+use App\Exceptions\GeneralException;
+use App\Exceptions\LoraException;
 use App\Exceptions\ProjectException;
 use App\Project;
 use App\Thing;
@@ -21,11 +23,13 @@ use MongoDB\BSON\ObjectId;
 class ProjectService
 {
     protected $coreService;
+    protected $loraService;
 
 
-    public function __construct(CoreService $coreService)
+    public function __construct(CoreService $coreService, LoraService $loraService)
     {
         $this->coreService = $coreService;
+        $this->loraService = $loraService;
     }
 
     /**
@@ -51,19 +55,22 @@ class ProjectService
 
     /**
      * @param Request $request
-     * @return $this|\Illuminate\Database\Eloquent\Model
-     * @throws \App\Exceptions\GeneralException
+     * @return void
+     * @throws GeneralException
+     * @throws LoraException
      */
     public function insertProject(Request $request)
     {
         $id = new ObjectId();
+        $application_id = $this->loraService->postApp($request->get('description'), $id);
         $container = $this->coreService->postProject($id);
         $project = Project::create([
             '_id' => $id,
             'name' => $request->get('name'),
             'description' => $request->get('description'),
             'active' => true,
-            'container' => $container
+            'container' => $container,
+            'application_id' => $application_id
         ]);
         return $project;
     }
@@ -116,7 +123,7 @@ class ProjectService
     public function addThing(Project $project, Thing $thing, $codec)
     {
         $this->coreService->postThing($project, $thing);
-        if($codec)
+        if ($codec)
             $this->coreService->sendCodec($project, $thing, $codec->code);
     }
 }

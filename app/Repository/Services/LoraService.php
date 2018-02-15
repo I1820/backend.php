@@ -19,31 +19,31 @@ class LoraService
 {
     protected $token;
     protected $base_url;
-    protected $application_id;
     protected $organization_id;
     protected $curlService;
     protected $networkServerID;
+    protected $serviceProfileID;
 
     public function __construct(CurlService $curlService)
     {
         $this->token = Storage::get('jwt.token');
         $this->base_url = config('iot.lora.serverBaseUrl');
-        $this->application_id = config('iot.lora.applicationID');
         $this->organization_id = config('iot.lora.organizationID');
         $this->networkServerID = config('iot.lora.networkServerID');
+        $this->serviceProfileID = config('iot.lora.serviceProfileID');
         $this->curlService = $curlService;
     }
 
     /**
      * @param Collection $data
-     * @throws LoraException
+     * @param $application_id
      * @return string
+     * @throws LoraException
      */
-    public function postDevice(Collection $data)
+    public function postDevice(Collection $data, $application_id)
     {
         if (env('TEST_MODE'))
             return collect(['deviceProfileID' => 'test']);
-        $this->authenticate();
         $url = $this->base_url . '/api/devices';
         $data = $data->only([
             'description',
@@ -51,70 +51,32 @@ class LoraService
             'deviceProfileID',
             'name',
         ])->merge([
-            'applicationID' => $this->application_id
+            'applicationID' => $application_id,
+            'deviceProfileID' => $data->get('thing_profile_slug')
         ]);
         $response = $this->send($url, $data, 'post');
-
         if ($response->status == 200)
             return $data;
         throw new LoraException($response->content->error, $response->content->code);
     }
 
     /**
-     * @param Collection $data
+     * @param $data
      * @return void
      * @throws LoraException
      */
-    public function postDeviceProfile(Collection $data)
+    public function postDeviceProfile($data)
     {
         if (env('TEST_MODE'))
             return (object)['deviceProfileID' => 'test'];
+
         $url = $this->base_url . '/api/device-profiles';
-        $response = $this->send($url, $this->prepareDeviceProfileData($data), 'post');
+        $response = $this->send($url, $data, 'post');
         if ($response->status == 200)
             return $response->content;
         throw new LoraException($response->content->error, $response->content->code);
     }
 
-
-    private function prepareDeviceProfileData(Collection $data)
-    {
-        try {
-            $factoryPresetFreqs = collect($data->get('factoryPresetFreqs'))->map(function ($item, $key) {
-                return (int)$item;
-            });
-            $res = [
-                'deviceProfile' => [
-                    'classBTimeout' => (int)$data->get('classBTimeout', 0),
-                    'classCTimeout' => (int)$data->get('classCTimeout', 0),
-                    'factoryPresetFreqs' => $factoryPresetFreqs,
-                    'macVersion' => $data->get('macVersion', ''),
-                    'maxDutyCycle' => (int)$data->get('maxDutyCycle', 0),
-                    'maxEIRP' => (int)$data->get('maxEIRP', 0),
-                    'pingSlotDR' => (int)$data->get('pingSlotDR', 0),
-                    'pingSlotFreq' => (int)$data->get('pingSlotFreq', 0),
-                    'pingSlotPeriod' => (int)$data->get('pingSlotPeriod', 0),
-                    'regParamsRevision' => $data->get('regParamsRevision', ''),
-                    'rfRegion' => $data->get('rfRegion', ''),
-                    'rxDROffset1' => (int)$data->get('rxDROffset1', 0),
-                    'rxDataRate2' => (int)$data->get('rxDataRate2', 0),
-                    'rxDelay1' => (int)$data->get('rxDelay1', 0),
-                    'rxFreq2' => (int)$data->get('rxFreq2', 0),
-                    'supports32bitFCnt' => $data->get('supports32bitFCnt') ? true : false,
-                    'supportsClassB' => $data->get('supportsClassB') ? true : false,
-                    'supportsClassC' => $data->get('supportsClassC') ? true : false,
-                    'supportsJoin' => $data->get('supportsJoin') === 1 ? true : false
-                ],
-                'name' => $data->get('name'),
-                'networkServerID' => $this->networkServerID,
-                'organizationID' => $this->organization_id
-            ];
-        } catch (\Exception $e) {
-            throw new LoraException('Device Profile Data Invalid', 500);
-        }
-
-        return $res;
-    }
 
     /**
      * @param $deviceProfileId
@@ -202,7 +164,7 @@ class LoraService
                 $new_response = $response->asJsonResponse()->get();
                 break;
         }
-        if ($new_response->status == 401) {
+        if ($new_response->status == 401 | $new_response->status == 403) {
             $this->authenticate();
             $response = $response->withHeader('Authorization: ' . $this->token);
             switch ($method) {
@@ -236,5 +198,65 @@ class LoraService
         $this->token = $response->jwt;
         Storage::put('jwt.token', $this->token);
     }
+
+    /**
+     * @return \Illuminate\Config\Repository|mixed
+     */
+    public function getOrganizationId()
+    {
+        return $this->organization_id;
+    }
+
+    /**
+     * @return \Illuminate\Config\Repository|mixed
+     */
+    public function getNetworkServerID()
+    {
+        return $this->networkServerID;
+    }
+
+    /**
+     * @param $description
+     * @param $id
+     * @return string
+     * @throws LoraException
+     */
+    public function postApp($description, $id)
+    {
+        if (env('TEST_MODE'))
+            return collect(['deviceProfileID' => 'test']);
+
+        $url = $this->base_url . '/api/applications';
+        $data = [
+            'organizationID' => $this->organization_id,
+            'serviceProfileID' => $this->serviceProfileID,
+            'name' => (string)$id,
+            'description' => $description
+        ];
+        $response = $this->send($url, $data, 'post');
+
+        if ($response->status == 200)
+            return $response->content->id;
+        throw new LoraException($response->content->error, $response->content->code);
+    }
+
+    /**
+     * @param $applicationId
+     * @return string
+     * @throws LoraException
+     */
+    public function deleteApp($applicationId)
+    {
+        if (env('TEST_MODE'))
+            return (object)['test' => 'testValue'];
+
+        $url = $url = $this->base_url . '/api/applications/' . $applicationId;
+        $response = $this->send($url, [], 'delete');
+
+        if ($response->status == 200)
+            return $response->content;
+        throw new LoraException($response->content->error ?: '', $response->status);
+    }
+
 
 }

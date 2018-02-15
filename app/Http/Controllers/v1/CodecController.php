@@ -25,13 +25,14 @@ class CodecController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param Project $project
      * @param Thing $thing
+     * @param Request $request
      * @return array
      * @throws CodecException
      * @throws \App\Exceptions\GeneralException
      */
-    public function create(Request $request, Thing $thing)
+    public function create(Project $project, Thing $thing, Request $request)
     {
         $user = Auth::user();
         if ($thing->user()->first()['id'] != $user->id)
@@ -42,17 +43,18 @@ class CodecController extends Controller
         else
             $codec = $this->codecService->insertCodec($request, $thing);
 
-        if($thing->project()->first())
+        if ($thing->project()->first())
             $this->coreService->sendCodec($thing->project()->first(), $thing, $codec->code);
         return Response::body(compact('codec'));
     }
 
 
     /**
+     * @param Project $project
      * @param Thing $thing
      * @return array
      */
-    public function get(Thing $thing)
+    public function get(Project $project, Thing $thing)
     {
         $user = Auth::user();
         if ($thing->user()->first()['id'] != $user->id)
