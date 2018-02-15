@@ -169,6 +169,36 @@ class CoreService
         return $response;
     }
 
+
+    /**
+     * @return string
+     * @throws GeneralException
+     */
+    public function projectList()
+    {
+        $url = '/api/project';
+        $response = $this->send($url, [], 'get');
+        if ($response->status == 200)
+            return $response->content;
+        throw new GeneralException($response->content->error ?: '', $response->status);
+        return $response;
+    }
+
+    /**
+     * @param $project_id
+     * @return string
+     * @throws GeneralException
+     */
+    public function projectLogs($project_id)
+    {
+        $url = '/api/project/' . $project_id . '/logs/?limit=10';
+        $response = $this->send($url, [], 'get');
+        if ($response->status == 200)
+            return $response->content;
+        throw new GeneralException($response->content->error ?: '', $response->status);
+        return $response;
+    }
+
     private function send($url, $data, $method = 'get', $port = '', $json_request = 1)
     {
         $port = $port == '' ? $this->port : $port;

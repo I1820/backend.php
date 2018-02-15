@@ -14,3 +14,11 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::group(['prefix' => 'logs'], function () {
+    Route::get('/containers', 'LogController@containers');
+    Route::get('/containers/{id}', 'LogController@containerLog');
+});
+
+//Auth::routes();
+
