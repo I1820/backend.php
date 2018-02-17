@@ -78,14 +78,19 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::post('/user/packages', 'PaymentController@getUserPackages');
         Route::post('/user/package/status', 'PaymentController@updatePackageStatus');
         Route::get('/user/package/status', 'PaymentController@getLastPackageStatus');
-        Route::post('/user/package/buy', 'PaymentController@paymentRequest');
+        Route::post('/user/package/request', 'PaymentController@paymentRequest');
         Route::post('/user/packages/status', 'PaymentController@getUserPackagesByStatus');
 
-        Route::get('/user/transactions', 'PaymentController@getUserTransactions');
+        Route::post('/user/transactions', 'PaymentController@getUserTransactions');
+
+        Route::post('/transactions', 'PaymentController@getTransactions');
 
         Route::get('/packages', 'PaymentController@getPackages');
         Route::post('/package/update', 'PaymentController@updatePackage');
+        Route::post('/package/create', 'PaymentController@createPackage');
         Route::post('/package/delete', 'PaymentController@deletePackage');
+
+        Route::get('/verification/{userId}/{merchantId}/{amount}/{packageType}', 'PaymentController@paymentVerification');
     });
 });
 
