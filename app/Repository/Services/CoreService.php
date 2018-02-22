@@ -23,7 +23,7 @@ class CoreService
     protected $base_url;
     protected $port;
     protected $dmPort;
-    protected $gmPort;
+    protected $downLinkPort;
     protected $curlService;
 
     public function __construct(CurlService $curlService)
@@ -31,7 +31,7 @@ class CoreService
         $this->base_url = config('iot.core.serverBaseUrl');
         $this->port = config('iot.core.port');
         $this->dmPort = config('iot.core.dmPort');
-        $this->gmPort = config('iot.core.gmPort');
+        $this->downLinkPort = config('iot.core.downLinkPort');
         $this->curlService = $curlService;
     }
 
@@ -196,7 +196,16 @@ class CoreService
         if ($response->status == 200)
             return $response->content;
         throw new GeneralException($response->content->error ?: '', $response->status);
-        return $response;
+    }
+
+    public function downLinkThing(Thing $thing, $data)
+    {
+        $url = '/api/send';
+        $data = ['thing' => $thing->toArray(), 'data' => $data,'project_id'=>$thing->project_id];
+        $response = $this->send($url, $data, 'post', $this->downLinkPort);
+        if ($response->status == 200)
+            return $response->content;
+        throw new GeneralException($response->content->error ?: '', $response->status);
     }
 
     private function send($url, $data, $method = 'get', $port = '', $json_request = 1)

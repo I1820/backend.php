@@ -121,14 +121,14 @@ class ThingService
 
     public function activateABP($request, Thing $thing)
     {
-        $validor = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'devAddr' => 'required',
             'nwkSKey' => 'required',
             'appSKey' => 'required',
             'fCntUp' => 'required',
             'fCntDown' => 'required',
         ]);
-        if ($validor->fails())
+        if ($validator->fails())
             throw new GeneralException('اطلاعات را کامل وارد کنید', 407);
         $data = $request->only([
             'devAddr',

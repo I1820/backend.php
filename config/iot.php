@@ -11,7 +11,7 @@ return [
         'serverBaseUrl' => env('CORE_BASE_URL','172.23.132.50'),
         'port' => '8080',
         'dmPort' => '1372',
-        'gmPort' => '1373'
+        'downLinkPort' => '1373'
     ],
 
 ];
