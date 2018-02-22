@@ -13,7 +13,7 @@ class ThingProfile extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'thing_profile_slug', 'data'
+        'thing_profile_slug', 'data','type'
     ];
 
     /**
@@ -22,7 +22,12 @@ class ThingProfile extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'updated_at', 'created_at', 'device_profile_id'
+        'updated_at', 'created_at', 'device_profile_id','data'
     ];
+
+    public function things()
+    {
+        return $this->hasMany(Thing::class)->with('user');
+    }
 
 }

@@ -25,14 +25,22 @@ class GatewayService
     public function validateCreateGateway(Request $request)
     {
         $messages = [
-            'name.required' => 'لطفا نام سناریو را وارد کنید',
-            'address.required' => 'لطفا آدرس گیت وی را وارد کنید',
+            'altitude.required' => 'لطفا altitude را وارد کنید',
+            'name.required' => 'لطفا نام درگاه را وارد کنید',
+            'mac.required' => 'لطفا آدرس فیزیکی درگاه را وارد کنید',
+            'latitude.required' => 'لطفا مختصات جغرافیایی درگاه را وارد کنید',
+            'longitude.required' => 'لطفا مختصات جغرافیایی درگاه را وارد کنید',
+            'description.required' => 'لطفا توضیحات درگاه را وارد کنید',
 
         ];
 
         $validator = Validator::make($request->all(), [
-            'address' => 'required',
-            'name' => 'required'
+            'altitude' => 'required',
+            'name' => 'required',
+            'mac' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
+            'description' => 'required',
         ], $messages);
 
         if ($validator->fails())
@@ -41,21 +49,23 @@ class GatewayService
 
     /**
      * @param Request $request
-     * @param $lora_info
-     * @param $core_info
+     * @param $id
      * @return void
      */
-    public function insertGateway(Request $request, $lora_info, $core_info)
+    public function insertGateway(Request $request, $id)
     {
-        $user = Auth::user();
         $gateway = Gateway::create([
+            '_id' => $id,
             'name' => $request->get('name'),
-            'address' => $request->get('address'),
-            'lora_info' => $lora_info,
-            'core_info' => $core_info,
+            'altitude' => $request->get('altitude'),
+            'description' => $request->get('description'),
+            'mac' => $request->get('mac'),
+            'loc' => [
+                'type' => 'Point',
+                'coordinates' => [$request->get('latitude'), $request->get('longitude')]
+            ],
         ]);
 
-        $user->gateways()->save($gateway);
         return $gateway;
     }
 

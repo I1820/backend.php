@@ -10,6 +10,7 @@ use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
 use App\Repository\Services\LoraService;
 use App\Repository\Services\PermissionService;
+use App\ThingProfile;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -57,7 +58,8 @@ class ThingController extends Controller
     {
         $user = Auth::user();
         $this->thingService->validateCreateThing($request);
-        $thing = $this->thingService->insertThing($request, $project);
+        $thing_profile = ThingProfile::where('thing_profile_slug', $request->get('thing_profile_slug'))->first();
+        $thing = $this->thingService->insertThing($request, $project, $thing_profile);
         $user->things()->save($thing);
         $owner_permission = $this->permissionService->get('THING-OWNER');
         $permission = Permission::create([
@@ -91,8 +93,8 @@ class ThingController extends Controller
         $user = Auth::user();
         if ($thing['user_id'] != $user->id)
             abort(404);
-        if($project->things()->where('_id',$thing['_id'])->first())
-        $thing->load(['user', 'project', 'codec']);
+        if ($project->things()->where('_id', $thing['_id'])->first())
+            $thing->load(['user', 'project', 'codec']);
 
         return Response::body(compact('thing'));
     }
@@ -150,14 +152,15 @@ class ThingController extends Controller
         $this->thingService->validateExcel($request);
         $file = $request->file('things');
         $res = [];
-        Excel::load($file, function ($reader) use (&$res) {
+        Excel::load($file, function ($reader) use (&$res, $project) {
             $user = Auth::user();
             $results = $reader->all();
             foreach ($results as $row) {
                 $data = $this->prepareRow($row);
                 try {
                     $this->thingService->validateCreateThing($data);
-                    $thing = $this->thingService->insertThing($data);
+                    $thing_profile = ThingProfile::where('thing_profile_slug', $data['thing_profile_slug'])->first();
+                    $thing = $this->thingService->insertThing($data, $project, $thing_profile);
                     $user->things()->save($thing);
                     $owner_permission = $this->permissionService->get('THING-OWNER');
                     $permission = Permission::create([
@@ -168,9 +171,12 @@ class ThingController extends Controller
                     $thing->permissions()->save($permission);
                     $user->permissions()->save($permission);
                     $res[$data['devEUI']] = $thing;
-                } catch (\Exception $e) {
+                } catch (LoraException $e) {
                     if (isset($data['devEUI']))
-                        $res[$data['devEUI']] = 'Error';
+                        $res[$data['devEUI']] = $e->getMessage();
+                }catch (\Exception $e){
+                    if (isset($data['devEUI']))
+                        $res[$data['devEUI']] = 'Unknown Error';
                 }
             }
 

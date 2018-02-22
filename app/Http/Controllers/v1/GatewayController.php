@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\Exceptions\GeneralException;
 use App\Exceptions\LoraException;
+use App\Gateway;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
 use App\Repository\Services\GatewayService;
@@ -39,21 +40,24 @@ class GatewayController extends Controller
      * @param Request $request
      * @return array
      * @throws GeneralException
+     * @throws LoraException
      */
     public function create(Request $request)
     {
         $this->gatewayService->validateCreateGateway($request);
-        $name = (string)(new ObjectId());
-        $core_info = $this->coreService->sendGateway(['address' => $request->get('address'), 'name' => $name]);
-        $core_info = (array)$core_info;
-        $core_info['name'] = $name;
-        $lora_address = 'tcp://' . config('iot.core.serverBaseUrl') . ':' . $core_info['port'];
-        try {
-            $lora_info = $this->loraService->sendNetworkServer(['address' => $lora_address, 'name' => $name]);
-        } catch (LoraException $e) {
-            $lora_info = [];
-        }
-        $gateway = $this->gatewayService->insertGateway($request, $lora_info, $core_info);
+        $data = $request->only(['altitude', 'mac', 'latitude', 'longitude', 'description']);
+        $data = array_merge($data, [
+            'organizationID' => $this->loraService->getOrganizationId(),
+            'networkServerID' => $this->loraService->getNetworkServerID(),
+        ]);
+        $id = new ObjectId();
+        $data['name'] = (string)$id;
+        $data['altitude'] = intval($data['altitude']);
+        $data['latitude'] = floatval($data['latitude']);
+        $data['longitude'] = floatval($data['longitude']);
+        $data['ping'] = $request->get('ping') === '1' ? true : false;
+        $this->loraService->sendGateway($data);
+        $gateway = $this->gatewayService->insertGateway($request, $id);
         return Response::body(compact('gateway'));
     }
 
@@ -63,11 +67,22 @@ class GatewayController extends Controller
      */
     public function list()
     {
-        $user = Auth::user();
+        $gateways = Gateway::all();
 
-        $gateway = $user->gateways()->get();
+        return Response::body(compact('gateways'));
+    }
 
-        return Response::body(compact('gateway'));
+    /**
+     * @param Gateway $gateway
+     * @return array
+     * @throws LoraException
+     * @throws \Exception
+     */
+    public function delete(Gateway $gateway)
+    {
+        $this->loraService->deleteGateway($gateway['mac']);
+        $gateway->delete();
+        return Response::body([]);
     }
 
 

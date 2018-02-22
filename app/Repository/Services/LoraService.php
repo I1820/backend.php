@@ -115,12 +115,28 @@ class LoraService
      * @return string
      * @throws LoraException
      */
-    public function sendNetworkServer($data)
+    public function sendGateway($data)
     {
         if (env('TEST_MODE'))
-            return (object)['test' => 'testValue'];
-        $url = $url = $this->base_url . '/api/network-servers';
+            return ['test' => 'testValue'];
+        $url = $url = $this->base_url . '/api/gateways';
         $response = $this->send($url, $data, 'post');
+        if ($response->status == 200)
+            return $response->content;
+        throw new LoraException($response->content->error ?: '', $response->status);
+    }
+
+    /**
+     * @param $mac
+     * @return string
+     * @throws LoraException
+     */
+    public function deleteGateway($mac)
+    {
+        if (env('TEST_MODE'))
+            return [];
+        $url = $url = $this->base_url . '/api/gateways/' . $mac;
+        $response = $this->send($url, [], 'delete');
         if ($response->status == 200)
             return $response->content;
         throw new LoraException($response->content->error ?: '', $response->status);
@@ -137,6 +153,65 @@ class LoraService
             return (object)['test' => 'testValue'];
         $url = $url = $this->base_url . '/api/devices/' . $data['devEUI'] . '/activate';
         $response = $this->send($url, $data, 'post');
+        if ($response->status == 200)
+            return $response->content;
+        throw new LoraException($response->content->error ?: '', $response->status);
+    }
+
+    /**
+     * @return \Illuminate\Config\Repository|mixed
+     */
+    public function getOrganizationId()
+    {
+        return $this->organization_id;
+    }
+
+    /**
+     * @return \Illuminate\Config\Repository|mixed
+     */
+    public function getNetworkServerID()
+    {
+        return $this->networkServerID;
+    }
+
+    /**
+     * @param $description
+     * @param $id
+     * @return string
+     * @throws LoraException
+     */
+    public function postApp($description, $id)
+    {
+        if (env('TEST_MODE'))
+            return collect(['deviceProfileID' => 'test']);
+
+        $url = $this->base_url . '/api/applications';
+        $data = [
+            'organizationID' => $this->organization_id,
+            'serviceProfileID' => $this->serviceProfileID,
+            'name' => (string)$id,
+            'description' => $description
+        ];
+        $response = $this->send($url, $data, 'post');
+
+        if ($response->status == 200)
+            return $response->content->id;
+        throw new LoraException($response->content->error, $response->content->code);
+    }
+
+    /**
+     * @param $applicationId
+     * @return string
+     * @throws LoraException
+     */
+    public function deleteApp($applicationId)
+    {
+        if (env('TEST_MODE'))
+            return (object)['test' => 'testValue'];
+
+        $url = $url = $this->base_url . '/api/applications/' . $applicationId;
+        $response = $this->send($url, [], 'delete');
+
         if ($response->status == 200)
             return $response->content;
         throw new LoraException($response->content->error ?: '', $response->status);
@@ -197,65 +272,6 @@ class LoraService
             ->post();;
         $this->token = $response->jwt;
         Storage::put('jwt.token', $this->token);
-    }
-
-    /**
-     * @return \Illuminate\Config\Repository|mixed
-     */
-    public function getOrganizationId()
-    {
-        return $this->organization_id;
-    }
-
-    /**
-     * @return \Illuminate\Config\Repository|mixed
-     */
-    public function getNetworkServerID()
-    {
-        return $this->networkServerID;
-    }
-
-    /**
-     * @param $description
-     * @param $id
-     * @return string
-     * @throws LoraException
-     */
-    public function postApp($description, $id)
-    {
-        if (env('TEST_MODE'))
-            return collect(['deviceProfileID' => 'test']);
-
-        $url = $this->base_url . '/api/applications';
-        $data = [
-            'organizationID' => $this->organization_id,
-            'serviceProfileID' => $this->serviceProfileID,
-            'name' => (string)$id,
-            'description' => $description
-        ];
-        $response = $this->send($url, $data, 'post');
-
-        if ($response->status == 200)
-            return $response->content->id;
-        throw new LoraException($response->content->error, $response->content->code);
-    }
-
-    /**
-     * @param $applicationId
-     * @return string
-     * @throws LoraException
-     */
-    public function deleteApp($applicationId)
-    {
-        if (env('TEST_MODE'))
-            return (object)['test' => 'testValue'];
-
-        $url = $url = $this->base_url . '/api/applications/' . $applicationId;
-        $response = $this->send($url, [], 'delete');
-
-        if ($response->status == 200)
-            return $response->content;
-        throw new LoraException($response->content->error ?: '', $response->status);
     }
 
 

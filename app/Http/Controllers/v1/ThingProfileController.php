@@ -33,11 +33,12 @@ class ThingProfileController extends Controller
     {
         $data = $this->prepareDeviceProfileData(collect($request->all()));
         $device_profile_id = $this->loraService->postDeviceProfile(collect($data))->deviceProfileID;
-        $thing_profiles = ThingProfile::create([
+        $thing_profile = ThingProfile::create([
             'thing_profile_slug' => $device_profile_id,
-            'data' => $data
+            'data' => $data,
+            'type' => $request->get('supportsJoin') === '1' ? 'OTAA' : 'ABP'
         ]);
-        return Response::body(compact('thing_profiles'));
+        return Response::body(compact('thing_profile'));
     }
 
     /**
@@ -89,7 +90,7 @@ class ThingProfileController extends Controller
                     'supports32bitFCnt' => $data->get('supports32bitFCnt') ? true : false,
                     'supportsClassB' => $data->get('supportsClassB') ? true : false,
                     'supportsClassC' => $data->get('supportsClassC') ? true : false,
-                    'supportsJoin' => $data->get('supportsJoin') === 1 ? true : false
+                    'supportsJoin' => $data->get('supportsJoin') === '1' ? true : false
                 ],
                 'name' => $data->get('name'),
                 'networkServerID' => $this->loraService->getNetworkServerID(),

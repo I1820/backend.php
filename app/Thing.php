@@ -21,7 +21,7 @@ class Thing extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'loc', 'description', 'period', 'interface'
+        'name', 'loc', 'description', 'period', 'interface', 'type'
     ];
 
     /**
@@ -30,7 +30,7 @@ class Thing extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'updated_at', 'created_at', 'user_id', 'id', 'project_id'
+        'updated_at', 'created_at', 'user_id', 'id', 'project_id','profile_id'
     ];
 
 
@@ -54,5 +54,10 @@ class Thing extends Eloquent
     public function codec()
     {
         return $this->hasOne(Codec::class);
+    }
+
+    public function profile()
+    {
+        return $this->belongsTo(ThingProfile::class);
     }
 }

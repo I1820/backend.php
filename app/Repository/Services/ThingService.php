@@ -14,6 +14,7 @@ use App\Exceptions\LoraException;
 use App\Exceptions\ThingException;
 use App\Project;
 use App\Thing;
+use App\ThingProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -91,25 +92,28 @@ class ThingService
     /**
      * @param $request
      * @param Project $project
+     * @param ThingProfile $thingProfile
      * @return void
      * @throws GeneralException
      * @throws LoraException
      */
-    public function insertThing($request, Project $project)
+    public function insertThing($request, Project $project, ThingProfile $thingProfile = null)
     {
-
+        if (!$thingProfile)
+            throw new GeneralException('Thing Profile Not found', 405);
         $device = $this->loraService->postDevice(collect($request->all()), $project['application_id']);
-
         $thing = Thing::create([
             'name' => $request->get('name'),
             'description' => $request->get('description'),
             'interface' => $device->toArray(),
             'period' => $request->get('period'),
+            'type' => $thingProfile['data']['deviceProfile']['supportsJoin'] ? 'OTAA' : 'ABP',
             'loc' => [
                 'type' => 'Point',
                 'coordinates' => [$request->get('lat'), $request->get('long')]
             ],
         ]);
+        $thing->profile()->associate($thingProfile);
         $this->addToProject($project, $thing);
         return $thing;
     }

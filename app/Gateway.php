@@ -14,7 +14,7 @@ class Gateway extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'address', 'user_id', 'lora_info', 'core_info'
+        'name', 'mac', 'user_id', 'description', 'loc', 'altitude', '_id'
     ];
     protected $appends = [];
 
@@ -24,11 +24,7 @@ class Gateway extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'updated_at', 'created_at', 'user_id'
+        'updated_at', 'created_at', 'user_id', 'lora_info'
     ];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 }
