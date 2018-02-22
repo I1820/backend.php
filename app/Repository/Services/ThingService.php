@@ -119,18 +119,37 @@ class ThingService
     }
 
 
-    public function activate($request, Thing $thing)
+    public function activateABP($request, Thing $thing)
     {
-        $data = $request->only([
-            "appSKey",
-            "devAddr",
-            "fCntDown",
-            "fCntUp",
-            "nwkSKey",
-            "skipFCntCheck"
+        $validor = Validator::make($request->all(), [
+            'devAddr' => 'required',
+            'nwkSKey' => 'required',
+            'appSKey' => 'required',
+            'fCntUp' => 'required',
+            'fCntDown' => 'required',
         ]);
+        if ($validor->fails())
+            throw new GeneralException('اطلاعات را کامل وارد کنید', 407);
+        $data = $request->only([
+            'devAddr',
+            'nwkSKey',
+            'appSKey',
+            'fCntUp',
+            'fCntDown',
+        ]);
+        $data['fCntUp'] = intval($data['fCntUp']);
+        $data['fCntDown'] = intval($data['fCntDown']);
+        $data['skipFCntCheck'] = $request->get('skipFCntCheck') === '1' ? true : false;
         $data['devEUI'] = $thing['interface']['devEUI'];
         $info = $this->loraService->activateDevice($data);
+        return $info;
+    }
+
+    public function activateOTAA($request, Thing $thing)
+    {
+        $data = ['deviceKeys' => ['appKey' => $request->get('appKey')]];
+        $data['devEUI'] = $thing['interface']['devEUI'];
+        $info = $this->loraService->SendKeys($data);
         return $info;
     }
 

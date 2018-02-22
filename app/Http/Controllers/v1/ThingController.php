@@ -174,7 +174,7 @@ class ThingController extends Controller
                 } catch (LoraException $e) {
                     if (isset($data['devEUI']))
                         $res[$data['devEUI']] = $e->getMessage();
-                }catch (\Exception $e){
+                } catch (\Exception $e) {
                     if (isset($data['devEUI']))
                         $res[$data['devEUI']] = 'Unknown Error';
                 }
@@ -198,6 +198,22 @@ class ThingController extends Controller
         $thing->permissions()->delete();
         $thing->delete();
         return Response::body(['success' => 'true']);
+    }
+
+    /**
+     * @param Project $project
+     * @param Thing $thing
+     * @param Request $request
+     * @return array
+     * @throws GeneralException
+     */
+    public function activate(Project $project, Thing $thing, Request $request)
+    {
+        if ($thing['type'] == 'OTAA')
+            $this->thingService->activateOTAA($request, $thing);
+        else
+            $this->thingService->activateABP($request, $thing);
+        return Response::body(['success' => 1]);
     }
 
     private function prepareRow($row)

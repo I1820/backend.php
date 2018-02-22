@@ -53,6 +53,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
             Route::get('/{thing}/data', 'ThingController@data');
             Route::patch('/{thing}', 'ThingController@update');
             Route::delete('/{thing}', 'ThingController@delete');
+            Route::post('/{thing}/activate', 'ThingController@activate');
 
             Route::post('/{thing}/codec', 'CodecController@create');
             Route::get('/{thing}/codec', 'CodecController@get');

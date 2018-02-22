@@ -159,6 +159,22 @@ class LoraService
     }
 
     /**
+     * @param $data
+     * @return string
+     * @throws LoraException
+     */
+    public function sendKeys($data)
+    {
+        if (env('TEST_MODE'))
+            return (object)['test' => 'testValue'];
+        $url = $url = $this->base_url . '/api/devices/' . $data['devEUI'] . '/keys';
+        $response = $this->send($url, $data, 'post');
+        if ($response->status == 200)
+            return $response->content;
+        throw new LoraException($response->content->error ?: '', $response->status);
+    }
+
+    /**
      * @return \Illuminate\Config\Repository|mixed
      */
     public function getOrganizationId()
