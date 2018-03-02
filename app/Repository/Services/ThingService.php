@@ -99,6 +99,7 @@ class ThingService
      */
     public function insertThing($request, Project $project, ThingProfile $thingProfile = null)
     {
+        $request->merge(['devEUI' => $project->generateDevEUI()]);
         if (!$thingProfile)
             throw new GeneralException('Thing Profile Not found', 405);
         $device = $this->loraService->postDevice(collect($request->all()), $project['application_id']);

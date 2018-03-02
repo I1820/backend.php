@@ -78,4 +78,14 @@ class Project extends Eloquent
         $scenario->save();
     }
 
+    public function generateDevEUI()
+    {
+        if (!$this->devEUICounter)
+            $this->devEUICounter = 1;
+        else
+            $this->devEUICounter++;
+        $this->save();
+        return sprintf('%08d', $this->application_id) . sprintf('%08d', $this->devEUICounter);
+    }
+
 }
