@@ -50,11 +50,15 @@ class ThingService
             'long.required' => 'لطفا محل سنسور را وارد کنید',
             'period.required' => 'لطفا بازه ارسال داده سنسور را وارد کنید',
             'period.numeric' => 'لطفا بازه ارسال داده سنسور را درست وارد کنید',
+            'devEUI.min' => 'لطفا devEUI سنسور را درست وارد کنید',
+            'devEUI.max' => 'لطفا devEUI سنسور را درست وارد کنید',
+            'devEUI.required' => 'لطفا devEUI سنسور را وارد کنید',
             'thing_profile_slug.required' => 'لطفا شناسه پروفایل شی را وارد کنید',
         ];
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
+            'devEUI' => 'required|min:16|max:16',
             'type' => 'required|',
             'description' => 'string',
             'lat' => 'required|numeric',
@@ -99,7 +103,6 @@ class ThingService
      */
     public function insertThing($request, Project $project, ThingProfile $thingProfile = null)
     {
-        $request->merge(['devEUI' => $project->generateDevEUI()]);
         if (!$thingProfile)
             throw new GeneralException('Thing Profile Not found', 405);
         $device = $this->loraService->postDevice(collect($request->all()), $project['application_id']);
