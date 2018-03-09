@@ -58,6 +58,23 @@ class ScenarioController extends Controller
 
     /**
      * @param Project $project
+     * @param Scenario $scenario
+     * @return array
+     * @throws GeneralException
+     */
+    public function activate(Project $project, Scenario $scenario)
+    {
+        $user = Auth::user();
+        if ($scenario->user()->first()['id'] != $user->id)
+            abort(404);
+        $scenario->load('project');
+        $this->coreService->sendScenario($project, $scenario);
+        return Response::body(compact('scenario'));
+    }
+
+
+    /**
+     * @param Project $project
      * @return array
      */
     public function list(Project $project)
