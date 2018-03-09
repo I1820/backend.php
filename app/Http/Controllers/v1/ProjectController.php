@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\v1;
 
+use App\Exceptions\GeneralException;
 use App\Exceptions\ProjectException;
 use App\Project;
 use App\Repository\Helper\Response;
@@ -39,11 +40,16 @@ class ProjectController extends Controller
     /**
      * @param Project $project
      * @return array
-     * @throws \App\Exceptions\GeneralException
+     * @throws GeneralException
+     * @throws \Exception
      */
     public function stop(Project $project)
     {
+        $things = $project->things();
+        if($things)
+            throw new GeneralException('Delete Things first');
         $response = $this->coreService->deleteProject($project->container->name);
+        $project->delete();
         return Response::body(compact('response'));
     }
 
@@ -51,8 +57,9 @@ class ProjectController extends Controller
     /**
      * @param Request $request
      * @return array
+     * @throws GeneralException
      * @throws ProjectException
-     * @throws \App\Exceptions\GeneralException
+     * @throws \App\Exceptions\LoraException
      */
     public function create(Request $request)
     {

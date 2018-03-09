@@ -199,8 +199,7 @@ class LoraService
     public function postApp($description, $id)
     {
         if (env('TEST_MODE'))
-            return collect(['deviceProfileID' => 'test']);
-
+            return 1;
         $url = $this->base_url . '/api/applications';
         $data = [
             'organizationID' => $this->organization_id,
