@@ -45,10 +45,11 @@ class ProjectController extends Controller
      */
     public function stop(Project $project)
     {
-        $things = $project->things();
-        if($things)
-            throw new GeneralException('Delete Things first');
-        $response = $this->coreService->deleteProject($project->container->name);
+        $things = $project->things()->get();
+        if(count($things))
+            throw new GeneralException('Delete Things and then try',400);
+        $response = $this->coreService->deleteProject($project->container['name']);
+        $project->permissions()->delete();
         $project->delete();
         return Response::body(compact('response'));
     }
