@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ThingProfile extends Eloquent
 {
+    protected $appends = ['name'];
     /**
      * The attributes that are mass assignable.
      *
@@ -30,4 +31,8 @@ class ThingProfile extends Eloquent
         return $this->hasMany(Thing::class)->with('user');
     }
 
+    public function getNameAttribute($value)
+    {
+        return $this['data']['name'];
+    }
 }
