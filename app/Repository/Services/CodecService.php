@@ -45,37 +45,16 @@ class CodecService
 
     /**
      * @param Request $request
-     * @param Thing $thing
+     * @param Project $project
      * @return void
      */
-    public function insertCodec(Request $request, Thing $thing)
+    public function insertCodec(Request $request, Project $project)
     {
-        $user = Auth::user();
         $codec = Codec::create([
             'name' => $request->get('name'),
-            'code' => $request->get('code')
+            'code' => $request->get('code'),
+            'project_id' => $project['id']
         ]);
-        $thing->codec()->save($codec);
-        $user->codecs()->save($codec);
-        $codec->thing()->associate($thing);
-        $codec->user()->associate($user);
-        return $codec;
-    }
-
-
-    /**
-     * @param Request $request
-     * @param Thing $thing
-     * @return $this|\Illuminate\Database\Eloquent\Model
-     */
-    public function updateCodec(Request $request, Thing $thing)
-    {
-        $data = $request->only(['name', 'code']);
-        $codec = $thing->codec()->first();
-        if (!$codec)
-            return $this->insertCodec($request, $thing);
-        $codec->code = $data['code'];
-        $codec->name = $data['name'];
         $codec->save();
         return $codec;
     }

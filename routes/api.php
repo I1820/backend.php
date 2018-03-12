@@ -45,6 +45,8 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::get('/{project}/scenario', 'ScenarioController@list');
         Route::get('/{project}/scenario/{scenario}', 'ScenarioController@get');
         Route::get('/{project}/scenario/{scenario}/activate', 'ScenarioController@activate');
+        Route::post('/{project}/codec', 'CodecController@create');
+        Route::get('/{project}/codec', 'CodecController@list');
 
         Route::group(['prefix' => '/{project}/things', 'middleware' => ['auth.jwt']], function () {
             Route::get('/', 'ThingController@all');
@@ -57,9 +59,8 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
             Route::post('/{thing}/activate', 'ThingController@activate');
             Route::post('/{thing}/send', 'DownLinkController@sendThing');
 
-            Route::post('/{thing}/codec', 'CodecController@create');
+            Route::post('/{thing}/codec', 'CodecController@send');
             Route::get('/{thing}/codec', 'CodecController@get');
-            Route::patch('/{thing}/codec', 'CodecController@update');
         });
     });
 

@@ -49,6 +49,11 @@ class Project extends Eloquent
         return $this->hasMany(Scenario::class);
     }
 
+    public function codecs()
+    {
+        return $this->hasMany(Codec::class);
+    }
+
 
     public function user()
     {

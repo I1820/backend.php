@@ -26,25 +26,17 @@ class CodecController extends Controller
 
     /**
      * @param Project $project
-     * @param Thing $thing
      * @param Request $request
      * @return array
      * @throws CodecException
-     * @throws \App\Exceptions\GeneralException
      */
-    public function create(Project $project, Thing $thing, Request $request)
+    public function create(Project $project, Request $request)
     {
         $user = Auth::user();
-        if ($thing->user()->first()['id'] != $user->id)
+        if ($project->owner['id'] != $user->id)
             abort(404);
-        $this->codecService->validateCreateCodec($request, $thing);
-        if ($thing->codec()->first())
-            $codec = $this->codecService->updateCodec($request, $thing);
-        else
-            $codec = $this->codecService->insertCodec($request, $thing);
-
-        if ($thing->project()->first())
-            $this->coreService->sendCodec($thing->project()->first(), $thing, $codec->code);
+        $this->codecService->validateCreateCodec($request);
+        $codec = $this->codecService->insertCodec($request, $project);
         return Response::body(compact('codec'));
     }
 
@@ -52,16 +44,46 @@ class CodecController extends Controller
     /**
      * @param Project $project
      * @param Thing $thing
+     * @param Request $request
+     * @return array
+     * @throws \App\Exceptions\GeneralException
+     */
+    public function send(Project $project, Thing $thing, Request $request)
+    {
+        $codec = $request->get('codec');
+        $this->coreService->sendCodec($project, $thing, $codec);
+        $thing->codec = $codec;
+        $thing->save();
+        return Response::body(['success'=>'200']);
+    }
+
+    /**
+     * @param Project $project
+     * @param Thing $thing
+     * @param Request $request
      * @return array
      */
-    public function get(Project $project, Thing $thing)
+    public function get(Project $project, Thing $thing, Request $request)
     {
         $user = Auth::user();
-        if ($thing->user()->first()['id'] != $user->id)
+        if ($project->owner['id'] != $user->id)
             abort(404);
-        $codec = $thing->codec()->first();
-
+        $codec = $thing->codec;
         return Response::body(compact('codec'));
+    }
+
+
+    /**
+     * @param Project $project
+     * @return array
+     */
+    public function list(Project $project)
+    {
+        $user = Auth::user();
+        if ($project->owner['id'] != $user->id)
+            abort(404);
+        $codecs = $project->codecs()->get();
+        return Response::body(compact('codecs'));
     }
 
 }

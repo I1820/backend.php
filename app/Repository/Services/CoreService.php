@@ -110,7 +110,7 @@ class CoreService
     public function sendCodec(Project $project, Thing $thing, $codec)
     {
         if (env('TEST_MODE'))
-            return (object)['test' => 'testValue'];
+            return ['test' => 'testValue'];
         $url = '/api/codec/' . $thing['interface']['devEUI'];
         $response = $this->send($url, $codec, 'post', $project['container']['runner']['port'], 0);
         if ($response->status == 200)

@@ -1,6 +1,7 @@
 <?php
 
 namespace App;
+
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,7 +13,7 @@ class Codec extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'code','user_id', 'thing_id'
+        'name', 'code', 'user_id', 'project_id'
     ];
     protected $appends = [];
 
@@ -22,16 +23,11 @@ class Codec extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'updated_at', 'created_at', 'thing_id', 'user_id'
+        'updated_at', 'created_at', 'thing_id', 'user_id', 'project_id'
     ];
 
-    public function thing()
+    public function project()
     {
-        return $this->belongsTo(Thing::class);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Project::class);
     }
 }
