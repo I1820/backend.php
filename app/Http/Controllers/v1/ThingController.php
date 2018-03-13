@@ -94,7 +94,10 @@ class ThingController extends Controller
         if ($thing['user_id'] != $user->id)
             abort(404);
         if ($project->things()->where('_id', $thing['_id'])->first())
-            $thing->load(['user', 'project', 'codec']);
+            $thing->load(['user', 'project']);
+        $codec = $thing['codec'];
+        $thing = $thing->toArray();
+        $thing['codec'] = $codec;
 
         return Response::body(compact('thing'));
     }
