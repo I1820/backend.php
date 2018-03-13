@@ -112,12 +112,11 @@ class ProjectController extends Controller
         if ($project['owner']['id'] != $user->id)
             abort(404);
         $project->load(['things', 'scenarios']);
-        foreach ($project['scenarios'] as $scenario)
-            if ($scenario['is_active'] == true) {
-                $project['scenario'] = $scenario;
-                unset($project['scenarios']);
-                break;
-            }
+        $project['scenarios']->forget('code');
+        $project['scenarios'] = $project['scenarios']->map(function ($item, $key) {
+            unset($item['code']);
+            return $item;
+        });
 
         return Response::body(compact('project'));
     }

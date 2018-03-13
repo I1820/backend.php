@@ -76,6 +76,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::post('/', 'GatewayController@create');
         Route::get('/', 'GatewayController@list');
         Route::delete('/{gateway}', 'GatewayController@delete');
+        Route::get('/{gateway}', 'GatewayController@info');
     });
 
     Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt']], function () {

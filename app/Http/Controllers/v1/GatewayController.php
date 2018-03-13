@@ -63,6 +63,15 @@ class GatewayController extends Controller
 
 
     /**
+     * @param Gateway $gateway
+     * @return array
+     */
+    public function info(Gateway $gateway)
+    {
+        return Response::body(compact('gateway'));
+    }
+
+    /**
      * @return array
      */
     public function list()
