@@ -132,14 +132,26 @@ class ThingController extends Controller
      */
     public function data(Project $project, Thing $thing, Request $request)
     {
-        $user = Auth::user();
+		$user = Auth::user();
         if ($thing['user_id'] != $user->id)
             abort(404);
-
+        $aliases = isset($project['aliases']) ? $project['aliases'] : null;
         $offset = $request->get('offset') ? Carbon::createFromTimestamp($request->get('offset')) : 0;
         $count = $request->get('count') ?: 100;
         $data = $this->coreService->getDeviceData($thing, $offset, $count);
-        //$data = $thing->data()->where('timestamp', '>', $offset)->take((int)$count)->get();
+        if ($aliases)
+            foreach ($data as $d) {
+                $res = [];
+                foreach ($d->data as $key => $item) {
+                    if (isset($aliases[$key]))
+                        $res[$aliases[$key]] = $item;
+                    else
+                        $res[$key] = $item;
+                }
+                $d->data = $res;
+                $aliased_data[] = $res;
+
+            }
 
         return Response::body(compact('data'));
     }
