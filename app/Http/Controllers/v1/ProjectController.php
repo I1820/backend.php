@@ -7,6 +7,7 @@ use App\Exceptions\ProjectException;
 use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
+use App\Repository\Services\LoraService;
 use App\Repository\Services\PermissionService;
 use App\Repository\Services\ProjectService;
 use App\Permission;
@@ -20,20 +21,24 @@ class ProjectController extends Controller
     protected $projectService;
     protected $permissionService;
     protected $coreService;
+    protected $loraService;
 
     /**
      * ProjectController constructor.
      * @param ProjectService $projectService
      * @param PermissionService $permissionService
      * @param CoreService $coreService
+     * @param LoraService $loraService
      */
     public function __construct(ProjectService $projectService,
                                 PermissionService $permissionService,
-                                CoreService $coreService)
+                                CoreService $coreService,
+                                LoraService $loraService)
     {
         $this->projectService = $projectService;
         $this->permissionService = $permissionService;
         $this->coreService = $coreService;
+        $this->loraService = $loraService;
     }
 
 
@@ -49,6 +54,7 @@ class ProjectController extends Controller
         if(count($things))
             throw new GeneralException('Delete Things and then try',400);
         $response = $this->coreService->deleteProject($project->container['name']);
+        $this->loraService->deleteApp($project['application_id']);
         $project->permissions()->delete();
         $project->delete();
         return Response::body(compact('response'));
