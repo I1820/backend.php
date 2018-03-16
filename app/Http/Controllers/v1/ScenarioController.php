@@ -72,6 +72,24 @@ class ScenarioController extends Controller
         return Response::body(compact('scenario'));
     }
 
+    /**
+     * @param Project $project
+     * @param Scenario $scenario
+     * @return array
+     * @throws GeneralException
+     * @throws \Exception
+     */
+    public function delete(Project $project, Scenario $scenario)
+    {
+        $user = Auth::user();
+        if ($scenario->user()->first()['id'] != $user->id)
+            abort(404);
+        if ($scenario->is_active)
+            throw new GeneralException('سناریو فعال است', 403);
+        $scenario->delete();
+        return Response::body(['success' => true]);
+    }
+
 
     /**
      * @param Project $project

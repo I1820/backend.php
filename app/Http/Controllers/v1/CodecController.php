@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\v1;
 
+use App\Codec;
 use App\Exceptions\CodecException;
 use App\Project;
 use App\Repository\Helper\Response;
@@ -54,7 +55,7 @@ class CodecController extends Controller
         $this->coreService->sendCodec($project, $thing, $codec);
         $thing->codec = $codec;
         $thing->save();
-        return Response::body(['success'=>'200']);
+        return Response::body(['success' => '200']);
     }
 
     /**
@@ -84,6 +85,21 @@ class CodecController extends Controller
             abort(404);
         $codecs = $project->codecs()->get();
         return Response::body(compact('codecs'));
+    }
+
+    /**
+     * @param Project $project
+     * @param Codec $codec
+     * @return array
+     * @throws \Exception
+     */
+    public function delete(Project $project, Codec $codec)
+    {
+        $user = Auth::user();
+        if ($project->owner['id'] != $user->id)
+            abort(404);
+        $codec->delete();
+        return Response::body(['success' => true]);
     }
 
 }

@@ -133,7 +133,7 @@ class CoreService
         $url = '/api/things/' . $thing['interface']['devEUI'];
         $response = $this->send($url, ['offset' => $offset->timestamp, 'limit' => $limit], 'get', $this->dmPort);
         if ($response->status == 200)
-            return $response->content;
+            return $response->content ?: [];
 
         throw new GeneralException($response->content->error ?: '', $response->status);
         return $response;
@@ -204,10 +204,10 @@ class CoreService
         throw new GeneralException($response->content->error ?: '', $response->status);
     }
 
-    public function downLinkThing(Thing $thing, $data)
+    public function downLinkThing(Project $project, Thing $thing, $data)
     {
         $url = '/api/send';
-        $data = ['thing' => $thing->toArray(), 'data' => $data, 'project_id' => $thing->project_id];
+        $data = ['thing' => $thing->toArray(), 'data' => $data, 'project_id' => $project->application_id];
         $response = $this->send($url, $data, 'post', $this->downLinkPort);
         if ($response->status == 200)
             return $response->content;
