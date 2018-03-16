@@ -69,6 +69,9 @@ class ScenarioController extends Controller
             abort(404);
         $scenario->load('project');
         $this->coreService->sendScenario($project, $scenario);
+        $project->scenarios()->update(['is_active'=>false]);
+        $scenario->is_active = true;
+        $scenario->save();
         return Response::body(compact('scenario'));
     }
 
