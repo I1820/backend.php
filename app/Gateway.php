@@ -27,4 +27,9 @@ class Gateway extends Eloquent
         'updated_at', 'created_at', 'user_id', 'lora_info'
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

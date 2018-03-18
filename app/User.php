@@ -39,10 +39,6 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
         return $this->permissions()->where('item_type', 'project')->with('project', 'project.things');
     }
 
-    public function scenarios()
-    {
-        return $this->hasMany(Scenario::class);
-    }
 
     public function things()
     {
@@ -60,8 +56,4 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
         return $this->hasMany(Gateway::class,'user_id');
     }
 
-    public function codecs()
-    {
-        return $this->hasMany(Codec::class, 'user_id');
-    }
 }

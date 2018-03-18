@@ -123,6 +123,8 @@ class LoraService
         $response = $this->send($url, $data, 'post');
         if ($response->status == 200)
             return $response->content;
+        if($response->status == 409)
+            return true;
         throw new LoraException($response->content->error ?: '', $response->status);
     }
 

@@ -51,11 +51,17 @@ class GatewayService
      * @param Request $request
      * @param $id
      * @return void
+     * @throws GeneralException
      */
     public function insertGateway(Request $request, $id)
     {
+        $user = Auth::user();
+        $old = $user->gateways()->where('mac', $request->get('mac'))->get();
+        if (count($old))
+            throw new GeneralException('این Gateway قبلا وجود دارد', 706);
         $gateway = Gateway::create([
             '_id' => $id,
+            'user_id' => $user['_id'],
             'name' => $request->get('name'),
             'altitude' => $request->get('altitude'),
             'description' => $request->get('description'),

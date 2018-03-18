@@ -68,6 +68,9 @@ class GatewayController extends Controller
      */
     public function info(Gateway $gateway)
     {
+        if (Auth::user()['_id'] != $gateway['user_id'])
+            abort(404);
+
         return Response::body(compact('gateway'));
     }
 
@@ -76,7 +79,7 @@ class GatewayController extends Controller
      */
     public function list()
     {
-        $gateways = Gateway::all();
+        $gateways = Auth::user()->gateways()->get();
 
         return Response::body(compact('gateways'));
     }
@@ -89,9 +92,13 @@ class GatewayController extends Controller
      */
     public function delete(Gateway $gateway)
     {
-        $this->loraService->deleteGateway($gateway['mac']);
+        if (Auth::user()['_id'] != $gateway['user_id'])
+            abort(404);
         $gateway->delete();
-        return Response::body([]);
+        $gateways = Gateway::where('mac', $gateway['mac'])->get();
+        if (!count($gateways))
+            $this->loraService->deleteGateway($gateway['mac']);
+        return Response::body();
     }
 
 
