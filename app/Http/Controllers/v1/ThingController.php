@@ -132,13 +132,46 @@ class ThingController extends Controller
      */
     public function data(Project $project, Thing $thing, Request $request)
     {
-		$user = Auth::user();
+        $user = Auth::user();
         if ($thing['user_id'] != $user->id)
             abort(404);
         $aliases = isset($project['aliases']) ? $project['aliases'] : null;
-        $offset = $request->get('offset') ? Carbon::createFromTimestamp($request->get('offset')) : 0;
-        $count = $request->get('count') ?: 100;
-        $data = $this->coreService->getDeviceData($thing, $offset, $count);
+        $since = $request->get('since') ?: 0;
+        $until = $request->get('until') ?: Carbon::now()->getTimestamp();
+        $data = $this->coreService->thingData($thing, $since, $until);
+        if ($aliases)
+            foreach ($data as $d) {
+                $res = [];
+                foreach ($d->data as $key => $item) {
+                    if (isset($aliases[$key]))
+                        $res[$aliases[$key]] = $item;
+                    else
+                        $res[$key] = $item;
+                }
+                $d->data = $res;
+                $aliased_data[] = $res;
+
+            }
+
+        return Response::body(compact('data'));
+    }
+
+    /**
+     * @param Project $project
+     * @param Thing $thing
+     * @param Request $request
+     * @return array
+     * @throws \App\Exceptions\GeneralException
+     */
+    public function multiThingData(Project $project, Request $request)
+    {
+
+        $aliases = isset($project['aliases']) ? $project['aliases'] : null;
+        $since = $request->get('since') ?: 0;
+        $until = $request->get('until') ?: Carbon::now()->getTimestamp();
+        $thing_ids = json_decode($request->get('thing_ids'), true)['ids'] ?: [];
+        $thing_ids = $project->things()->whereIn('_id',$thing_ids)->get()->pluck('interface.devEUI');
+        $data = $this->coreService->thingsData($thing_ids, $since, $until);
         if ($aliases)
             foreach ($data as $d) {
                 $res = [];

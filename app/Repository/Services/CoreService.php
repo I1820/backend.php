@@ -121,17 +121,37 @@ class CoreService
 
     /**
      * @param Thing $thing
-     * @param $offset
-     * @param $limit
+     * @param $since
+     * @param $until
      * @return string
      * @throws GeneralException
      */
-    public function getDeviceData(Thing $thing, $offset, $limit)
+    public function thingData(Thing $thing, $since, $until)
     {
         if (env('TEST_MODE'))
             return ['test' => 'testValue'];
         $url = '/api/things/' . $thing['interface']['devEUI'];
-        $response = $this->send($url, ['offset' => $offset->timestamp, 'limit' => $limit], 'get', $this->dmPort);
+        $response = $this->send($url, ['since' => $since, 'until' => $until], 'get', $this->dmPort);
+        if ($response->status == 200)
+            return $response->content ?: [];
+
+        throw new GeneralException($response->content->error ?: '', $response->status);
+        return $response;
+    }
+
+    /**
+     * @param array $ids
+     * @param $since
+     * @param $until
+     * @return string
+     * @throws GeneralException
+     */
+    public function thingsData($ids, $since, $until)
+    {
+        if (env('TEST_MODE'))
+            return ['test' => 'testValue'];
+        $url = '/api/things/';
+        $response = $this->send($url, ['since' => $since, 'until' => $until, 'thing_ids' => $ids], 'post', $this->dmPort);
         if ($response->status == 200)
             return $response->content ?: [];
 

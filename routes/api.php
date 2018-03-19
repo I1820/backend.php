@@ -56,7 +56,10 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
             Route::post('/', 'ThingController@create');
             Route::post('/from-excel', 'ThingController@fromExcel');
             Route::get('/{thing}', 'ThingController@get');
+
             Route::get('/{thing}/data', 'ThingController@data');
+            Route::post('data', 'ThingController@multiThingData');
+
             Route::patch('/{thing}', 'ThingController@update');
             Route::delete('/{thing}', 'ThingController@delete');
             Route::post('/{thing}/activate', 'ThingController@activate');
