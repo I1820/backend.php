@@ -44,6 +44,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::post('/{project}/scenario', 'ScenarioController@create');
         Route::get('/{project}/scenario', 'ScenarioController@list');
         Route::get('/{project}/scenario/{scenario}', 'ScenarioController@get');
+        Route::patch('/{project}/scenario/{scenario}', 'ScenarioController@update');
         Route::delete('/{project}/scenario/{scenario}', 'ScenarioController@delete');
         Route::get('/{project}/scenario/{scenario}/activate', 'ScenarioController@activate');
         Route::post('/{project}/codec', 'CodecController@create');
