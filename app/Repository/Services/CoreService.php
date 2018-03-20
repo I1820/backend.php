@@ -89,7 +89,7 @@ class CoreService
     {
         if (env('TEST_MODE'))
             return (object)['test' => 'testValue'];
-        $url = '/api/project/' . $project['container']['name'] . '/things/';
+        $url = '/api/project/' . $project['container']['name'] . '/things';
         $data = [
             'name' => $thing['interface']['devEUI'],
         ];
@@ -150,8 +150,8 @@ class CoreService
     {
         if (env('TEST_MODE'))
             return ['test' => 'testValue'];
-        $url = '/api/things/';
-        $response = $this->send($url, ['since' => $since, 'until' => $until, 'thing_ids' => $ids], 'post', $this->dmPort);
+        $url = '/api/things';
+        $response = $this->send($url, ['since' => (int)$since, 'until' => (int)$until, 'thing_ids' => $ids], 'post', $this->dmPort);
         if ($response->status == 200)
             return $response->content ?: [];
 
