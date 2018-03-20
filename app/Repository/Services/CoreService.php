@@ -149,7 +149,96 @@ class CoreService
     public function thingsData($ids, $since, $until)
     {
         if (env('TEST_MODE'))
-            return ['test' => 'testValue'];
+            return array (
+                        0 =>
+                            (object)array (
+                                '_id' => '5ab0bb08845ac1936f1f3c15',
+                                'data' =>
+                                    array (
+                                        1 => 23.625101089477539,
+                                        4 => 23.497787475585938,
+                                    ),
+                                'rxinfo' =>
+                                    array (
+                                        0 =>
+                                            array (
+                                                'lorasnr' => 3,
+                                                'mac' => 'b827ebffff47d1a5',
+                                                'name' => '5aaf30e5429987001965dfa5',
+                                                'rssi' => -114,
+                                                'time' => '0001-01-01T00:00:00Z',
+                                            ),
+                                    ),
+                                'thingid' => '0000000000000001',
+                                'timestamp' => '2018-03-20T11:10:56.908+03:30',
+                            ),
+                        1 =>
+                            (object)array (
+                                '_id' => '5ab0bb0b845ac1936f1f3c1a',
+                                'data' =>
+                                    array (
+                                        2 => 23.497787475585938,
+                                        4 => 23.625101089477539,
+                                    ),
+                                'rxinfo' =>
+                                    array (
+                                        0 =>
+                                            array (
+                                                'lorasnr' => 2.5,
+                                                'mac' => 'b827ebffff47d1a5',
+                                                'name' => '5aaf30e5429987001965dfa5',
+                                                'rssi' => -114,
+                                                'time' => '0001-01-01T00:00:00Z',
+                                            ),
+                                    ),
+                                'thingid' => '0000000000000001',
+                                'timestamp' => '2018-03-20T11:10:59.015+03:30',
+                            ),
+                        2 =>
+                            (object)array (
+                                '_id' => '5ab0bd61845ac1936f1f3d63',
+                                'data' =>
+                                    array (
+                                        1 => 23.435916900634766,
+                                        3 => 23.829360961914062,
+                                    ),
+                                'rxinfo' =>
+                                    array (
+                                        0 =>
+                                            array (
+                                                'lorasnr' => 3.5,
+                                                'mac' => 'b827ebffff47d1a5',
+                                                'name' => '5aaf30e5429987001965dfa5',
+                                                'rssi' => -112,
+                                                'time' => '0001-01-01T00:00:00Z',
+                                            ),
+                                    ),
+                                'thingid' => '0000000000000001',
+                                'timestamp' => '2018-03-20T11:20:57.053+03:30',
+                            ),
+                        3 =>
+                            (object)array (
+                                '_id' => '5ab0bd63845ac1936f1f3d67',
+                                'data' =>
+                                    array (
+                                        1 => 23.435916900634766,
+                                        2 => 23.829360961914062,
+                                    ),
+                                'rxinfo' =>
+                                    array (
+                                        0 =>
+                                            array (
+                                                'lorasnr' => 1.2,
+                                                'mac' => 'b827ebffff47d1a5',
+                                                'name' => '5aaf30e5429987001965dfa5',
+                                                'rssi' => -114,
+                                                'time' => '0001-01-01T00:00:00Z',
+                                            ),
+                                    ),
+                                'thingid' => '0000000000000001',
+                                'timestamp' => '2018-03-20T11:20:59.162+03:30',
+                            ),
+            );
         $url = '/api/things';
         $response = $this->send($url, ['since' => (int)$since, 'until' => (int)$until, 'thing_ids' => $ids], 'post', $this->dmPort);
         if ($response->status == 200)

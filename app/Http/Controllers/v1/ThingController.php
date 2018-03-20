@@ -139,20 +139,8 @@ class ThingController extends Controller
         $since = $request->get('since') ?: 0;
         $until = $request->get('until') ?: Carbon::now()->getTimestamp();
         $data = $this->coreService->thingData($thing, $since, $until);
-        if ($aliases)
-            foreach ($data as $d) {
-                $res = [];
-                foreach ($d->data as $key => $item) {
-                    if (isset($aliases[$key]))
-                        $res[$aliases[$key]] = $item;
-                    else
-                        $res[$key] = $item;
-                }
-                $d->data = $res;
-                $aliased_data[] = $res;
-
-            }
-
+        $data = $this->fillMissingData($data);
+        $data = $this->alias($data, $aliases);
         return Response::body(compact('data'));
     }
 
@@ -170,21 +158,10 @@ class ThingController extends Controller
         $since = $request->get('since') ?: 0;
         $until = $request->get('until') ?: Carbon::now()->getTimestamp();
         $thing_ids = json_decode($request->get('thing_ids'), true)['ids'] ?: [];
-        $thing_ids = $project->things()->whereIn('_id',$thing_ids)->get()->pluck('interface.devEUI');
+        $thing_ids = $project->things()->whereIn('_id', $thing_ids)->get()->pluck('interface.devEUI');
         $data = $this->coreService->thingsData($thing_ids, $since, $until);
-        if ($aliases)
-            foreach ($data as $d) {
-                $res = [];
-                foreach ($d->data as $key => $item) {
-                    if (isset($aliases[$key]))
-                        $res[$aliases[$key]] = $item;
-                    else
-                        $res[$key] = $item;
-                }
-                $d->data = $res;
-                $aliased_data[] = $res;
-
-            }
+        $data = $this->fillMissingData($data);
+        $data = $this->alias($data, $aliases);
 
         return Response::body(compact('data'));
     }
@@ -271,6 +248,35 @@ class ThingController extends Controller
         $row['factoryPresetFreqs'] = isset($row['factoryPresetFreqs']) ? [$row['factoryPresetFreqs']] : [];
         return collect($row);
 
+    }
+
+    private function fillMissingData($data)
+    {
+        $keys = [];
+        foreach ($data as $d)
+            $keys = array_unique(array_merge($keys, array_keys($d->data)));
+
+        foreach ($data as $d)
+            foreach ($keys as $key)
+                if (!isset($d->data[$key]))
+                    $d->data[$key] = null;
+        return $data;
+    }
+
+    private function alias($data, $aliases)
+    {
+        if ($aliases)
+            foreach ($data as $d) {
+                $res = [];
+                foreach ($d->data as $key => $item) {
+                    if (isset($aliases[$key]))
+                        $res[$aliases[$key]] = $item;
+                    else
+                        $res[$key] = $item;
+                }
+                $d->data = $res;
+            }
+        return $data;
     }
 
 
