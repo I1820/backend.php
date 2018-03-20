@@ -159,7 +159,7 @@ class ThingController extends Controller
         $thing_ids = json_decode($request->get('thing_ids'), true)['ids'] ?: [];
         $thing_ids = $project->things()->whereIn('_id', $thing_ids)->get()->pluck('interface.devEUI');
         $data = $this->coreService->thingsData($thing_ids, $since, $until);
-        $data = $this->fillMissingData($data);
+        //$data = $this->fillMissingData($data);
         $data = $this->alias($data, $aliases);
 
         return Response::body(compact('data'));
