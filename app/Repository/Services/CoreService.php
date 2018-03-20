@@ -131,7 +131,7 @@ class CoreService
         if (env('TEST_MODE'))
             return ['test' => 'testValue'];
         $url = '/api/things/' . $thing['interface']['devEUI'];
-        $response = $this->send($url, ['since' => $since, 'until' => $until], 'get', $this->dmPort);
+        $response = $this->send($url, ['since' => (int)$since, 'until' => (int)$until], 'get', $this->dmPort);
         if ($response->status == 200)
             return $response->content ?: [];
 
