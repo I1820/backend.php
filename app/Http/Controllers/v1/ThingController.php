@@ -253,13 +253,15 @@ class ThingController extends Controller
     {
         $keys = [];
         foreach ($data as $d)
-            $keys = array_unique(array_merge($keys, array_keys($d->data)));
+            $keys = array_unique(array_merge($keys, array_keys((array)$d->data)));
 
-        foreach ($data as $d)
+        foreach ($data as $d) {
             foreach ($keys as $key)
-                if (!isset($d->data[$key]))
-                    $d->data[$key] = null;
+                if (!property_exists($d->data, $key))
+                    $d->data->$key = null;
+        }
         return $data;
+
     }
 
     private function alias($data, $aliases)
