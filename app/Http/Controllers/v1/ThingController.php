@@ -139,7 +139,6 @@ class ThingController extends Controller
         $since = $request->get('since') ?: 0;
         $until = $request->get('until') ?: Carbon::now()->getTimestamp();
         $data = $this->coreService->thingData($thing, $since, $until);
-        $data = $this->fillMissingData($data);
         $data = $this->alias($data, $aliases);
         return Response::body(compact('data'));
     }
