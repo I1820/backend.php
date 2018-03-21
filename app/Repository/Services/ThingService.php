@@ -202,8 +202,8 @@ class ThingService
 
         if ($request->get('lat') && $request->get('long'))
             $thing->loc = [
-                'lat' => $request->get('lat'),
-                'long' => $request->get('long')
+                'type' => 'Point',
+                'coordinates' => [$request->get('lat'), $request->get('long')]
             ];
 
         $thing->save();
