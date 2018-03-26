@@ -23,6 +23,12 @@ class CodecController extends Controller
     {
         $this->codecService = $codecService;
         $this->coreService = $coreService;
+
+        $this->middleware('can:update,project')->only(['create']);
+        $this->middleware('can:view,project')->only(['list']);
+        $this->middleware('can:update,thing')->only(['send']);
+        $this->middleware('can:view,codec')->only(['get']);
+        $this->middleware('can:delete,codec')->only(['delete']);
     }
 
     /**

@@ -39,26 +39,10 @@ class ProjectController extends Controller
         $this->coreService = $coreService;
         $this->loraService = $loraService;
 
-        $this->middleware('can:view,project')->only(['get']);
-    }
-
-
-    /**
-     * @param Project $project
-     * @return array
-     * @throws GeneralException
-     * @throws \Exception
-     */
-    public function stop(Project $project)
-    {
-        $things = $project->things()->get();
-        if(count($things))
-            throw new GeneralException('Delete Things and then try',400);
-        $response = $this->coreService->deleteProject($project->container['name']);
-        $this->loraService->deleteApp($project['application_id']);
-        $project->permissions()->delete();
-        $project->delete();
-        return Response::body($response);
+        $this->middleware('can:view,project')->only(['get','things']);
+        $this->middleware('can:update,project')->only(['update']);
+        $this->middleware('can:delete,project')->only(['stop']);
+        $this->middleware('can:create,App\Project')->only(['create']);
     }
 
 
@@ -84,6 +68,25 @@ class ProjectController extends Controller
         $user->permissions()->save($permission);
 
         return Response::body(compact('project'));
+    }
+
+
+    /**
+     * @param Project $project
+     * @return array
+     * @throws GeneralException
+     * @throws \Exception
+     */
+    public function stop(Project $project)
+    {
+        $things = $project->things()->get();
+        if(count($things))
+            throw new GeneralException('ابتدا اشیا این پروژه رو پاک کنید',700);
+        $response = $this->coreService->deleteProject($project->container['name']);
+        $this->loraService->deleteApp($project['application_id']);
+        $project->permissions()->delete();
+        $project->delete();
+        return Response::body($response);
     }
 
     /**
@@ -114,9 +117,6 @@ class ProjectController extends Controller
      */
     public function get(Project $project)
     {
-//        $user = Auth::user();
-//        if ($project['owner']['id'] != $user->id)
-//            abort(404);
         $project->load(['things', 'scenarios']);
         $project['scenarios']->forget('code');
         $project['scenarios'] = $project['scenarios']->map(function ($item, $key) {
@@ -136,10 +136,6 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        $user = Auth::user();
-        if ($project['owner']['id'] != $user->id)
-            abort(404);
-
         $this->projectService->validateUpdateProject($request);
 
         $project = $this->projectService->updateProject($request, $project);

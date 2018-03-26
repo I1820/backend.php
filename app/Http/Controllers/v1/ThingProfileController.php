@@ -9,6 +9,7 @@ use App\Exceptions\LoraException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class ThingProfileController extends Controller
 {
@@ -21,6 +22,10 @@ class ThingProfileController extends Controller
     public function __construct(LoraService $loraService)
     {
         $this->loraService = $loraService;
+
+        $this->middleware('can:view,thing_profile')->only(['get']);
+        $this->middleware('can:delete,thing_profile')->only(['delete']);
+        $this->middleware('can:create,App\ThingProfile')->only(['create']);
     }
 
 
@@ -31,12 +36,14 @@ class ThingProfileController extends Controller
      */
     public function create(Request $request)
     {
+        $user = Auth::user();
         $data = $this->prepareDeviceProfileData(collect($request->all()));
         $device_profile_id = $this->loraService->postDeviceProfile(collect($data))->deviceProfileID;
         $thing_profile = ThingProfile::create([
             'thing_profile_slug' => $device_profile_id,
             'data' => $data,
-            'type' => $request->get('supportsJoin') === '1' ? 'OTAA' : 'ABP'
+            'type' => $request->get('supportsJoin') === '1' ? 'OTAA' : 'ABP',
+            'user_id' => $user['_id'],
         ]);
         return Response::body(compact('thing_profile'));
     }
@@ -46,8 +53,20 @@ class ThingProfileController extends Controller
      */
     public function all()
     {
-        $thing_profiles = ThingProfile::all();
+        $thing_profiles = Auth::user()->thingProfiles()->get();
         return Response::body(compact('thing_profiles'));
+    }
+
+
+    /**
+     * @param ThingProfile $thing_profile
+     * @return array
+     */
+    public function get(ThingProfile $thing_profile)
+    {
+        $res = $thing_profile->toArray();
+        $res['parameters'] = $thing_profile['data']['deviceProfile'];
+        return Response::body(['thing_profile' => $res]);
     }
 
     /**
@@ -102,4 +121,5 @@ class ThingProfileController extends Controller
 
         return $res;
     }
+
 }

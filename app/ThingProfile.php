@@ -14,7 +14,7 @@ class ThingProfile extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'thing_profile_slug', 'data','type'
+        'thing_profile_slug', 'data','type', 'user_id'
     ];
 
     /**

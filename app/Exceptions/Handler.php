@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use App\Repository\Helper\Response;
 use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
@@ -49,7 +50,9 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        if ($exception instanceof IOTException) { # IOT exceptions
+        if ($exception instanceof AuthorizationException)
+            $response = response(Response::body(GeneralException::M_ACCESS_DENIED, 703), 403);
+        else if ($exception instanceof IOTException) { # IOT exceptions
             $response = $this->CustomException($exception);
         } else { # other exceptions
             $response = $this->otherExceptions($request, $exception);
@@ -63,7 +66,6 @@ class Handler extends ExceptionHandler
      */
     private function CustomException(Exception $e)
     {
-
         if ($e->getCode() == 701)
             $code = 401;
         else

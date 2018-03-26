@@ -53,7 +53,12 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
 
     public function gateways()
     {
-        return $this->hasMany(Gateway::class,'user_id');
+        return $this->hasMany(Gateway::class, 'user_id');
+    }
+
+    public function thingProfiles()
+    {
+        return $this->hasMany(ThingProfile::class, 'user_id');
     }
 
 }

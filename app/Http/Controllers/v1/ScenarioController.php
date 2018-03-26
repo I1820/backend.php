@@ -22,6 +22,12 @@ class ScenarioController extends Controller
     {
         $this->scenarioService = $scenarioService;
         $this->coreService = $coreService;
+
+        $this->middleware('can:view,project')->only(['list']);
+        $this->middleware('can:update,project')->only(['create', 'activate']);
+        $this->middleware('can:delete,scenario')->only(['delete']);
+        $this->middleware('can:view,scenario')->only(['get']);
+        $this->middleware('can:update,scenario')->only(['update']);
     }
 
     /**
@@ -32,8 +38,6 @@ class ScenarioController extends Controller
      */
     public function create(Request $request, Project $project)
     {
-        if (!$this->custom_authorize($project))
-            abort(404);
         $this->scenarioService->validateCreateScenario($request);
         $scenario = $this->scenarioService->insertScenario($request, $project);
         $this->coreService->sendScenario($project, $scenario);
@@ -48,8 +52,6 @@ class ScenarioController extends Controller
      */
     public function get(Project $project, Scenario $scenario)
     {
-        if (!$this->custom_authorize($project, $scenario))
-            abort(404);
         $scenario->load('project');
         return Response::body(compact('scenario'));
     }
@@ -62,8 +64,6 @@ class ScenarioController extends Controller
      */
     public function activate(Project $project, Scenario $scenario)
     {
-        if (!$this->custom_authorize($project, $scenario))
-            abort(404);
         $scenario->load('project');
         $this->coreService->sendScenario($project, $scenario);
         $project->scenarios()->update(['is_active' => false]);
@@ -81,11 +81,10 @@ class ScenarioController extends Controller
      */
     public function update(Project $project, Scenario $scenario, Request $request)
     {
-        if (!$this->custom_authorize($project, $scenario))
-            abort(404);
-        if($request->get('name'))
+
+        if ($request->get('name'))
             $scenario->name = $request->get('name');
-        if($request->get('code'))
+        if ($request->get('code'))
             $scenario->code = $request->get('code');
         $scenario->save();
         return Response::body(compact('scenario'));
@@ -100,8 +99,6 @@ class ScenarioController extends Controller
      */
     public function delete(Project $project, Scenario $scenario)
     {
-        if (!$this->custom_authorize($project, $scenario))
-            abort(404);
         if ($scenario->is_active)
             throw new GeneralException('سناریو فعال است', 403);
         $scenario->delete();
@@ -116,24 +113,8 @@ class ScenarioController extends Controller
     public function list(Project $project)
     {
 
-        if (!$this->custom_authorize($project))
-            abort(404);
         $scenarios = $project->scenarios()->get();
-
         return Response::body(compact('scenarios'));
     }
 
-    public function custom_authorize(Project $project, Scenario $scenario = null)
-    {
-        $user = Auth::user();
-        if ($project['owner']['_id'] != $user->id)
-            return false;
-        if ($scenario && $scenario->user()->first()['id'] != $user->id)
-            return false;
-        if ($scenario && $scenario['project_id'] != $project['_id'])
-            return false;
-        return true;
-
-
-    }
 }

@@ -75,6 +75,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::get('/', 'ThingProfileController@all');
         Route::post('/', 'ThingProfileController@create');
         Route::delete('/{thing_profile}', 'ThingProfileController@delete');
+        Route::get('/{thing_profile}', 'ThingProfileController@get');
 
     });
 

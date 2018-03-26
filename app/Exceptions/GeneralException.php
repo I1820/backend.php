@@ -22,6 +22,7 @@ class GeneralException extends IOTException
 
 
     const M_UNKNOWN = 'خطای نامشخص';
+    const M_ACCESS_DENIED = 'دسترسی انجام این عملیات را ندارید';
 
     /**
      * UserException constructor.

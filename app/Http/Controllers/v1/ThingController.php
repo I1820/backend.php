@@ -42,6 +42,12 @@ class ThingController extends Controller
         $this->permissionService = $permissionService;
         $this->coreService = $coreService;
         $this->loraService = $loraService;
+
+        $this->middleware('can:view,project')->only(['all']);
+        $this->middleware('can:update,project')->only(['fromExcel','create']);
+        $this->middleware('can:delete,thing')->only(['delete']);
+        $this->middleware('can:update,thing')->only(['activate','update']);
+        $this->middleware('can:view,thing')->only(['get','data','multiThingData']);
     }
 
 
@@ -88,9 +94,6 @@ class ThingController extends Controller
      */
     public function get(Project $project, Thing $thing)
     {
-        $user = Auth::user();
-        if ($thing['user_id'] != $user->id)
-            abort(404);
         if ($project->things()->where('_id', $thing['_id'])->first())
             $thing->load(['user', 'project']);
         $codec = $thing['codec'];
@@ -109,14 +112,8 @@ class ThingController extends Controller
      */
     public function update(Project $project, Thing $thing, Request $request)
     {
-        $user = Auth::user();
-        if ($thing['user_id'] != $user->id)
-            abort(404);
-
         $this->thingService->validateUpdateThing($request);
-
         $thing = $this->thingService->updateThing($request, $thing);
-
 
         return Response::body(compact('thing'));
     }
@@ -130,9 +127,6 @@ class ThingController extends Controller
      */
     public function data(Project $project, Thing $thing, Request $request)
     {
-        $user = Auth::user();
-        if ($thing['user_id'] != $user->id)
-            abort(404);
         $aliases = isset($project['aliases']) ? $project['aliases'] : null;
         $since = $request->get('since') ?: 0;
         $until = $request->get('until') ?: Carbon::now()->getTimestamp();
@@ -143,14 +137,12 @@ class ThingController extends Controller
 
     /**
      * @param Project $project
-     * @param Thing $thing
      * @param Request $request
      * @return array
-     * @throws \App\Exceptions\GeneralException
+     * @throws GeneralException
      */
     public function multiThingData(Project $project, Request $request)
     {
-
         $aliases = isset($project['aliases']) ? $project['aliases'] : null;
         $since = $request->get('since') ?: 0;
         $until = $request->get('until') ?: Carbon::now()->getTimestamp();
