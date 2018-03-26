@@ -14,7 +14,6 @@ use App\ThingProfile;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Exceptions\ThingException;
 use App\Repository\Services\ThingService;
 use App\Thing;
 use Illuminate\Support\Facades\Auth;
@@ -50,7 +49,6 @@ class ThingController extends Controller
      * @param Project $project
      * @param Request $request
      * @return array
-     * @throws ThingException
      * @throws GeneralException
      * @throws LoraException
      */
@@ -107,7 +105,7 @@ class ThingController extends Controller
      * @param Thing $thing
      * @param Request $request
      * @return array
-     * @throws ThingException
+     * @throws GeneralException
      */
     public function update(Project $project, Thing $thing, Request $request)
     {
@@ -169,7 +167,7 @@ class ThingController extends Controller
      * @param Project $project
      * @param Request $request
      * @return array
-     * @throws ThingException
+     * @throws GeneralException
      */
     public function fromExcel(Project $project, Request $request)
     {
@@ -237,7 +235,7 @@ class ThingController extends Controller
             $this->thingService->activateOTAA($request, $thing);
         else
             $this->thingService->activateABP($request, $thing);
-        return Response::body(['success' => 1]);
+        return Response::body(['success' => 'true']);
     }
 
     private function prepareRow($row)

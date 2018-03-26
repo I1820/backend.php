@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Codec;
-use App\Exceptions\CodecException;
+use App\Exceptions\GeneralException;
 use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CodecService;
@@ -29,7 +29,7 @@ class CodecController extends Controller
      * @param Project $project
      * @param Request $request
      * @return array
-     * @throws CodecException
+     * @throws GeneralException
      */
     public function create(Project $project, Request $request)
     {
@@ -55,7 +55,7 @@ class CodecController extends Controller
         $this->coreService->sendCodec($project, $thing, $codec);
         $thing->codec = $codec;
         $thing->save();
-        return Response::body(['success' => '200']);
+        return Response::body(['success' => 'true']);
     }
 
     /**

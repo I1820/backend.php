@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Exceptions\AuthException;
+use App\Exceptions\GeneralException;
 use App\Http\Controllers\Controller;
 use App\Repository\Helper\Response;
 use App\Repository\Services\UserService;
@@ -27,7 +28,7 @@ class AuthController extends Controller
     /**
      * @param Request $request
      * @return array
-     * @throws AuthException
+     * @throws GeneralException
      */
     public function register(Request $request)
     {
@@ -48,19 +49,20 @@ class AuthController extends Controller
      * @param Request $request
      * @return array
      * @throws AuthException
+     * @throws GeneralException
      */
     public function login(Request $request)
     {
         $request->merge($request->json()->all());
         $validator = $this->loginValidator($request);
         if ($validator->fails()) {
-            throw new AuthException($validator->errors()->first(), AuthException::C_ER);
+            throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
         }
 
         $token = $this->userService->generateToken($request);
         $user = Auth::user();
         if (!$user->active)
-            throw new AuthException(AuthException::M_NA, AuthException::C_NA);
+            throw new AuthException(AuthException::M_USER_NOT_ACTIVE, AuthException::UNAUTHORIZED);
 
         return Response::body(compact('user', 'token'));
     }

@@ -10,7 +10,7 @@ namespace App\Repository\Services;
 
 
 use App\Codec;
-use App\Exceptions\CodecException;
+use App\Exceptions\GeneralException;
 use App\Project;
 use App\Thing;
 use Illuminate\Http\Request;
@@ -24,7 +24,7 @@ class CodecService
     /**
      * @param Request $request
      * @return void
-     * @throws CodecException
+     * @throws GeneralException
      */
     public function validateCreateCodec(Request $request)
     {
@@ -40,7 +40,7 @@ class CodecService
         ], $messages);
 
         if ($validator->fails())
-            throw new  CodecException($validator->errors()->first(), CodecException::C_GE);
+            throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
     }
 
     /**

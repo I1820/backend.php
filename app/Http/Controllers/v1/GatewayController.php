@@ -98,7 +98,7 @@ class GatewayController extends Controller
         $gateways = Gateway::where('mac', $gateway['mac'])->get();
         if (!count($gateways))
             $this->loraService->deleteGateway($gateway['mac']);
-        return Response::body();
+        return Response::body(['success' => 'true']);
     }
 
 

@@ -14,9 +14,10 @@ class AuthJwt
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure $next
      * @return mixed
+     * @throws AuthException
      */
     public function handle($request, Closure $next)
     {
@@ -32,14 +33,14 @@ class AuthJwt
     {
         try {
             if (!$user = JWTAuth::parseToken()->authenticate()) {
-                throw new AuthException(AuthException::M_UNF, AuthException::C_UNF);
+                throw new AuthException('user not found', AuthException::UNAUTHORIZED);
             }
         } catch (TokenExpiredException $e) {
-            throw new AuthException(AuthException::M_TE, AuthException::C_TE);
+            throw new AuthException('token expired', AuthException::UNAUTHORIZED);
         } catch (TokenInvalidException $e) {
-            throw new AuthException(AuthException::M_TI, AuthException::C_TI);
-        } catch (JWTException $e){
-            throw new AuthException(AuthException::M_UA, AuthException::C_UA);
+            throw new AuthException('token invalid', AuthException::UNAUTHORIZED);
+        } catch (JWTException $e) {
+            throw new AuthException('unauthorized', AuthException::UNAUTHORIZED);
         }
     }
 }

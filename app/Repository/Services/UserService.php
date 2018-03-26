@@ -9,6 +9,7 @@
 namespace App\Repository\Services;
 
 use App\Exceptions\AuthException;
+use App\Exceptions\GeneralException;
 use App\Repository\Traits\RegisterUser;
 use App\Repository\Traits\UpdateUser;
 use Illuminate\Http\Request;
@@ -35,7 +36,7 @@ class UserService
         $token = JWTAuth::attempt($credentials);
 
         if (!$token) {
-            throw new AuthException(AuthException::M_IC, AuthException::C_IC);
+            throw new AuthException(AuthException::M_INVALID_CREDENTIALS, AuthException::UNAUTHORIZED);
         }
 
         return $token;
@@ -43,14 +44,14 @@ class UserService
 
     /**
      * @return string
-     * @throws AuthException
+     * @throws GeneralException
      */
     public function refreshToken(): string
     {
         try {
             return JWTAuth::refresh(JWTAuth::getToken());
         } catch (TokenBlacklistedException $exception) {
-            throw new AuthException(AuthException::M_TBL, AuthException::C_TBL);
+            throw new GeneralException(GeneralException::M_UNKNOWN, GeneralException::UNKNOWN_ERROR);
         }
     }
 

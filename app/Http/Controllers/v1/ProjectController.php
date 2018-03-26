@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\v1;
 
 use App\Exceptions\GeneralException;
-use App\Exceptions\ProjectException;
 use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
@@ -39,6 +38,8 @@ class ProjectController extends Controller
         $this->permissionService = $permissionService;
         $this->coreService = $coreService;
         $this->loraService = $loraService;
+
+        $this->middleware('can:view,project')->only(['get']);
     }
 
 
@@ -57,7 +58,7 @@ class ProjectController extends Controller
         $this->loraService->deleteApp($project['application_id']);
         $project->permissions()->delete();
         $project->delete();
-        return Response::body(compact('response'));
+        return Response::body($response);
     }
 
 
@@ -65,7 +66,6 @@ class ProjectController extends Controller
      * @param Request $request
      * @return array
      * @throws GeneralException
-     * @throws ProjectException
      * @throws \App\Exceptions\LoraException
      */
     public function create(Request $request)
@@ -114,9 +114,9 @@ class ProjectController extends Controller
      */
     public function get(Project $project)
     {
-        $user = Auth::user();
-        if ($project['owner']['id'] != $user->id)
-            abort(404);
+//        $user = Auth::user();
+//        if ($project['owner']['id'] != $user->id)
+//            abort(404);
         $project->load(['things', 'scenarios']);
         $project['scenarios']->forget('code');
         $project['scenarios'] = $project['scenarios']->map(function ($item, $key) {
@@ -129,10 +129,10 @@ class ProjectController extends Controller
 
 
     /**
-     * @param Project $project
      * @param Request $request
+     * @param Project $project
      * @return array
-     * @throws ProjectException
+     * @throws GeneralException
      */
     public function update(Request $request, Project $project)
     {

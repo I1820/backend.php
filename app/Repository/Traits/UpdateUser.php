@@ -8,7 +8,7 @@
 
 namespace App\Repository\Traits;
 
-use App\Exceptions\UserException;
+use App\Exceptions\GeneralException;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +19,7 @@ trait UpdateUser
 
     /**
      * @param Request $request
-     * @return $this|\Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function updateUser(Request $request)
     {
@@ -34,7 +34,7 @@ trait UpdateUser
     /**
      * @param Request $request
      * @return void
-     * @throws UserException
+     * @throws GeneralException
      */
     public function validateUpdateUser(Request $request)
     {
@@ -62,7 +62,7 @@ trait UpdateUser
         ], $messages);
 
         if ($validator->fails())
-            throw new UserException($validator->errors()->first(), UserException::C_UE);
+            throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
     }
 
     private function validateUpdateLegal(Request $request)

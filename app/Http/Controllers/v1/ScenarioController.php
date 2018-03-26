@@ -105,7 +105,7 @@ class ScenarioController extends Controller
         if ($scenario->is_active)
             throw new GeneralException('سناریو فعال است', 403);
         $scenario->delete();
-        return Response::body(['success' => true]);
+        return Response::body(['success' => 'true']);
     }
 
 

@@ -32,7 +32,7 @@ class Handler extends ExceptionHandler
      *
      * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
      *
-     * @param  \Exception  $exception
+     * @param  \Exception $exception
      * @return void
      */
     public function report(Exception $exception)
@@ -49,7 +49,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        if ($exception instanceof IOTException) { # papad exceptions
+        if ($exception instanceof IOTException) { # IOT exceptions
             $response = $this->CustomException($exception);
         } else { # other exceptions
             $response = $this->otherExceptions($request, $exception);
@@ -59,26 +59,16 @@ class Handler extends ExceptionHandler
 
     /**
      * @param Exception $e
-     * @return \Illuminate\Http\JsonResponse
+     * @return array
      */
     private function CustomException(Exception $e)
     {
-        $unauthorized = [
-            AuthException::C_UA,
-            AuthException::C_TE,
-            AuthException::C_TI,
-            AuthException::C_IC,
-            AuthException::C_UNF,
-        ];
 
-        if (in_array($e->getCode(), $unauthorized))
+        if ($e->getCode() == 701)
             $code = 401;
         else
             $code = 200;
-        return response(
-            Response::body($e->getMessage(), $e->getCode()),
-            $code
-        );
+        return response(Response::body($e->getMessage(), $e->getCode()), $code);
     }
 
     /**

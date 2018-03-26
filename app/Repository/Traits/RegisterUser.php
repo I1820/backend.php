@@ -8,7 +8,7 @@
 
 namespace App\Repository\Traits;
 
-use App\Exceptions\AuthException;
+use App\Exceptions\GeneralException;
 use App\Repository\Helper\MobileFactory;
 use App\User;
 use Illuminate\Http\Request;
@@ -33,7 +33,7 @@ trait RegisterUser
     /**
      * @param Request $request
      * @return void
-     * @throws AuthException
+     * @throws GeneralException
      */
     public function validateRegisterUser(Request $request)
     {
@@ -64,7 +64,7 @@ trait RegisterUser
         ], $messages);
 
         if ($validator->fails())
-            throw new AuthException($validator->errors()->first(), AuthException::C_GE);
+            throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
     }
 
     private function validateRegisterLegal(Request $request)
@@ -103,7 +103,7 @@ trait RegisterUser
         ], $messages);
 
         if ($validator->fails())
-            throw new AuthException($validator->errors()->first(), AuthException::C_GE);
+            throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
     }
 
 

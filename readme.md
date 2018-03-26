@@ -4,7 +4,9 @@ backend of IOT platform
 
 
 ## Errors Numbers
+   * 701 UnAuthorized      
+   * 704 Not Found 
    * 706 Already Existed   
-   * 704 Not Found         
+   * 707 Validation Error  
    
    

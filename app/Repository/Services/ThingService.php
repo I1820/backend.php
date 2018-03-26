@@ -11,7 +11,6 @@ namespace App\Repository\Services;
 
 use App\Exceptions\GeneralException;
 use App\Exceptions\LoraException;
-use App\Exceptions\ThingException;
 use App\Project;
 use App\Thing;
 use App\ThingProfile;
@@ -37,7 +36,7 @@ class ThingService
     /**
      * @param $request
      * @return void
-     * @throws ThingException
+     * @throws GeneralException
      */
     public function validateCreateThing($request)
     {
@@ -68,14 +67,14 @@ class ThingService
         ], $messages);
 
         if ($validator->fails())
-            throw new  ThingException($validator->errors()->first(), ThingException::C_GE);
+            throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
     }
 
 
     /**
      * @param Request $request
      * @return void
-     * @throws ThingException
+     * @throws GeneralException
      */
     public function validateExcel(Request $request)
     {
@@ -90,7 +89,7 @@ class ThingService
         ], $messages);
 
         if ($validator->fails())
-            throw new  ThingException($validator->errors()->first(), ThingException::C_GE);
+            throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
     }
 
     /**
@@ -160,7 +159,7 @@ class ThingService
     /**
      * @param Request $request
      * @return void
-     * @throws ThingException
+     * @throws GeneralException
      */
     public function validateUpdateThing(Request $request)
     {
@@ -181,7 +180,7 @@ class ThingService
         ], $messages);
 
         if ($validator->fails())
-            throw new  ThingException($validator->errors()->first(), ThingException::C_GE);
+            throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
     }
 
     /**

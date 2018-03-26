@@ -12,7 +12,6 @@ namespace App\Repository\Services;
 use App\Codec;
 use App\Exceptions\GeneralException;
 use App\Exceptions\LoraException;
-use App\Exceptions\ProjectException;
 use App\Project;
 use App\Thing;
 use Illuminate\Http\Request;
@@ -35,7 +34,7 @@ class ProjectService
     /**
      * @param Request $request
      * @return void
-     * @throws ProjectException
+     * @throws GeneralException
      */
     public function validateCreateProject(Request $request)
     {
@@ -50,7 +49,7 @@ class ProjectService
         ], $messages);
 
         if ($validator->fails())
-            throw new  ProjectException($validator->errors()->first(), ProjectException::C_GE);
+            throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
     }
 
     /**
@@ -78,7 +77,7 @@ class ProjectService
     /**
      * @param Request $request
      * @return void
-     * @throws ProjectException
+     * @throws GeneralException
      */
     public function validateUpdateProject(Request $request)
     {
@@ -94,7 +93,7 @@ class ProjectService
         ], $messages);
 
         if ($validator->fails())
-            throw new  ProjectException($validator->errors()->first(), ProjectException::C_GE);
+            throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
     }
 
     /**

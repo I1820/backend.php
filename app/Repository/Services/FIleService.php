@@ -8,11 +8,7 @@
 
 namespace App\Repository\Services;
 
-use App\Exceptions\AuthException;
-use App\Repository\Traits\RegisterUser;
-use App\Repository\Traits\UpdateUser;
-use Illuminate\Http\File;
-use Illuminate\Http\Request;
+
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
