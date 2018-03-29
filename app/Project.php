@@ -18,7 +18,7 @@ class Project extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'description', 'active', 'container', 'application_id', '_id'
+        'name', 'description', 'active', 'container', 'application_id', '_id',
     ];
     protected $appends = ['owner'];
 
@@ -28,7 +28,7 @@ class Project extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'updated_at', 'created_at', 'user_id', 'permissions'
+        'updated_at', 'created_at', 'user_id', 'permissions','aliases'
     ];
 
     public function permissions()

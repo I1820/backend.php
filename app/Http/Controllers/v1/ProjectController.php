@@ -39,8 +39,8 @@ class ProjectController extends Controller
         $this->coreService = $coreService;
         $this->loraService = $loraService;
 
-        $this->middleware('can:view,project')->only(['get','things']);
-        $this->middleware('can:update,project')->only(['update']);
+        $this->middleware('can:view,project')->only(['get', 'things']);
+        $this->middleware('can:update,project')->only(['update', 'aliases']);
         $this->middleware('can:delete,project')->only(['stop']);
         $this->middleware('can:create,App\Project')->only(['create']);
     }
@@ -80,8 +80,8 @@ class ProjectController extends Controller
     public function stop(Project $project)
     {
         $things = $project->things()->get();
-        if(count($things))
-            throw new GeneralException('ابتدا اشیا این پروژه رو پاک کنید',700);
+        if (count($things))
+            throw new GeneralException('ابتدا اشیا این پروژه رو پاک کنید', 700);
         $response = $this->coreService->deleteProject($project->container['name']);
         $this->loraService->deleteApp($project['application_id']);
         $project->permissions()->delete();
@@ -123,8 +123,10 @@ class ProjectController extends Controller
             unset($item['code']);
             return $item;
         });
+        $result = $project->toArray();
+        $result['aliases'] = $project['aliases'];
 
-        return Response::body(compact('project'));
+        return Response::body(['project' => $result]);
     }
 
 
@@ -142,6 +144,21 @@ class ProjectController extends Controller
         $project->load('things');
 
         return Response::body(compact('project'));
+    }
+
+    /**
+     * @param Request $request
+     * @param Project $project
+     * @return array
+     * @throws GeneralException
+     */
+    public function aliases(Request $request, Project $project)
+    {
+        $aliases = $request->get('aliases');
+        $aliases = json_decode($aliases);
+        $this->projectService->setAliases($project, $aliases);
+
+        return Response::body(['success' => 'true']);
     }
 
 }

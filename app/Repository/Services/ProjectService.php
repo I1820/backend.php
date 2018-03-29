@@ -125,4 +125,26 @@ class ProjectService
         if ($codec)
             $this->coreService->sendCodec($project, $thing, $codec->code);
     }
+
+    /**
+     * @param Project $project
+     * @param array $aliases
+     * @throws GeneralException
+     */
+    public function setAliases(Project $project, $aliases)
+    {
+        if (!$aliases || !$this->validateAlias($aliases))
+            throw new GeneralException('لطفا اطلاعات را درست وارد کنید.', GeneralException::VALIDATION_ERROR);
+        $project['aliases'] = $aliases;
+        $project->save();
+    }
+
+
+    private function validateAlias($aliases)
+    {
+        foreach ($aliases as $a)
+            if (gettype($a) !== 'string' && gettype($a) !== 'integer')
+                return false;
+        return true;
+    }
 }
