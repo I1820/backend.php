@@ -50,10 +50,12 @@ class CodecService
      */
     public function insertCodec(Request $request, Project $project)
     {
+        $user = Auth::user();
         $codec = Codec::create([
             'name' => $request->get('name'),
             'code' => $request->get('code'),
-            'project_id' => $project['id']
+            'project_id' => $project['id'],
+            'user_id' => $user['_id']
         ]);
         $codec->save();
         return $codec;

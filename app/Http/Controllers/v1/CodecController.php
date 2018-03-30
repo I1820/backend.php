@@ -39,9 +39,6 @@ class CodecController extends Controller
      */
     public function create(Project $project, Request $request)
     {
-        $user = Auth::user();
-        if ($project->owner['id'] != $user->id)
-            abort(404);
         $this->codecService->validateCreateCodec($request);
         $codec = $this->codecService->insertCodec($request, $project);
         return Response::body(compact('codec'));
@@ -72,9 +69,6 @@ class CodecController extends Controller
      */
     public function get(Project $project, Thing $thing, Request $request)
     {
-        $user = Auth::user();
-        if ($project->owner['id'] != $user->id)
-            abort(404);
         $codec = $thing->codec;
         return Response::body(compact('codec'));
     }
@@ -86,9 +80,6 @@ class CodecController extends Controller
      */
     public function list(Project $project)
     {
-        $user = Auth::user();
-        if ($project->owner['id'] != $user->id)
-            abort(404);
         $codecs = $project->codecs()->get();
         return Response::body(compact('codecs'));
     }
@@ -101,9 +92,6 @@ class CodecController extends Controller
      */
     public function delete(Project $project, Codec $codec)
     {
-        $user = Auth::user();
-        if ($project->owner['id'] != $user->id)
-            abort(404);
         $codec->delete();
         return Response::body(['success' => true]);
     }
