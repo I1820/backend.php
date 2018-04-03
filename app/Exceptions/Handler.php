@@ -51,7 +51,7 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
         if ($exception instanceof AuthorizationException)
-            $response = response(Response::body(GeneralException::M_ACCESS_DENIED, 703), 403);
+            $response = response(Response::body(GeneralException::M_ACCESS_DENIED, GeneralException::ACCESS_DENIED), 403);
         else if ($exception instanceof IOTException) { # IOT exceptions
             $response = $this->CustomException($exception);
         } else { # other exceptions

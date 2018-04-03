@@ -16,6 +16,7 @@ class GeneralException extends IOTException
     # Exception Codes list
     const UNKNOWN_ERROR = 700;
     const ALREADY_EXISTS = 706;
+    const ACCESS_DENIED = 703;
     const NOT_FOUND = 704;
     const VALIDATION_ERROR = 707;
 

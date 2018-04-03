@@ -101,6 +101,16 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::post('/package/update', 'PaymentController@updatePackage');
         Route::post('/package/delete', 'PaymentController@deletePackage');
     });
+
+
+
+});
+
+
+Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () use ($router) {
+    Route::group(['prefix' => 'users', 'middleware' => ['auth.jwt','admin']], function () {
+        Route::get('/', 'UserController@list');
+    });
 });
 
 
