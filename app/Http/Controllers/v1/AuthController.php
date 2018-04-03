@@ -5,10 +5,13 @@ namespace App\Http\Controllers\v1;
 use App\Exceptions\AuthException;
 use App\Exceptions\GeneralException;
 use App\Http\Controllers\Controller;
+use App\Mail\EmailVerification;
 use App\Repository\Helper\Response;
 use App\Repository\Services\UserService;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -38,11 +41,12 @@ class AuthController extends Controller
         $this->userService->validateRegisterUser($request);
 
         $user = $this->userService->insertUser($request);
-
         # generate token
-        $token = JWTAuth::fromUser($user);
+        # $token = JWTAuth::fromUser($user);
 
-        return Response::body(compact('token'));
+        Mail::to($user['email'])->send(new EmailVerification($user));
+
+        return Response::body(['message' => 'ایمیل فعال سازی برای شما فرستاده شد']);
     }
 
     /**
@@ -107,5 +111,21 @@ class AuthController extends Controller
         }
         $message = "با موفقیت خارج شدید";
         return Response::body($message);
+    }
+
+    /**
+     * @param User $user
+     * @param $token
+     * @return void
+     */
+    public function verifyEmail(User $user, $token)
+    {
+        if (md5($user['email_token']) == $token) {
+            $user['active'] = true;
+            $user->unset('email_token');
+            $user->save();
+            return view('auth.verified');
+        }
+        return view('auth.not_verified');
     }
 }

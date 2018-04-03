@@ -112,7 +112,7 @@ trait RegisterUser
         MobileFactory::sendWelcome($request->get('mobile'));
         return User::create([
             'legal' => false,
-            'active' => true,
+            'active' => false,
             'mobile' => $request->get('mobile'),
             'name' => $request->get('name'),
             'email' => $request->get('email'),

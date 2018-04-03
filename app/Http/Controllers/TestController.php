@@ -12,19 +12,8 @@ use Illuminate\Support\Facades\Auth;
 
 class TestController extends Controller
 {
-    public function delete()
+    public function index(Request $request)
     {
-        $things = Thing::all();
-        $a = app('App\Http\Controllers\v1\ThingController');
-        foreach ($things as $thing) {
-            try {
-                $a->delete($thing);
-            } catch (\Exception $e) {
-            }
-        }
-    }
-
-    public function index(Request $request){
 
     }
 

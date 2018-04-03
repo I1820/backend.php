@@ -20,6 +20,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
     Route::post('/login', 'AuthController@login');
     Route::post('/logout', 'AuthController@logout');
     Route::put('/refresh', 'AuthController@refresh');
+    Route::get('/verify/{user}/{token}', 'AuthController@verifyEmail')->name('verify-email');
 
 
     Route::group(['prefix' => 'authorization', 'middleware' => ['auth.jwt']], function () {
