@@ -25,7 +25,7 @@ class UserController extends Controller
 
     public function list(Request $request)
     {
-        $users = User::skip($request->get('offset'))->take($request->get('limit') ?: 10)->get();
+        $users = User::skip(intval($request->get('offset')))->take(intval($request->get('limit')) ?: 10)->get();
         return Response::body(compact('users'));
 
     }
