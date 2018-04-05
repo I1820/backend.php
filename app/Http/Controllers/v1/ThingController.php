@@ -43,11 +43,11 @@ class ThingController extends Controller
         $this->coreService = $coreService;
         $this->loraService = $loraService;
 
-        $this->middleware('can:view,project')->only(['all']);
-        $this->middleware('can:update,project')->only(['fromExcel','create']);
+        $this->middleware('can:view,project')->only(['all', 'multiThingData']);
+        $this->middleware('can:update,project')->only(['fromExcel', 'create']);
         $this->middleware('can:delete,thing')->only(['delete']);
-        $this->middleware('can:update,thing')->only(['activate','update']);
-        $this->middleware('can:view,thing')->only(['get','data','multiThingData']);
+        $this->middleware('can:update,thing')->only(['activate', 'update']);
+        $this->middleware('can:view,thing')->only(['get', 'data']);
     }
 
 
