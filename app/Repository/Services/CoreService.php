@@ -199,7 +199,7 @@ class CoreService
                 "message" => "Module name \"linter-1522838068\" doesn't conform to snake_case naming style",
                 "message-id" => "C0103"
             ]];
-        $url = '/api/lint/';
+        $url = '/api/lint';
         $response = $this->send($url, $code, 'post', $project['container']['runner']['port'], 0);
         if ($response->status == 200)
             return $response->content;
