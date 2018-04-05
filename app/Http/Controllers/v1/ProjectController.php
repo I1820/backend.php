@@ -161,4 +161,32 @@ class ProjectController extends Controller
         return Response::body(['success' => 'true']);
     }
 
+
+    /**
+     * @param Request $request
+     * @param Project $project
+     * @return array
+     * @throws GeneralException
+     */
+    public function log(Request $request, Project $project)
+    {
+        $limit = intval($request->get('limit')) ?: 10;
+        $logs = $this->coreService->projectLogs($project, $limit);
+        return Response::body(['logs' => $logs]);
+    }
+
+
+    /**
+     * @param Request $request
+     * @param Project $project
+     * @return array
+     * @throws GeneralException
+     */
+    public function lint(Project $project, Request $request)
+    {
+        $code = $request->get('code');
+        $result = $this->coreService->lint($project, $code);
+        return Response::body(['result' => $result]);
+    }
+
 }
