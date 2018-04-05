@@ -37,11 +37,14 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
     Route::group(['prefix' => 'project', 'middleware' => ['auth.jwt']], function () {
         Route::get('/', 'ProjectController@all');
         Route::post('/', 'ProjectController@create');
+        Route::get('/lint', 'ProjectController@lint');
         Route::patch('/{project}', 'ProjectController@update');
         Route::delete('/{project}', 'ProjectController@stop');
         Route::get('/{project}', 'ProjectController@get');
         Route::get('/{project}/things', 'ProjectController@things');
         Route::post('/{project}/aliases', 'ProjectController@aliases');
+        Route::get('/{project}/log', 'ProjectController@log');
+
 
         Route::post('/{project}/scenario', 'ScenarioController@create');
         Route::get('/{project}/scenario', 'ScenarioController@list');
