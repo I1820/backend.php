@@ -247,7 +247,7 @@ class CoreService
      */
     public function projectLogs($project_id, $limit)
     {
-        $url = '/api/project/' . $project_id . '/logs/?limit=' . $limit;
+        $url = '/api/project/' . $project_id . '/logs?limit=' . $limit;
         $response = $this->send($url, [], 'get');
         if ($response->status == 200)
             return $response->content;
