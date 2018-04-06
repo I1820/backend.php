@@ -92,19 +92,9 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::get('/{gateway}', 'GatewayController@info');
     });
 
-    Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt']], function () {
-        Route::get('/user/new', 'PaymentController@setNewUser');
-        Route::post('/user/packages', 'PaymentController@getUserPackages');
-        Route::post('/user/package/status', 'PaymentController@updatePackageStatus');
-        Route::get('/user/package/status', 'PaymentController@getLastPackageStatus');
-        Route::post('/user/package/buy', 'PaymentController@paymentRequest');
-        Route::post('/user/packages/status', 'PaymentController@getUserPackagesByStatus');
-
-        Route::get('/user/transactions', 'PaymentController@getUserTransactions');
-
-        Route::get('/packages', 'PaymentController@getPackages');
-        Route::post('/package/update', 'PaymentController@updatePackage');
-        Route::post('/package/delete', 'PaymentController@deletePackage');
+    Route::group(['prefix' => 'packages', 'middleware' => ['auth.jwt']], function () {
+        Route::get('/', 'PackageController@list');
+        Route::get('/{package}', 'PackageController@get');
     });
 
 

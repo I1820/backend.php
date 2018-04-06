@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Codec;
 use App\Gateway;
+use App\Package;
 use App\Policies\CodecPolicy;
 use App\Policies\GatewayPolicy;
+use App\Policies\PackagePolicy;
 use App\Policies\ProjectPolicy;
 use App\Policies\ScenarioPolicy;
 use App\Policies\ThingPolicy;
@@ -31,6 +33,7 @@ class AuthServiceProvider extends ServiceProvider
         Gateway::class => GatewayPolicy::class,
         Scenario::class => ScenarioPolicy::class,
         Codec::class => CodecPolicy::class,
+        Package::class => PackagePolicy::class,
 
     ];
 

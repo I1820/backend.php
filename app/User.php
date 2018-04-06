@@ -61,4 +61,9 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
         return $this->hasMany(ThingProfile::class, 'user_id');
     }
 
+    public function isAdmin()
+    {
+        return (isset($this['is_admin']) && $this['is_admin']);
+    }
+
 }
