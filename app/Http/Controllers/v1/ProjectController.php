@@ -171,7 +171,7 @@ class ProjectController extends Controller
     public function log(Request $request, Project $project)
     {
         $limit = intval($request->get('limit')) ?: 10;
-        $logs = $this->coreService->projectLogs($project, $limit);
+        $logs = $this->coreService->projectLogs($project['_id'], $limit);
         return Response::body(['logs' => $logs]);
     }
 
