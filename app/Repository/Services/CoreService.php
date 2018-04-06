@@ -202,7 +202,7 @@ class CoreService
         $url = '/api/lint';
         $response = $this->send($url, $code, 'post', $project['container']['runner']['port'], 0);
         if ($response->status == 200)
-            return json_encode($response->content);
+            return json_decode($response->content);
         throw new GeneralException($response->content->error ?: '', $response->status);
         return $response;
     }
