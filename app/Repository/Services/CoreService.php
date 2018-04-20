@@ -42,15 +42,9 @@ class CoreService
      */
     public function postProject($id)
     {
+        if (env('CORE_TEST') == 1)
+            return $this->fake();
         $id = (string)$id;
-        if (env('TEST_MODE'))
-            return [
-                "name" => "5a9958eca8f082000a24bf84",
-                "runner" => [
-                    "id" => "37cb1c466fb56b40c94813e2cc3a5dcb21b3d578daa82682f7c26f33d809d23d",
-                    "port" => "8081"
-                ]
-            ];
         $url = '/api/project';
         $data = [
             'name' => $id,
@@ -69,8 +63,8 @@ class CoreService
      */
     public function deleteProject($project_id)
     {
-        if (env('TEST_MODE'))
-            return (object)['test' => 'testValue'];
+        if (env('CORE_TEST') == 1)
+            return $this->fake();
         $url = '/api/project/' . $project_id;
         $response = $this->send($url, [], 'delete');
         if ($response->status == 200)
@@ -87,8 +81,8 @@ class CoreService
      */
     public function postThing(Project $project, Thing $thing)
     {
-        if (env('TEST_MODE'))
-            return (object)['test' => 'testValue'];
+        if (env('CORE_TEST') == 1)
+            return $this->fake();
         $url = '/api/project/' . $project['container']['name'] . '/things';
         $data = [
             'name' => $thing['interface']['devEUI'],
@@ -109,8 +103,8 @@ class CoreService
      */
     public function sendCodec(Project $project, Thing $thing, $codec)
     {
-        if (env('TEST_MODE'))
-            return ['test' => 'testValue'];
+        if (env('CORE_TEST') == 1)
+            return $this->fake();
         $url = '/api/codec/' . $thing['interface']['devEUI'];
         $response = $this->send($url, $codec, 'post', $project['container']['runner']['port'], 0);
         if ($response->status == 200)
@@ -128,8 +122,8 @@ class CoreService
      */
     public function thingData(Thing $thing, $since, $until)
     {
-        if (env('TEST_MODE'))
-            return ['test' => 'testValue'];
+        if (env('CORE_TEST') == 1)
+            return $this->fake();
         $url = '/api/things/' . $thing['interface']['devEUI'];
         $response = $this->send($url, ['since' => (int)$since, 'until' => (int)$until], 'get', $this->dmPort);
         if ($response->status == 200)
@@ -148,8 +142,8 @@ class CoreService
      */
     public function thingsData($ids, $since, $until)
     {
-        if (env('TEST_MODE'))
-            return [];
+        if (env('CORE_TEST') == 1)
+            return $this->fake();
         $url = '/api/things';
         $response = $this->send($url, ['since' => (int)$since, 'until' => (int)$until, 'thing_ids' => $ids], 'post', $this->dmPort);
         if ($response->status == 200)
@@ -168,8 +162,8 @@ class CoreService
      */
     public function sendScenario(Project $project, Scenario $scenario)
     {
-        if (env('TEST_MODE'))
-            return (object)['test' => 'testValue'];
+        if (env('CORE_TEST') == 1)
+            return $this->fake();
         $url = '/api/scenario/' . $project['container']['name'];
         $response = $this->send($url, $scenario->code, 'post', $project['container']['runner']['port'], 0);
         if ($response->status == 200)
@@ -187,18 +181,8 @@ class CoreService
      */
     public function lint(Project $project, $code)
     {
-        if (env('TEST_MODE'))
-            return [[
-                "type" => "convention",
-                "module" => "linter-1522838068",
-                "obj" => "",
-                "line" => 1,
-                "column" => 0,
-                "path" => "/tmp/linter-1522838068.py",
-                "symbol" => "invalid-name",
-                "message" => "Module name \"linter-1522838068\" doesn't conform to snake_case naming style",
-                "message-id" => "C0103"
-            ]];
+        if (env('CORE_TEST') == 1)
+            return $this->fake();
         $url = '/api/lint';
         $response = $this->send($url, $code, 'post', $project['container']['runner']['port'], 0);
         if ($response->status == 200)
@@ -214,8 +198,8 @@ class CoreService
      */
     public function sendGateway($data)
     {
-        if (env('TEST_MODE'))
-            return (object)['test' => 'testValue'];
+        if (env('CORE_TEST') == 1)
+            return $this->fake();
         $url = '/api/gateway';
         $response = $this->send($url, $data, 'post', $this->gmPort);
         if ($response->status == 200)
@@ -231,6 +215,8 @@ class CoreService
      */
     public function projectList()
     {
+        if (env('CORE_TEST') == 1)
+            return $this->fake();
         $url = '/api/project';
         $response = $this->send($url, [], 'get');
         if ($response->status == 200)
@@ -247,6 +233,8 @@ class CoreService
      */
     public function projectLogs($project_id, $limit)
     {
+        if (env('CORE_TEST') == 1)
+            return $this->fake();
         $url = '/api/project/' . $project_id . '/logs?limit=' . $limit;
         $response = $this->send($url, [], 'get');
         if ($response->status == 200)
@@ -256,6 +244,8 @@ class CoreService
 
     public function downLinkThing(Project $project, Thing $thing, $data)
     {
+        if (env('CORE_TEST') == 1)
+            return $this->fake();
         $url = '/api/send';
         $data = ['thing' => $thing->toArray(), 'data' => $data, 'project_id' => $project->application_id];
         $response = $this->send($url, $data, 'post', $this->downLinkPort);
@@ -297,5 +287,13 @@ class CoreService
         return $new_response;
     }
 
-
+    public function fake()
+    {
+        return (object)[
+            'status' => 200,
+            'content' => [
+                'key' => 'value'
+            ]
+        ];
+    }
 }

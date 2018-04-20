@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\v1;
 
+use App\Repository\Helper\Counter;
 use App\Repository\Helper\Response;
 use App\Repository\Services\LoraService;
 use App\ThingProfile;
@@ -36,11 +37,13 @@ class ThingProfileController extends Controller
      */
     public function create(Request $request)
     {
+        $id = Counter::thingProfile();
         $user = Auth::user();
         $data = $this->prepareDeviceProfileData(collect($request->all()));
         $device_profile_id = $this->loraService->postDeviceProfile(collect($data))->deviceProfileID;
         $thing_profile = ThingProfile::create([
-            'thing_profile_slug' => $device_profile_id,
+            'thing_profile_slug' => $id,
+            'device_profile_id' => $device_profile_id,
             'data' => $data,
             'type' => $request->get('supportsJoin') === '1' ? 'OTAA' : 'ABP',
             'user_id' => $user['_id'],
@@ -77,7 +80,7 @@ class ThingProfileController extends Controller
      */
     public function delete(ThingProfile $thing_profile)
     {
-        $this->loraService->deleteDeviceProfile($thing_profile['thing_profile_slug']);
+        $this->loraService->deleteDeviceProfile($thing_profile['device_profile_id']);
         $thing_profile->delete();
         return Response::body(['success' => 'true']);
     }
@@ -116,7 +119,7 @@ class ThingProfileController extends Controller
                 'organizationID' => $this->loraService->getOrganizationId()
             ];
         } catch (\Exception $e) {
-            throw new LoraException('Device Profile Data Invalid', 500);
+            throw new LoraException('Device Profile Data Invalid', 700);
         }
 
         return $res;

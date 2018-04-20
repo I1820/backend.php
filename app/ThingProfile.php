@@ -14,7 +14,7 @@ class ThingProfile extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'thing_profile_slug', 'data','type', 'user_id'
+        'thing_profile_slug', 'data', 'type', 'user_id', 'device_profile_id'
     ];
 
     /**
@@ -23,7 +23,7 @@ class ThingProfile extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'updated_at', 'created_at', 'device_profile_id','data'
+        'updated_at', 'created_at', 'device_profile_id', 'data', 'user_id'
     ];
 
     public function things()

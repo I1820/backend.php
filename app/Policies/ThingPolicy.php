@@ -2,13 +2,21 @@
 
 namespace App\Policies;
 
+use App\Project;
 use App\User;
 use App\Thing;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Http\Request;
 
 class ThingPolicy
 {
     use HandlesAuthorization;
+    protected $request;
+
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+    }
 
     /**
      * Determine whether the user can view the thing.
@@ -19,7 +27,7 @@ class ThingPolicy
      */
     public function view(User $user, Thing $thing)
     {
-        return $this->isOwner($user,$thing);
+        return $this->isOwner($user, $thing);
     }
 
     /**
@@ -30,7 +38,8 @@ class ThingPolicy
      */
     public function create(User $user)
     {
-        return $user['active'];
+        $project = Project::where('_id', $this->request->get('project_id'))->first();
+        return $project && $project['owner']['_id'] == $user['_id'];
     }
 
     /**
@@ -42,7 +51,7 @@ class ThingPolicy
      */
     public function update(User $user, Thing $thing)
     {
-        return $this->isOwner($user,$thing);
+        return $this->isOwner($user, $thing);
     }
 
     /**
@@ -54,7 +63,7 @@ class ThingPolicy
      */
     public function delete(User $user, Thing $thing)
     {
-        return $this->isOwner($user,$thing);
+        return $this->isOwner($user, $thing);
     }
 
 

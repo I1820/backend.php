@@ -43,8 +43,8 @@ class ThingController extends Controller
         $this->coreService = $coreService;
         $this->loraService = $loraService;
 
-        $this->middleware('can:view,project')->only(['all', 'multiThingData']);
-        $this->middleware('can:update,project')->only(['fromExcel', 'create']);
+        $this->middleware('can:create,App\Thing')->only(['multiThingData']);
+        $this->middleware('can:create,App\Thing')->only(['fromExcel', 'create']);
         $this->middleware('can:delete,thing')->only(['delete']);
         $this->middleware('can:update,thing')->only(['activate', 'update']);
         $this->middleware('can:view,thing')->only(['get', 'data']);
@@ -52,17 +52,17 @@ class ThingController extends Controller
 
 
     /**
-     * @param Project $project
      * @param Request $request
      * @return array
      * @throws GeneralException
      * @throws LoraException
      */
-    public function create(Project $project, Request $request)
+    public function create(Request $request)
     {
         $user = Auth::user();
         $this->thingService->validateCreateThing($request);
-        $thing_profile = ThingProfile::where('thing_profile_slug', $request->get('thing_profile_slug'))->first();
+        $thing_profile = ThingProfile::where('thing_profile_slug', (int)$request->get('thing_profile_slug'))->first();
+        $project = Project::where('_id', $request->get('project_id'))->first();
         $thing = $this->thingService->insertThing($request, $project, $thing_profile);
         $user->things()->save($thing);
         $owner_permission = $this->permissionService->get('THING-OWNER');
@@ -78,24 +78,24 @@ class ThingController extends Controller
     }
 
     /**
-     * @param Project $project
      * @return array
      */
-    public function all(Project $project)
+    public function all()
     {
-        $things = $project->things()->get();
+        $things = Auth::user()->things()->get();
+        $things = $things->map(function ($item) {
+            return $item['thing'];
+        });
         return Response::body(compact('things'));
     }
 
     /**
-     * @param Project $project
      * @param Thing $thing
      * @return array
      */
-    public function get(Project $project, Thing $thing)
+    public function get(Thing $thing)
     {
-        if ($project->things()->where('_id', $thing['_id'])->first())
-            $thing->load(['user', 'project']);
+        $thing->load(['user', 'project']);
         $codec = $thing['codec'];
         $thing = $thing->toArray();
         $thing['codec'] = $codec;
@@ -104,13 +104,11 @@ class ThingController extends Controller
     }
 
     /**
-     * @param Project $project
      * @param Thing $thing
      * @param Request $request
      * @return array
-     * @throws GeneralException
      */
-    public function update(Project $project, Thing $thing, Request $request)
+    public function update(Thing $thing, Request $request)
     {
         $this->thingService->validateUpdateThing($request);
         $thing = $this->thingService->updateThing($request, $thing);
@@ -119,14 +117,14 @@ class ThingController extends Controller
     }
 
     /**
-     * @param Project $project
      * @param Thing $thing
      * @param Request $request
      * @return array
      * @throws \App\Exceptions\GeneralException
      */
-    public function data(Project $project, Thing $thing, Request $request)
+    public function data(Thing $thing, Request $request)
     {
+        $project = $thing->project()->first();
         $aliases = isset($project['aliases']) ? $project['aliases'] : null;
         $since = $request->get('since') ?: 0;
         $until = $request->get('until') ?: Carbon::now()->getTimestamp();
@@ -136,37 +134,44 @@ class ThingController extends Controller
     }
 
     /**
-     * @param Project $project
      * @param Request $request
      * @return array
      * @throws GeneralException
      */
-    public function multiThingData(Project $project, Request $request)
+    public function multiThingData(Request $request)
     {
+        $project = Project::where('_id', $request->get('project_id'))->first();
         $aliases = isset($project['aliases']) ? $project['aliases'] : null;
-        $since = $request->get('since') ?: 0;
-        $until = $request->get('until') ?: Carbon::now()->getTimestamp();
+        if ($request->get('window')) {
+            $since = Carbon::now()->subMinute((int)$request->get('window'))->getTimestamp();
+            $until = Carbon::now()->getTimestamp();
+        } else {
+            $since = $request->get('since') ?: 0;
+            $until = $request->get('until') ?: Carbon::now()->getTimestamp();
+        }
         $thing_ids = json_decode($request->get('thing_ids'), true)['ids'] ?: [];
-        $thing_ids = $project->things()->whereIn('_id', $thing_ids)->get()->pluck('interface.devEUI');
+        $thing_ids = $project->things()->whereIn('_id', $thing_ids)->get()->pluck('dev_eui');
         $data = $this->coreService->thingsData($thing_ids, $since, $until);
         //$data = $this->fillMissingData($data);
+        dd(count($data));
         $data = $this->alias($data, $aliases);
 
         return Response::body(compact('data'));
     }
 
     /**
-     * @param Project $project
      * @param Request $request
      * @return array
      * @throws GeneralException
      */
-    public function fromExcel(Project $project, Request $request)
+    // TODO
+    public function fromExcel(Request $request)
     {
         $this->thingService->validateExcel($request);
         $file = $request->file('things');
         $res = [];
-        Excel::load($file, function ($reader) use (&$res, $project) {
+        Excel::load($file, function ($reader) use (&$res) {
+            $project = [];
             $user = Auth::user();
             $results = $reader->all();
             foreach ($results as $row) {
@@ -200,13 +205,12 @@ class ThingController extends Controller
     }
 
     /**
-     * @param Project $project
      * @param Thing $thing
      * @return array
      * @throws \App\Exceptions\LoraException
      * @throws \Exception
      */
-    public function delete(Project $project, Thing $thing)
+    public function delete(Thing $thing)
     {
         $this->loraService->deleteDevice($thing['interface']['devEUI']);
         $thing->permissions()->delete();
@@ -215,19 +219,21 @@ class ThingController extends Controller
     }
 
     /**
-     * @param Project $project
      * @param Thing $thing
      * @param Request $request
      * @return array
      * @throws GeneralException
      */
-    public function activate(Project $project, Thing $thing, Request $request)
+    public function activate(Thing $thing, Request $request)
     {
+
         if ($thing['type'] == 'OTAA')
-            $this->thingService->activateOTAA($request, $thing);
+            $keys = $this->thingService->activateOTAA($request, $thing);
         else
-            $this->thingService->activateABP($request, $thing);
-        return Response::body(['success' => 'true']);
+            $keys = $this->thingService->activateABP($request, $thing);
+        $thing['keys'] = $keys;
+        $thing->save();
+        return Response::body(['keys' => $keys]);
     }
 
     private function prepareRow($row)
@@ -236,21 +242,6 @@ class ThingController extends Controller
         $row['type'] = 'lora';
         $row['factoryPresetFreqs'] = isset($row['factoryPresetFreqs']) ? [$row['factoryPresetFreqs']] : [];
         return collect($row);
-
-    }
-
-    private function fillMissingData($data)
-    {
-        $keys = [];
-        foreach ($data as $d)
-            $keys = array_unique(array_merge($keys, array_keys((array)$d->data)));
-
-        foreach ($data as $d) {
-            foreach ($keys as $key)
-                if (!property_exists($d->data, $key))
-                    $d->data->$key = null;
-        }
-        return $data;
 
     }
 

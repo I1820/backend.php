@@ -100,16 +100,25 @@ class ThingService
      * @throws GeneralException
      * @throws LoraException
      */
-    public function insertThing($request, Project $project, ThingProfile $thingProfile = null)
+    public function insertThing($request, Project $project = null, ThingProfile $thingProfile = null)
     {
         if (!$thingProfile)
-            throw new GeneralException('Thing Profile Not found', 405);
-        $device = $this->loraService->postDevice(collect($request->all()), $project['application_id']);
+            throw new GeneralException('پروفایل شی یافت نشد', 700);
+        if (!$project)
+            throw new GeneralException('پروژه یافت نشد', 700);
+
+        $device = $this->loraService->postDevice(
+            collect($request->all()),
+            $project['application_id'],
+            $thingProfile['device_profile_id']
+        );
+        $this->validateInsert($request);
         $thing = Thing::create([
             'name' => $request->get('name'),
             'description' => $request->get('description'),
             'interface' => $device->toArray(),
             'period' => $request->get('period'),
+            'dev_eui' => $request->get('devEUI'),
             'type' => $thingProfile['data']['deviceProfile']['supportsJoin'] ? 'OTAA' : 'ABP',
             'loc' => [
                 'type' => 'Point',
@@ -144,16 +153,16 @@ class ThingService
         $data['fCntDown'] = intval($data['fCntDown']);
         $data['skipFCntCheck'] = $request->get('skipFCntCheck') === '1' ? true : false;
         $data['devEUI'] = $thing['interface']['devEUI'];
-        $info = $this->loraService->activateDevice($data);
-        return $info;
+        $this->loraService->activateDevice($data);
+        return $data;
     }
 
     public function activateOTAA($request, Thing $thing)
     {
         $data = ['deviceKeys' => ['appKey' => $request->get('appKey')]];
         $data['devEUI'] = $thing['interface']['devEUI'];
-        $info = $this->loraService->SendKeys($data);
-        return $info;
+        $this->loraService->SendKeys($data);
+        return $data;
     }
 
     /**
@@ -161,10 +170,10 @@ class ThingService
      * @return void
      * @throws GeneralException
      */
-    public function validateUpdateThing(Request $request)
+    public function validateInsert(Request $request)
     {
         $messages = [
-            'name.filled' => 'لطفا نام شی را وارد کنید',
+            'name.required' => 'لطفا نام شی را وارد کنید',
             'description.filled' => 'لطفا توضیحات را درست وارد کنید',
             'period.*' => 'لطفا بازه ارسال را درست وارد کنید',
             'lat.*' => 'لطفا محل سنسور را درست وارد کنید',
@@ -172,11 +181,12 @@ class ThingService
         ];
 
         $validator = Validator::make($request->all(), [
-            'name' => 'filled|string|max:255',
-            'description' => 'filled|string',
-            'period' => 'filled|numeric',
-            'lat' => 'filled|numeric',
-            'long' => 'filled|numeric',
+            'name' => 'required|string|max:255',
+            'description' => 'max:255',
+            'period' => 'numeric',
+            'lat' => 'required|numeric',
+            'long' => 'required|numeric',
+            'devEUI' => 'required|size:16',
         ], $messages);
 
         if ($validator->fails())
