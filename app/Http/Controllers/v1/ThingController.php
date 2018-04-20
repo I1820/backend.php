@@ -126,8 +126,13 @@ class ThingController extends Controller
     {
         $project = $thing->project()->first();
         $aliases = isset($project['aliases']) ? $project['aliases'] : null;
-        $since = $request->get('since') ?: 0;
-        $until = $request->get('until') ?: Carbon::now()->getTimestamp();
+        if ($request->get('window')) {
+            $since = Carbon::now()->subMinute((int)$request->get('window'))->getTimestamp();
+            $until = Carbon::now()->getTimestamp();
+        } else {
+            $since = $request->get('since') ?: 0;
+            $until = $request->get('until') ?: Carbon::now()->getTimestamp();
+        }
         $data = $this->coreService->thingData($thing, $since, $until);
         $data = $this->alias($data, $aliases);
         return Response::body(compact('data'));
