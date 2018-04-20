@@ -153,7 +153,6 @@ class ThingController extends Controller
         $thing_ids = $project->things()->whereIn('_id', $thing_ids)->get()->pluck('dev_eui');
         $data = $this->coreService->thingsData($thing_ids, $since, $until);
         //$data = $this->fillMissingData($data);
-        dd(count($data));
         $data = $this->alias($data, $aliases);
 
         return Response::body(compact('data'));
