@@ -52,9 +52,10 @@ class CodecController extends Controller
      * @return array
      * @throws \App\Exceptions\GeneralException
      */
-    public function send(Project $project, Thing $thing, Request $request)
+    public function send(Thing $thing, Request $request)
     {
         $codec = $request->get('codec');
+        $project = $thing->project()->first();
         $this->coreService->sendCodec($project, $thing, $codec);
         $thing->codec = $codec;
         $thing->save();
