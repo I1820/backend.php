@@ -53,6 +53,8 @@ class LoraService
             'applicationID' => $application_id,
             'deviceProfileID' => $deviceProfileID
         ]);
+        if (!$data['description'])
+            $data['description'] = '';
         $this->send($url, $data, 'post');
         return $data;
     }

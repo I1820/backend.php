@@ -15,6 +15,7 @@ use App\Project;
 use App\Thing;
 use App\ThingProfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -59,7 +60,6 @@ class ThingService
             'name' => 'required|string|max:255',
             'devEUI' => 'required|min:16|max:16',
             'type' => 'required|',
-            'description' => 'string',
             'lat' => 'required|numeric',
             'long' => 'required|numeric',
             'period' => 'required|numeric',
@@ -78,7 +78,6 @@ class ThingService
      */
     public function validateExcel(Request $request)
     {
-
         $messages = [
             'things.required' => 'لطفا فایل را انتخاب کنید',
             'things.mimes' => 'نوع فایل را درست وارد کنید',
@@ -90,6 +89,8 @@ class ThingService
 
         if ($validator->fails())
             throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
+        if ($request->file('things')->clientExtension() != 'csv')
+            throw new  GeneralException('لطفا فایل با فرمت csv انتخاب کنید', GeneralException::VALIDATION_ERROR);
     }
 
     /**
@@ -108,14 +109,14 @@ class ThingService
             throw new GeneralException('پروژه یافت نشد', 700);
 
         $device = $this->loraService->postDevice(
-            collect($request->all()),
+            $request,
             $project['application_id'],
             $thingProfile['device_profile_id']
         );
         $this->validateInsert($request);
         $thing = Thing::create([
             'name' => $request->get('name'),
-            'description' => $request->get('description'),
+            'description' => $request->get('description') ?: '',
             'interface' => $device->toArray(),
             'period' => $request->get('period'),
             'dev_eui' => $request->get('devEUI'),
@@ -137,20 +138,14 @@ class ThingService
             'devAddr' => 'required',
             'nwkSKey' => 'required',
             'appSKey' => 'required',
-            'fCntUp' => 'required',
-            'fCntDown' => 'required',
         ]);
         if ($validator->fails())
             throw new GeneralException('اطلاعات را کامل وارد کنید', 407);
-        $data = $request->only([
-            'devAddr',
-            'nwkSKey',
-            'appSKey',
-            'fCntUp',
-            'fCntDown',
-        ]);
-        $data['fCntUp'] = intval($data['fCntUp']);
-        $data['fCntDown'] = intval($data['fCntDown']);
+        $data['devAddr'] = (string)$request->get('devAddr');
+        $data['nwkSKey'] = (string)$request->get('nwkSKey');
+        $data['appSKey'] = (string)$request->get('appSKey');
+        $data['fCntUp'] = intval($request->get('fCntUp', 0));
+        $data['fCntDown'] = intval($request->get('fCntDown', 0));
         $data['skipFCntCheck'] = $request->get('skipFCntCheck') === '1' ? true : false;
         $data['devEUI'] = $thing['interface']['devEUI'];
         $this->loraService->activateDevice($data);
@@ -159,18 +154,21 @@ class ThingService
 
     public function activateOTAA($request, Thing $thing)
     {
-        $data = ['deviceKeys' => ['appKey' => $request->get('appKey')]];
+        $key = $request->get('appKey');
+        if (!$key)
+            $key = $request->get('appSKey');
+        $data = ['deviceKeys' => ['appKey' => $key]];
         $data['devEUI'] = $thing['interface']['devEUI'];
         $this->loraService->SendKeys($data);
         return $data;
     }
 
     /**
-     * @param Request $request
+     * @param $data
      * @return void
      * @throws GeneralException
      */
-    public function validateInsert(Request $request)
+    public function validateInsert(Collection $data)
     {
         $messages = [
             'name.required' => 'لطفا نام شی را وارد کنید',
@@ -180,7 +178,7 @@ class ThingService
             'long.*' => 'لطفا محل سنسور را درست وارد کنید',
         ];
 
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($data->all(), [
             'name' => 'required|string|max:255',
             'description' => 'max:255',
             'period' => 'numeric',

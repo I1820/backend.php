@@ -77,6 +77,6 @@ class Thing extends Eloquent
             $status = 'red';
         if (Carbon::now()->subSecond(4 * $this->period) > $time)
             $status = 'gray';
-        return ['status' => $status, 'time' => (string)lora_time($time)];
+        return ['status' => $status, 'time' => $time ? (string)lora_time($time) : ''];
     }
 }

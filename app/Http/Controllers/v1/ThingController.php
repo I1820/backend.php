@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repository\Services\ThingService;
 use App\Thing;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -44,7 +45,7 @@ class ThingController extends Controller
         $this->loraService = $loraService;
 
         $this->middleware('can:create,App\Thing')->only(['multiThingData']);
-        $this->middleware('can:create,App\Thing')->only(['fromExcel', 'create']);
+        $this->middleware('can:create,App\Thing')->only(['create']);
         $this->middleware('can:delete,thing')->only(['delete']);
         $this->middleware('can:update,thing')->only(['activate', 'update']);
         $this->middleware('can:view,thing')->only(['get', 'data']);
@@ -54,26 +55,11 @@ class ThingController extends Controller
     /**
      * @param Request $request
      * @return array
-     * @throws GeneralException
-     * @throws LoraException
      */
     public function create(Request $request)
     {
-        $user = Auth::user();
-        $this->thingService->validateCreateThing($request);
-        $thing_profile = ThingProfile::where('thing_profile_slug', (int)$request->get('thing_profile_slug'))->first();
         $project = Project::where('_id', $request->get('project_id'))->first();
-        $thing = $this->thingService->insertThing($request, $project, $thing_profile);
-        $user->things()->save($thing);
-        $owner_permission = $this->permissionService->get('THING-OWNER');
-        $permission = Permission::create([
-            'name' => $owner_permission['name'],
-            'permission_id' => (string)$owner_permission['_id'],
-            'item_type' => 'thing'
-        ]);
-        $thing->permissions()->save($permission);
-        $user->permissions()->save($permission);
-
+        $thing = $this->createThing(collect($request->all()), $project);
         return Response::body(compact('thing'));
     }
 
@@ -174,32 +160,17 @@ class ThingController extends Controller
         $this->thingService->validateExcel($request);
         $file = $request->file('things');
         $res = [];
-        Excel::load($file, function ($reader) use (&$res) {
-            $project = [];
-            $user = Auth::user();
+        Excel::load($file, function ($reader) use (&$res, $request) {
+            $project = Project::where('_id', $request->get('project_id'))->first();
             $results = $reader->all();
             foreach ($results as $row) {
                 $data = $this->prepareRow($row);
                 try {
-                    $this->thingService->validateCreateThing($data);
-                    $thing_profile = ThingProfile::where('thing_profile_slug', $data['thing_profile_slug'])->first();
-                    $thing = $this->thingService->insertThing($data, $project, $thing_profile);
-                    $user->things()->save($thing);
-                    $owner_permission = $this->permissionService->get('THING-OWNER');
-                    $permission = Permission::create([
-                        'name' => $owner_permission['name'],
-                        'permission_id' => (string)$owner_permission['_id'],
-                        'item_type' => 'thing'
-                    ]);
-                    $thing->permissions()->save($permission);
-                    $user->permissions()->save($permission);
+                    $thing = $this->createThing(collect($row), $project);
                     $res[$data['devEUI']] = $thing;
-                } catch (LoraException $e) {
-                    if (isset($data['devEUI']))
-                        $res[$data['devEUI']] = $e->getMessage();
+                    $this->activateThing($thing, collect($row));
                 } catch (\Exception $e) {
-                    if (isset($data['devEUI']))
-                        $res[$data['devEUI']] = 'Unknown Error';
+                    $res[$data['devEUI']] = $e->getMessage();
                 }
             }
 
@@ -226,18 +197,12 @@ class ThingController extends Controller
      * @param Thing $thing
      * @param Request $request
      * @return array
-     * @throws GeneralException
      */
     public function activate(Thing $thing, Request $request)
     {
-
-        if ($thing['type'] == 'OTAA')
-            $keys = $this->thingService->activateOTAA($request, $thing);
-        else
-            $keys = $this->thingService->activateABP($request, $thing);
-        $thing['keys'] = $keys;
-        $thing->save();
+        $keys = $this->activateThing($thing, collect($request->all()));
         return Response::body(['keys' => $keys]);
+
     }
 
     private function prepareRow($row)
@@ -265,5 +230,34 @@ class ThingController extends Controller
         return $data;
     }
 
+
+    private function createThing(Collection $data, Project $project)
+    {
+        $user = Auth::user();
+        $this->thingService->validateCreateThing($data);
+        $thing_profile = ThingProfile::where('thing_profile_slug', (int)$data->get('thing_profile_slug'))->first();
+        $thing = $this->thingService->insertThing($data, $project, $thing_profile);
+        $user->things()->save($thing);
+        $owner_permission = $this->permissionService->get('THING-OWNER');
+        $permission = Permission::create([
+            'name' => $owner_permission['name'],
+            'permission_id' => (string)$owner_permission['_id'],
+            'item_type' => 'thing'
+        ]);
+        $thing->permissions()->save($permission);
+        $user->permissions()->save($permission);
+        return $thing;
+    }
+
+    private function activateThing(Thing $thing, Collection $data)
+    {
+        if ($thing['type'] == 'OTAA')
+            $keys = $this->thingService->activateOTAA($data, $thing);
+        else
+            $keys = $this->thingService->activateABP($data, $thing);
+        $thing['keys'] = $keys;
+        $thing->save();
+        return $keys;
+    }
 
 }
