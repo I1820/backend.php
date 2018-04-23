@@ -23,7 +23,7 @@ class ThingProfile extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'updated_at', 'created_at', 'device_profile_id', 'data', 'user_id'
+        'updated_at', 'created_at', 'data', 'user_id'
     ];
 
     public function things()

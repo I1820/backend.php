@@ -12,6 +12,7 @@ namespace App\Repository\Services;
 use App\Exceptions\LoraException;
 use App\Thing;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Ixudra\Curl\CurlService;
 
@@ -182,6 +183,29 @@ class LoraService
 
     }
 
+    /**
+     * @param $mac
+     * @return string
+     * @throws LoraException
+     */
+    public function getGW($mac)
+    {
+        $url = $url = $this->base_url . '/api/gateways/' . $mac;
+        return $this->send($url, [], 'get');
+
+    }
+
+    /**
+     * @param $dev_eui
+     * @return string
+     * @throws LoraException
+     */
+    public function getDevice($dev_eui)
+    {
+        $url = $url = $this->base_url . '/api/devices/' . $dev_eui;
+        return $this->send($url, [], 'get');
+    }
+
     private function send($url, $data, $method = 'get', $accept = 200)
     {
         if (env('LORA_TEST'))
@@ -198,6 +222,9 @@ class LoraService
             ->withHeader('Authorization: ' . $this->token)
             ->returnResponseObject();
         $new_response = $this->sendMethods($method, $response);
+        // TODO remove debug
+        Log::notice('Lora Service Response');
+        Log::debug(print_r($new_response, true));
         if ($new_response->status == 401 | $new_response->status == 403) {
             $this->authenticate();
             $response = $response->withHeader('Authorization: ' . $this->token);

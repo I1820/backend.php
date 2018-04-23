@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Repository\Services\LoraService;
+use Carbon\Carbon;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 class Thing extends Eloquent
 {
 
+    protected $appends = ['last_seen_at'];
 
     /**
      * The attributes that are mass assignable.
@@ -21,7 +24,7 @@ class Thing extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'loc', 'description', 'period', 'interface', 'type','dev_eui'
+        'name', 'loc', 'description', 'period', 'interface', 'type', 'dev_eui'
     ];
 
     /**
@@ -61,5 +64,19 @@ class Thing extends Eloquent
         if (!$value)
             return "";
         return $value;
+    }
+
+    public function getLastSeenAtAttribute($value)
+    {
+        $loraService = resolve('App\Repository\Services\LoraService');
+        $time = $loraService->getDevice($this->dev_eui)->lastSeenAt;
+        $status = 'green';
+        if (Carbon::now()->subSecond(2 * $this->period) > $time)
+            $status = 'orange';
+        if (Carbon::now()->subSecond(3 * $this->period) > $time)
+            $status = 'red';
+        if (Carbon::now()->subSecond(4 * $this->period) > $time)
+            $status = 'gray';
+        return ['status' => $status, 'time' => (string)lora_time($time)];
     }
 }

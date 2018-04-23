@@ -4,6 +4,7 @@ namespace app\Http\Middleware;
 
 use App\Exceptions\AuthException;
 use Closure;
+use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
@@ -22,7 +23,9 @@ class AuthJwt
     public function handle($request, Closure $next)
     {
         $this->authenticate();
-
+        Log::notice('Request');
+        Log::debug($request->getRequestUri());
+        Log::debug(print_r($request->all(), true));
         return $next($request);
     }
 

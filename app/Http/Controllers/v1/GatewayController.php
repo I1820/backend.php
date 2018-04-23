@@ -9,6 +9,7 @@ use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
 use App\Repository\Services\GatewayService;
 use App\Repository\Services\LoraService;
+use function GuzzleHttp\Psr7\str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -69,18 +70,29 @@ class GatewayController extends Controller
     /**
      * @param Gateway $gateway
      * @return array
+     * @throws LoraException
      */
     public function info(Gateway $gateway)
     {
+        $info = $this->loraService->getGW($gateway['mac']);
+        //$gateway['firstSeenAt'] = $info->firstSeenAt;
+        $gateway['last_seen_at'] = (string)lora_time($info->lastSeenAt);
+        //$gateway['ping'] = $info->ping;
         return Response::body(compact('gateway'));
     }
 
     /**
      * @return array
+     * @throws LoraException
      */
     public function list()
     {
         $gateways = Auth::user()->gateways()->get();
+        foreach ($gateways as $gateway) {
+            $info = $this->loraService->getGW($gateway['mac']);
+            $gateway['last_seen_at'] = (string)lora_time($info->lastSeenAt);
+            //$gateway['ping'] = $info->ping;
+        }
         return Response::body(compact('gateways'));
     }
 

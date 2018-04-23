@@ -16,6 +16,7 @@ use App\Project;
 use App\Scenario;
 use App\Thing;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Ixudra\Curl\CurlService;
 
 class CoreService
@@ -63,8 +64,13 @@ class CoreService
      */
     public function deleteProject($project_id)
     {
-        if (env('CORE_TEST') == 1)
+        if (env('CORE_TEST') == '1') {
             return $this->fake();
+            dd('sajjad');
+        }
+
+
+        Log::error(env('CORE_TEST'));
         $url = '/api/project/' . $project_id;
         $response = $this->send($url, [], 'delete');
         if ($response->status == 200)
@@ -281,6 +287,10 @@ class CoreService
                 $new_response = $response->get();
                 break;
         }
+        // TODO remove debug
+        Log::notice('Core Service Response');
+        Log::debug(print_r($new_response, true));
+
         if ($new_response->status == 0) {
             throw new GeneralException($new_response->error, 0);
         }
