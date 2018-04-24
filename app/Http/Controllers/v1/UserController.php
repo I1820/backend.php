@@ -97,12 +97,13 @@ class UserController extends Controller
                 $thing = Thing::where('dev_eui', $widget['devEUI'])->first();
                 $since = Carbon::now()->subMinute((int)$widget['window'])->getTimestamp();
                 $until = Carbon::now()->getTimestamp();
-                dd($this->coreService->thingData($thing, $since, $until));
                 return [
                     'title' => $widget['title'],
                     'thing' => $thing,
-                    'data' => $this->coreService->thingData($thing, $since, $until)
-                ];
+                    'data' => collect($this->coreService->thingData($thing, $since, $until))->map(function ($data) use ($widget) {
+                        $data  = json_decode(json_encode($data), True);
+                        return ['timestamp' => $data['timestamp'], 'value' => $data['data'][$widget['key']]];
+                    })];
             } catch (\Error $e) {
                 return [];
             } catch (\Exception $e) {
