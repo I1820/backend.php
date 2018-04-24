@@ -95,12 +95,13 @@ class UserController extends Controller
         $charts = collect($config['widgets'])->map(function ($widget) {
             try {
                 $thing = Thing::where('dev_eui', $widget['devEUI'])->first();
+                $since = Carbon::now()->subMinute((int)$widget['window'])->getTimestamp();
+                $until = Carbon::now()->getTimestamp();
+                dd($this->coreService->thingData($thing, $since, $until));
                 return [
+                    'title' => $widget['title'],
                     'thing' => $thing,
-                    'data' => $this->coreService->thingData($thing,
-                        $widget['since'],
-                        $widget['until'] ?: Carbon::now()->getTimestamp()
-                    )
+                    'data' => $this->coreService->thingData($thing, $since, $until)
                 ];
             } catch (\Error $e) {
                 return [];
@@ -109,7 +110,7 @@ class UserController extends Controller
             }
         });
         return Response::body([
-            'charts'=> $charts,
+            'charts' => $charts,
             'things_num' => $user->things()->count(),
             'project_num' => $user->projects()->count()
         ]);

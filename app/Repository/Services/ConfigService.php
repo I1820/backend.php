@@ -40,8 +40,7 @@ class ConfigService
             'title',
             'devEUI',
             'key',
-            'since',
-            'until',
+            'window',
         ])->map(function ($value) {
             return $value ?: 0;
         })->toArray();
