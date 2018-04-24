@@ -33,6 +33,8 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::patch('/update', 'UserController@update');
         Route::get('/', 'UserController@profile');
         Route::post('/upload', 'UserController@upload');
+        Route::post('/widget/charts', 'UserController@setWidgetChart');
+        Route::get('/dashboard', 'UserController@dashboard');
     });
 
     Route::group(['prefix' => 'project', 'middleware' => ['auth.jwt']], function () {
