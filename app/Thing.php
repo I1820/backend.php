@@ -16,7 +16,9 @@ use Illuminate\Database\Eloquent\Model;
 class Thing extends Eloquent
 {
 
-    protected $appends = ['last_seen_at'];
+    protected $appends = ['last_seen_at', 'keys'];
+    protected $lora_thing;
+    protected $lora_activation;
 
     /**
      * The attributes that are mass assignable.
@@ -68,8 +70,11 @@ class Thing extends Eloquent
 
     public function getLastSeenAtAttribute($value)
     {
-        $loraService = resolve('App\Repository\Services\LoraService');
-        $time = $loraService->getDevice($this->dev_eui)->lastSeenAt;
+        if (!$this->lora_thing) {
+            $loraService = resolve('App\Repository\Services\LoraService');
+            $this->lora_thing = $loraService->getDevice($this->dev_eui);
+        }
+        $time = $this->lora_thing->lastSeenAt;
         $status = 'green';
         if (Carbon::now()->subSecond(2 * $this->period) > $time)
             $status = 'orange';
@@ -78,5 +83,21 @@ class Thing extends Eloquent
         if (Carbon::now()->subSecond(4 * $this->period) > $time)
             $status = 'gray';
         return ['status' => $status, 'time' => $time ? (string)lora_time($time) : ''];
+    }
+
+    public function getKeysAttribute($value)
+    {
+        if ($this->type == 'ABP')
+            return $value ?: [];
+        try {
+            if (!$this->lora_activation) {
+                $loraService = resolve('App\Repository\Services\LoraService');
+                $this->lora_activation = $loraService->getActivation($this->dev_eui);
+            }
+            return array_merge(json_decode(json_encode($this->lora_activation, true)), $value);
+        } catch (\Exception $e) {
+            return $value ?: [];
+        }
+
     }
 }

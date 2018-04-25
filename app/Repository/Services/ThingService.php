@@ -160,7 +160,7 @@ class ThingService
         $data = ['deviceKeys' => ['appKey' => $key]];
         $data['devEUI'] = $thing['interface']['devEUI'];
         $this->loraService->SendKeys($data);
-        return $data;
+        return $data['deviceKeys'];
     }
 
     /**

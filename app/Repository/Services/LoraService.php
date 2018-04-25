@@ -135,7 +135,12 @@ class LoraService
     public function sendKeys($data)
     {
         $url = $url = $this->base_url . '/api/devices/' . $data['devEUI'] . '/keys';
-        return $this->send($url, $data, 'post');
+        try{
+            return $this->send($url, $data, 'post');
+        }
+        catch (\Exception $e){
+            return $this->send($url, $data, 'put');
+        }
     }
 
     /**
@@ -208,6 +213,17 @@ class LoraService
         return $this->send($url, [], 'get');
     }
 
+    /**
+     * @param $dev_eui
+     * @return string
+     * @throws LoraException
+     */
+    public function getActivation($dev_eui)
+    {
+        $url = $url = $this->base_url . '/api/devices/' . $dev_eui . '/activation';
+        return $this->send($url, [], 'get');
+    }
+
     private function send($url, $data, $method = 'get', $accept = 200)
     {
         if (env('LORA_TEST'))
@@ -225,7 +241,7 @@ class LoraService
             ->returnResponseObject();
         $new_response = $this->sendMethods($method, $response);
         // TODO remove debug
-        Log::notice('Lora Service Response');
+        Log::notice("Lora\t" . $method . "\t" . $url);
         Log::debug(print_r($new_response, true));
         if ($new_response->status == 401 | $new_response->status == 403) {
             $this->authenticate();
