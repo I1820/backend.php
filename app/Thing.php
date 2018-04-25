@@ -85,18 +85,18 @@ class Thing extends Eloquent
         return ['status' => $status, 'time' => $time ? (string)lora_time($time) : ''];
     }
 
-    public function getKeysAttribute($value)
+    public function getKeysAttribute()
     {
         if ($this->type == 'ABP')
-            return $value ?: [];
+            return isset($this->attributes['keys']) ? $this->attributes['keys'] : [];
         try {
             if (!$this->lora_activation) {
                 $loraService = resolve('App\Repository\Services\LoraService');
                 $this->lora_activation = $loraService->getActivation($this->dev_eui);
             }
-            return array_merge(json_decode(json_encode($this->lora_activation, true)), $value);
+            return array_merge(json_decode(json_encode($this->lora_activation, true)), $this->attributes['keys']);
         } catch (\Exception $e) {
-            return $value ?: [];
+            return isset($this->attributes['keys']) ? $this->attributes['keys'] : [];
         }
 
     }
