@@ -46,11 +46,10 @@ class CodecController extends Controller
 
 
     /**
-     * @param Project $project
      * @param Thing $thing
      * @param Request $request
      * @return array
-     * @throws \App\Exceptions\GeneralException
+     * @throws GeneralException
      */
     public function send(Thing $thing, Request $request)
     {
@@ -95,6 +94,20 @@ class CodecController extends Controller
     {
         $codec->delete();
         return Response::body(['success' => true]);
+    }
+
+    /**
+     * @param Project $project
+     * @param Codec $codec
+     * @param Request $request
+     * @return array
+     * @throws GeneralException
+     */
+    public function update(Project $project, Codec $codec, Request $request)
+    {
+        $this->codecService->validateCreateCodec($request);
+        $codec = $this->codecService->updateCodec($request, $codec);
+        return Response::body(compact('codec'));
     }
 
 }
