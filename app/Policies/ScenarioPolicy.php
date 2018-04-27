@@ -19,7 +19,7 @@ class ScenarioPolicy
      */
     public function view(User $user, Scenario $scenario)
     {
-        $this->isOwner($user,$scenario);
+        return $this->isOwner($user,$scenario);
     }
 
     /**
