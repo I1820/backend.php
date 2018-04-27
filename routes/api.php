@@ -63,6 +63,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
             Route::post('/', 'CodecController@create');
             Route::get('/', 'CodecController@list');
             Route::delete('/{codec}', 'CodecController@delete');
+            Route::put('/{codec}', 'CodecController@update');
         });
 
 

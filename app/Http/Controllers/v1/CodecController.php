@@ -103,7 +103,7 @@ class CodecController extends Controller
      * @return array
      * @throws GeneralException
      */
-    public function update(Project $project, Codec $codec, Request $request)
+    public function update(Codec $codec,Request $request)
     {
         $this->codecService->validateCreateCodec($request);
         $codec = $this->codecService->updateCodec($request, $codec);
