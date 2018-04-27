@@ -36,6 +36,9 @@ class ConfigService
         if (!$config)
             $config = UserConfig::create(['user_id' => Auth::user()['_id']]);
         $config_widgets = isset($config['widgets']) ? $config['widgets'] : [];
+        $thing = Auth::user()->things()->where('dev_eui', $data->get('devEUI'))->first();
+        if (!$thing)
+            throw new GeneralException('شی یافت نشد', GeneralException::NOT_FOUND);
         $widget = $data->only([
             'title',
             'devEUI',
