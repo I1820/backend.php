@@ -64,6 +64,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
             Route::get('/', 'CodecController@list');
             Route::delete('/{codec}', 'CodecController@delete');
             Route::patch('/{codec}', 'CodecController@update');
+            Route::get('/{codec}', 'CodecController@get');
         });
 
 
@@ -87,7 +88,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::post('/{thing}/send', 'DownLinkController@sendThing');
 
         Route::post('/{thing}/codec', 'CodecController@send');
-        Route::get('/{thing}/codec', 'CodecController@get');
+        Route::get('/{thing}/codec', 'CodecController@getThing');
     });
 
     Route::group(['prefix' => 'thing-profile', 'middleware' => ['auth.jwt']], function () {

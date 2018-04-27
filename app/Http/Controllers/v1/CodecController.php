@@ -67,7 +67,7 @@ class CodecController extends Controller
      * @param Request $request
      * @return array
      */
-    public function get(Project $project, Thing $thing, Request $request)
+    public function getThing(Project $project, Thing $thing, Request $request)
     {
         $codec = $thing->codec;
         return Response::body(compact('codec'));
@@ -99,11 +99,22 @@ class CodecController extends Controller
     /**
      * @param Project $project
      * @param Codec $codec
+     * @return array
+     * @throws \Exception
+     */
+    public function get(Project $project, Codec $codec)
+    {
+        return Response::body(compact('codec'));
+    }
+
+    /**
+     * @param Project $project
+     * @param Codec $codec
      * @param Request $request
      * @return array
      * @throws GeneralException
      */
-    public function update(Codec $codec,Request $request)
+    public function update(Project $project, Codec $codec, Request $request)
     {
         $this->codecService->validateCreateCodec($request);
         $codec = $this->codecService->updateCodec($request, $codec);
