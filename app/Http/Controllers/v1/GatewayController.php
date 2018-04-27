@@ -83,14 +83,16 @@ class GatewayController extends Controller
 
     /**
      * @return array
-     * @throws LoraException
      */
     public function list()
     {
         $gateways = Auth::user()->gateways()->get();
         foreach ($gateways as $gateway) {
-            $info = $this->loraService->getGW($gateway['mac']);
-            $gateway['last_seen_at'] = (string)lora_time($info->lastSeenAt);
+            try {
+                $info = $this->loraService->getGW($gateway['mac']);
+                $gateway['last_seen_at'] = (string)lora_time($info->lastSeenAt);
+            } catch (LoraException $e) {
+            }
             //$gateway['ping'] = $info->ping;
         }
         return Response::body(compact('gateways'));
