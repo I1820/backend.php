@@ -54,6 +54,22 @@ class ConfigService
 
     }
 
+    /**
+     * @param Collection $data
+     * @return string
+     */
+    public function deleteWidgetChart(Collection $data)
+    {
+        $config = Auth::user()->config()->first();
+        if (!$config)
+            $config = UserConfig::create(['user_id' => Auth::user()['_id']]);
+        $config_widgets = isset($config['widgets']) ? $config['widgets'] : [];
+        unset($config_widgets[$data->get('id')]);
+        $config['widgets'] = $config_widgets;
+        $config->save();
+
+    }
+
     public function validateWidgetChart($data)
     {
         $messages = [

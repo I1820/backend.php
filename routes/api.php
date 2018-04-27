@@ -34,6 +34,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::get('/', 'UserController@profile');
         Route::post('/upload', 'UserController@upload');
         Route::post('/widget/charts', 'UserController@setWidgetChart');
+        Route::delete('/widget/charts', 'UserController@deleteWidgetChart');
         Route::get('/dashboard', 'UserController@dashboard');
     });
 

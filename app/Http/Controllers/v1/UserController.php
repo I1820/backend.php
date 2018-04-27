@@ -122,4 +122,10 @@ class UserController extends Controller
         $widgets = $this->configService->setWidgetChart(collect($request->all()));
         return Response::body(['widgets' => $widgets]);
     }
+
+    public function deleteWidgetChart(Request $request)
+    {
+        $this->configService->deleteWidgetChart(collect($request->all()));
+        return Response::body(['success' => true]);
+    }
 }
