@@ -9,6 +9,7 @@ use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
 use App\Repository\Services\GatewayService;
 use App\Repository\Services\LoraService;
+use Carbon\Carbon;
 use function GuzzleHttp\Psr7\str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -90,7 +91,9 @@ class GatewayController extends Controller
         foreach ($gateways as $gateway) {
             try {
                 $info = $this->loraService->getGW($gateway['mac']);
-                $gateway['last_seen_at'] = (string)lora_time($info->lastSeenAt);
+                $time = lora_time($info->lastSeenAt);
+                $gateway['last_seen_at']['time'] = (string)lora_time($info->lastSeenAt);
+                $gateway['last_seen_at']['status'] = Carbon::now()->subHour() > $time ? 'red' : 'green';
             } catch (LoraException $e) {
             }
             //$gateway['ping'] = $info->ping;
