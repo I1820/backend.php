@@ -71,14 +71,21 @@ class GatewayController extends Controller
     /**
      * @param Gateway $gateway
      * @return array
-     * @throws LoraException
      */
     public function info(Gateway $gateway)
     {
-        $info = $this->loraService->getGW($gateway['mac']);
         //$gateway['firstSeenAt'] = $info->firstSeenAt;
-        $gateway['last_seen_at'] = (string)lora_time($info->lastSeenAt);
-        //$gateway['ping'] = $info->ping;
+        try {
+            $info = $this->loraService->getGW($gateway['mac']);
+            $time = lora_time($info->lastSeenAt);
+            $last_seen = [
+                'time' => (string)lora_time($info->lastSeenAt),
+                'status' => Carbon::now()->subHour() > $time ? 'red' : 'green'
+            ];
+            $gateway['last_seen_at'] = $last_seen;
+        } catch (LoraException $e) {
+            $gateway['last_seen_at'] = ['time' => '', 'status' => ''];
+        }
         return Response::body(compact('gateway'));
     }
 

@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 class Thing extends Eloquent
 {
 
-    protected $appends = ['last_seen_at', 'keys'];
+    protected $appends = ['last_seen_at', 'keys', 'owner'];
     protected $lora_thing;
     protected $lora_activation;
 
@@ -66,6 +66,14 @@ class Thing extends Eloquent
         if (!$value)
             return "";
         return $value;
+    }
+
+    public function getOwnerAttribute($value)
+    {
+        foreach ($this->permissions as $permissions)
+            if ($permissions['name'] == 'PROJECT-OWNER')
+                return $permissions['user'];
+        return null;
     }
 
     public function getLastSeenAtAttribute($value)
