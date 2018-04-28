@@ -97,6 +97,7 @@ class ThingController extends Controller
     public function update(Thing $thing, Request $request)
     {
         $thing = $this->thingService->updateThing($request, $thing);
+        $thing->load(['profile', 'project', 'user']);
         return Response::body(compact('thing'));
     }
 
