@@ -45,6 +45,7 @@ class ThingProfileController extends Controller
             'thing_profile_slug' => $id,
             'device_profile_id' => $device_profile_id,
             'data' => $data,
+            'name' => $request->get('name'),
             'type' => $request->get('supportsJoin') === '1' ? 'OTAA' : 'ABP',
             'user_id' => $user['_id'],
         ]);

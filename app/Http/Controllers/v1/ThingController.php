@@ -93,10 +93,11 @@ class ThingController extends Controller
      * @param Thing $thing
      * @param Request $request
      * @return array
+     * @throws LoraException
      */
     public function update(Thing $thing, Request $request)
     {
-        $thing = $this->thingService->updateThing($request, $thing);
+        $thing = $this->thingService->updateThing(collect($request->all()), $thing);
         $thing->load(['profile', 'project', 'user']);
         return Response::body(compact('thing'));
     }
@@ -162,12 +163,28 @@ class ThingController extends Controller
         Excel::load($file, function ($reader) use (&$res, $request) {
             $project = Project::where('_id', $request->get('project_id'))->first();
             $results = $reader->all();
+            $user = Auth::user();
             foreach ($results as $row) {
                 $data = $this->prepareRow($row);
                 try {
-                    $thing = $this->createThing(collect($row), $project);
-                    $res[$data['devEUI']] = $thing;
-                    $this->activateThing($thing, collect($row));
+                    $thing = Thing::where('dev_eui', $data['devEUI'])->with('profile')->first();
+                    if (!$user->can('update', $project)) {
+                        $res[$data['devEUI']] = 'شما دسترسی این کار را ندارید';
+                    } elseif ($row['operation'] == 'add') {
+                        if (!$thing)
+                            $thing = $this->createThing(collect($row), $project);
+                        else
+                            $thing = $this->thingService->updateThing(collect($row), $thing);
+                        $res[$data['devEUI']] = $thing;
+                        $this->activateThing($thing, collect($row));
+                    } elseif ($row['operation'] == 'delete') {
+                        $deleted = $thing && $user->can('delete', $thing) ? $this->delete($thing) : 0;
+                        if ($deleted)
+                            $res[$data['devEUI']] = 'حذف شد';
+                        else
+                            $res[$data['devEUI']] = 'پیدا نشد';
+                    } else
+                        $res[$data['devEUI']] = 'خطای عملیات';
                 } catch (\Exception $e) {
                     $res[$data['devEUI']] = $e->getMessage();
                 }

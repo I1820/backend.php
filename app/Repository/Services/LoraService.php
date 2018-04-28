@@ -95,6 +95,19 @@ class LoraService
 
     /**
      * @param $data
+     * @param $dev_eui
+     * @return string
+     * @throws LoraException
+     */
+    public function updateDevice($data, $dev_eui)
+    {
+        $url = $url = $this->base_url . '/api/devices/' . $dev_eui;
+        $this->send($url, $data, 'put');
+        return true;
+    }
+
+    /**
+     * @param $data
      * @return string
      * @throws LoraException
      */
@@ -135,10 +148,9 @@ class LoraService
     public function sendKeys($data)
     {
         $url = $url = $this->base_url . '/api/devices/' . $data['devEUI'] . '/keys';
-        try{
+        try {
             return $this->send($url, $data, 'post');
-        }
-        catch (\Exception $e){
+        } catch (\Exception $e) {
             return $this->send($url, $data, 'put');
         }
     }
@@ -241,8 +253,12 @@ class LoraService
             ->returnResponseObject();
         $new_response = $this->sendMethods($method, $response);
         // TODO remove debug
+        Log::debug('-----------------------------------------------------');
         Log::notice("Lora\t" . $method . "\t" . $url);
+        Log::debug(print_r($data, true));
+        Log::debug('res ---------------------');
         Log::debug(print_r($new_response, true));
+        Log::debug('-----------------------------------------------------');
         if ($new_response->status == 401 | $new_response->status == 403) {
             $this->authenticate();
             $response = $response->withHeader('Authorization: ' . $this->token);
@@ -282,6 +298,9 @@ class LoraService
                 break;
             case 'post':
                 $new_response = $response->asJson()->post();
+                break;
+            case 'put':
+                $new_response = $response->asJson()->put();
                 break;
             case 'delete':
                 $new_response = $response->asJsonResponse()->delete();
