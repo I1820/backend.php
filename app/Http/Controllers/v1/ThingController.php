@@ -81,7 +81,7 @@ class ThingController extends Controller
      */
     public function get(Thing $thing)
     {
-        $thing->load(['user', 'project']);
+        $thing->load(['user', 'project','profile']);
         $codec = $thing['codec'];
         $thing = $thing->toArray();
         $thing['codec'] = $codec;
