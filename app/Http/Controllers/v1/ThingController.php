@@ -81,7 +81,7 @@ class ThingController extends Controller
      */
     public function get(Thing $thing)
     {
-        $thing->load(['user', 'project','profile']);
+        $thing->load(['user', 'project', 'profile']);
         $codec = $thing['codec'];
         $thing = $thing->toArray();
         $thing['codec'] = $codec;
@@ -96,9 +96,7 @@ class ThingController extends Controller
      */
     public function update(Thing $thing, Request $request)
     {
-        $this->thingService->validateUpdateThing($request);
         $thing = $this->thingService->updateThing($request, $thing);
-
         return Response::body(compact('thing'));
     }
 
