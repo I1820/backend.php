@@ -71,7 +71,7 @@ class Thing extends Eloquent
     public function getOwnerAttribute($value)
     {
         foreach ($this->permissions as $permissions)
-            if ($permissions['name'] == 'PROJECT-OWNER')
+            if ($permissions['name'] == 'THING-OWNER')
                 return $permissions['user'];
         return null;
     }
