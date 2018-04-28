@@ -140,7 +140,7 @@ class ThingService
             'appSKey' => 'required',
         ]);
         if ($validator->fails())
-            throw new GeneralException('اطلاعات را کامل وارد کنید', 407);
+            throw new GeneralException('اطلاعات فعال سازی را کامل وارد کنید', 407);
         $data['devAddr'] = (string)$request->get('devAddr');
         $data['nwkSKey'] = (string)$request->get('nwkSKey');
         $data['appSKey'] = (string)$request->get('appSKey');

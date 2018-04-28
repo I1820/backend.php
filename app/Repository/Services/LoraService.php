@@ -9,6 +9,7 @@
 namespace App\Repository\Services;
 
 
+use App\Exceptions\GeneralException;
 use App\Exceptions\LoraException;
 use App\Thing;
 use Illuminate\Support\Collection;
@@ -78,8 +79,13 @@ class LoraService
      */
     public function deleteDeviceProfile($deviceProfileId)
     {
-        $url = $url = $this->base_url . '/api/device-profiles/' . $deviceProfileId;
-        return $this->send($url, [], 'delete');
+        try {
+            $url = $url = $this->base_url . '/api/device-profiles/' . $deviceProfileId;
+            return $this->send($url, [], 'delete');
+        } catch (LoraException $exception) {
+            if ($exception->getCode() == 9)
+                throw new LoraException('ابتدا اشیای متصل را حذف کنید.', GeneralException::ACCESS_DENIED);
+        }
     }
 
     /**
