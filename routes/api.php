@@ -31,6 +31,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
 
     Route::group(['prefix' => 'user', 'middleware' => ['auth.jwt']], function () {
         Route::patch('/update', 'UserController@update');
+        Route::post('/password', 'UserController@changePassword');
         Route::get('/', 'UserController@profile');
         Route::post('/upload', 'UserController@upload');
         Route::post('/widget/charts', 'UserController@setWidgetChart');

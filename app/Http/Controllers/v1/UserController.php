@@ -44,7 +44,6 @@ class UserController extends Controller
     /**
      * @param Request $request
      * @return array
-     * @throws \App\Exceptions\GeneralException
      */
     public function update(Request $request)
     {
@@ -55,6 +54,19 @@ class UserController extends Controller
 
         return Response::body(compact('user'));
     }
+
+
+    /**
+     * @param Request $request
+     * @return array
+     * @throws \App\Exceptions\GeneralException
+     */
+    public function changePassword(Request $request)
+    {
+        $this->userService->changePassword($request);
+        return Response::body(['success' => true]);
+    }
+
 
     /**
      * @return array
@@ -101,7 +113,7 @@ class UserController extends Controller
                     'title' => $widget['title'],
                     'thing' => $thing,
                     'data' => collect($this->coreService->thingData($thing, $since, $until))->map(function ($data) use ($widget) {
-                        $data  = json_decode(json_encode($data), True);
+                        $data = json_decode(json_encode($data), True);
                         return ['timestamp' => $data['timestamp'], 'value' => $data['data'][$widget['key']]];
                     })];
             } catch (\Error $e) {
