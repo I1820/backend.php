@@ -46,6 +46,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::delete('/{project}', 'ProjectController@stop');
         Route::get('/{project}', 'ProjectController@get');
         Route::get('/{project}/things', 'ProjectController@things');
+        Route::get('/{project}/things/export', 'ProjectController@exportThings');
         Route::post('/{project}/aliases', 'ProjectController@aliases');
 
         Route::post('/{project}/lint', 'ProjectController@lint');

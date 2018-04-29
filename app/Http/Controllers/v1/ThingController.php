@@ -154,7 +154,6 @@ class ThingController extends Controller
      * @return array
      * @throws GeneralException
      */
-    // TODO
     public function fromExcel(Request $request)
     {
         $this->thingService->validateExcel($request);
