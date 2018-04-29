@@ -151,11 +151,14 @@ class ProjectController extends Controller
                 isset($item['keys']) && $item['type'] == 'ABP' ? $item['keys']['devAddr'] : '',
             ];
         })->toArray());
-        return $excel->create('things.csv', function ($excel) use ($res) {
+
+        return response($excel->create('things.csv', function ($excel) use ($res) {
             $excel->sheet('Things', function ($sheet) use ($res) {
                 $sheet->fromArray($res, null, 'A1', false, false);
             });
-        })->export('csv');
+        })->string('csv'))
+            ->header('Content-Disposition', 'attachment; filename="things.csv.csv"')
+            ->header('Content-Type', 'application/csv; charset=UTF-8');
     }
 
 
