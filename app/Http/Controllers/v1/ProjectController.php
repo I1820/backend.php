@@ -146,9 +146,9 @@ class ProjectController extends Controller
                 $item['period'],
                 $item['dev_eui'],
                 $item['profile']['thing_profile_slug'],
-                isset($item['keys']) ? ($item['type'] == 'ABP' ? $item['keys']['appSKey'] : $item['keys']['appKey']) : '',
-                isset($item['keys']) && $item['type'] == 'ABP' ? $item['keys']['nwkSKey'] : '',
-                isset($item['keys']) && $item['type'] == 'ABP' ? $item['keys']['devAddr'] : '',
+                isset($item['keys']['appSKey']) ? $item['keys']['appSKey'] : (isset($item['keys']['appKey']) ? $item['keys']['appKey'] : ''),
+                isset($item['keys']['nwkSKey']) ? $item['keys']['nwkSKey'] : '',
+                isset($item['keys']['devAddr']) ? $item['keys']['devAddr'] : '',
             ];
         })->toArray());
 

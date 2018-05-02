@@ -146,7 +146,7 @@ class ThingService
         $data['appSKey'] = (string)$request->get('appSKey');
         $data['fCntUp'] = intval($request->get('fCntUp', 0));
         $data['fCntDown'] = intval($request->get('fCntDown', 0));
-        $data['skipFCntCheck'] = $request->get('skipFCntCheck') === '1' ? true : false;
+        $data['skipFCntCheck'] = $request->get('skipFCntCheck') === 'true' ? true : false;
         $data['devEUI'] = $thing['interface']['devEUI'];
         $this->loraService->activateDevice($data);
         return $data;
