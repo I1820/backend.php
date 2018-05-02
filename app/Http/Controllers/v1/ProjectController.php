@@ -133,7 +133,11 @@ class ProjectController extends Controller
             'thing_profile_slug',
             'appSKey',
             'nwkSKey',
-            'devAddr'
+            'devAddr',
+            'fCntDown',
+            'fCntUp',
+            'skipFCntCheck',
+
         ]];
         $res = array_merge($res, $things->map(function ($item) {
             return [
@@ -149,6 +153,10 @@ class ProjectController extends Controller
                 isset($item['keys']['appSKey']) ? $item['keys']['appSKey'] : (isset($item['keys']['appKey']) ? $item['keys']['appKey'] : ''),
                 isset($item['keys']['nwkSKey']) ? $item['keys']['nwkSKey'] : '',
                 isset($item['keys']['devAddr']) ? $item['keys']['devAddr'] : '',
+                isset($item['keys']['devAddr']) ? $item['keys']['devAddr'] : '',
+                isset($item['keys']['fCntDown']) ? $item['keys']['fCntDown'] : '',
+                isset($item['keys']['fCntUp']) ? $item['keys']['fCntUp'] : '',
+                isset($item['keys']['skipFCntCheck']) ? $item['keys']['skipFCntCheck'] : '',
             ];
         })->toArray());
 
