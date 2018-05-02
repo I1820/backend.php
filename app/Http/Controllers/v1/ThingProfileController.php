@@ -111,8 +111,8 @@ class ThingProfileController extends Controller
                     'rxDelay1' => (int)$data->get('rxDelay1', 0),
                     'rxFreq2' => (int)$data->get('rxFreq2', 0),
                     'supports32bitFCnt' => $data->get('supports32bitFCnt') ? true : false,
-                    'supportsClassB' => $data->get('supportsClassB') ? true : false,
-                    'supportsClassC' => $data->get('supportsClassC') ? true : false,
+					'supportsClassB' => $data->get('supportsClassB') == 'true' ? true : false,
+                    'supportsClassC' => $data->get('supportsClassC') == 'true' ? true : false,
                     'supportsJoin' => $data->get('supportsJoin') === '1' ? true : false
                 ],
                 'name' => $data->get('name'),
