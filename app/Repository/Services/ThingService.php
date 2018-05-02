@@ -202,12 +202,12 @@ class ThingService
         $lora_data = [];
         if ($request->get('name')) {
             $thing->name = $request->get('name');
-            $lora_data['name'] = $request->get('name');
+            $lora_data['name'] = (string)$request->get('name');
         }
 
         if ($request->get('description')) {
             $thing->description = $request->get('description');
-            $lora_data['description'] = $request->get('description');
+            $lora_data['description'] = (string)$request->get('description');
         }
 
         if ($request->get('period'))
@@ -216,10 +216,10 @@ class ThingService
         if ($request->get('thing_profile_slug')) {
             $profile = ThingProfile::where('thing_profile_slug', (int)$request->get('thing_profile_slug'))->first();
             if ($profile && Auth::user()->can('view', $profile)) {
-                $lora_data['deviceProfileID'] = $profile['device_profile_id'];
+                $lora_data['deviceProfileID'] = (string)$profile['device_profile_id'];
                 $thing['profile_id'] = $profile['_id'];
             } else
-                $lora_data['deviceProfileID'] = $thing['profile']['device_profile_id'];
+                $lora_data['deviceProfileID'] = (string)$thing['profile']['device_profile_id'];
         }
 
 
