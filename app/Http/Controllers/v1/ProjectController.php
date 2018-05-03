@@ -155,7 +155,7 @@ class ProjectController extends Controller
                 isset($item['keys']['devAddr']) ? $item['keys']['devAddr'] : '',
                 isset($item['keys']['fCntDown']) ? $item['keys']['fCntDown'] : '',
                 isset($item['keys']['fCntUp']) ? $item['keys']['fCntUp'] : '',
-                isset($item['keys']['skipFCntCheck']) ? $item['keys']['skipFCntCheck'] : '',
+                isset($item['keys']['skipFCntCheck']) && $item['keys']['skipFCntCheck'] ? 'true' : '',
             ];
         })->toArray());
 
