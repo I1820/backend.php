@@ -45,7 +45,7 @@ class LoraService
      */
     public function postDevice(Collection $data, $application_id, $deviceProfileID)
     {
-        Log::debug("Send Device:\t" . $data['devEUI']);
+        Log::debug("Lora Send Device:\t" . $data['devEUI']);
         $url = $this->base_url . '/api/devices';
         $data = $data->only([
             'description',
@@ -68,7 +68,7 @@ class LoraService
      */
     public function postDeviceProfile($data)
     {
-        Log::debug("Send Device Profile");
+        Log::debug("Lora Send Device Profile");
         $url = $this->base_url . '/api/device-profiles';
         return $this->send($url, $data, 'post');
     }
@@ -81,7 +81,7 @@ class LoraService
      */
     public function deleteDeviceProfile($deviceProfileId)
     {
-        Log::debug("Delete Device Profile:\t" . $deviceProfileId);
+        Log::debug("Lora Delete Device Profile:\t" . $deviceProfileId);
         try {
             $url = $url = $this->base_url . '/api/device-profiles/' . $deviceProfileId;
             return $this->send($url, [], 'delete');
@@ -98,7 +98,7 @@ class LoraService
      */
     public function deleteDevice($deviceId)
     {
-        Log::debug("Delete Device:\t" . $deviceId);
+        Log::debug("Lora Delete Device:\t" . $deviceId);
         $url = $url = $this->base_url . '/api/devices/' . $deviceId;
         return $this->send($url, [], 'delete');
     }
@@ -111,7 +111,7 @@ class LoraService
      */
     public function updateDevice($data, $dev_eui)
     {
-        Log::debug("Update Device:\t" . $dev_eui);
+        Log::debug("Lora Update Device:\t" . $dev_eui);
         $url = $url = $this->base_url . '/api/devices/' . $dev_eui;
         $this->send($url, $data, 'put');
         return true;
@@ -124,7 +124,7 @@ class LoraService
      */
     public function sendGateway($data)
     {
-        Log::debug("Send Gateway");
+        Log::debug("Lora Send Gateway");
         $url = $url = $this->base_url . '/api/gateways';
         $this->send($url, $data, 'post', 409);
         return true;
@@ -137,7 +137,7 @@ class LoraService
      */
     public function deleteGateway($mac)
     {
-        Log::debug("Delete Gateway\t" . $mac);
+        Log::debug("Lora Delete Gateway\t" . $mac);
         $url = $url = $this->base_url . '/api/gateways/' . $mac;
         return $this->send($url, [], 'delete');
     }
@@ -149,7 +149,7 @@ class LoraService
      */
     public function activateDevice($data)
     {
-        Log::debug("Active Device ABP\t" . $data['devEUI']);
+        Log::debug("Lora Active Device ABP\t" . $data['devEUI']);
         $url = $url = $this->base_url . '/api/devices/' . $data['devEUI'] . '/activate';
         return $this->send($url, $data, 'post');
     }
@@ -161,7 +161,7 @@ class LoraService
      */
     public function sendKeys($data)
     {
-        Log::debug("Active Device OTAA\t" . $data['devEUI']);
+        Log::debug("Lora Active Device OTAA\t" . $data['devEUI']);
         $url = $url = $this->base_url . '/api/devices/' . $data['devEUI'] . '/keys';
         try {
             return $this->send($url, $data, 'post');
@@ -194,7 +194,7 @@ class LoraService
      */
     public function postApp($description, $id)
     {
-        Log::debug("Create Project\t" . $id);
+        Log::debug("Lora Create Project\t" . $id);
         $url = $this->base_url . '/api/applications';
         $data = [
             'organizationID' => $this->organization_id,
@@ -213,7 +213,7 @@ class LoraService
      */
     public function deleteApp($applicationId)
     {
-        Log::debug("Delete Project\t" . $applicationId);
+        Log::debug("Lora Delete Project\t" . $applicationId);
         $url = $url = $this->base_url . '/api/applications/' . $applicationId;
         return $this->send($url, [], 'delete');
 
@@ -226,7 +226,7 @@ class LoraService
      */
     public function getGW($mac)
     {
-        Log::debug("Get Gateway\t" . $mac);
+        Log::debug("Lora Get Gateway\t" . $mac);
         $url = $url = $this->base_url . '/api/gateways/' . $mac;
         return $this->send($url, [], 'get');
 
@@ -239,7 +239,7 @@ class LoraService
      */
     public function getDevice($dev_eui)
     {
-        Log::debug("Get Device\t" . $dev_eui);
+        Log::debug("Lora Get Device\t" . $dev_eui);
         $url = $url = $this->base_url . '/api/devices/' . $dev_eui;
         return $this->send($url, [], 'get');
     }
@@ -251,7 +251,7 @@ class LoraService
      */
     public function getActivation($dev_eui)
     {
-        Log::debug("Get Device Activation\t" . $dev_eui);
+        Log::debug("Lora Get Device Activation\t" . $dev_eui);
         $url = $url = $this->base_url . '/api/devices/' . $dev_eui . '/activation';
         return $this->send($url, [], 'get');
     }

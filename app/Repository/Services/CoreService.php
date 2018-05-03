@@ -43,15 +43,9 @@ class CoreService
      */
     public function postProject($id)
     {
-        if (env('CORE_TEST') == 1)
-            return $this->fake();
-        $id = (string)$id;
+        Log::debug("Core Send Project\t" . $id);
         $url = '/api/project';
-        $data = [
-            'name' => $id,
-        ];
-        $response = $this->send($url, $data, 'post');
-
+        $response = $this->send($url, ['name' => (string)$id], 'post');
         if ($response->status == 200)
             return $response->content;
         throw new GeneralException($response->content->error ?: '', $response->status);
@@ -64,13 +58,7 @@ class CoreService
      */
     public function deleteProject($project_id)
     {
-        if (env('CORE_TEST') == '1') {
-            return $this->fake();
-            dd('sajjad');
-        }
-
-
-        Log::error(env('CORE_TEST'));
+        Log::debug("Core Delete Project\t" . $project_id);
         $url = '/api/project/' . $project_id;
         $response = $this->send($url, [], 'delete');
         if ($response->status == 200)
@@ -87,8 +75,7 @@ class CoreService
      */
     public function postThing(Project $project, Thing $thing)
     {
-        if (env('CORE_TEST') == 1)
-            return $this->fake();
+        Log::debug("Core Send Thing\t" . $project['_id']);
         $url = '/api/project/' . $project['container']['name'] . '/things';
         $data = [
             'name' => $thing['interface']['devEUI'],
@@ -109,8 +96,7 @@ class CoreService
      */
     public function sendCodec(Project $project, Thing $thing, $codec)
     {
-        if (env('CORE_TEST') == 1)
-            return $this->fake();
+        Log::debug("Core Send Codec\t" . $project['_id']);
         $url = '/api/codec/' . $thing['interface']['devEUI'];
         $response = $this->send($url, $codec, 'post', $project['container']['runner']['port'], 0);
         if ($response->status == 200)
@@ -128,8 +114,7 @@ class CoreService
      */
     public function thingData(Thing $thing, $since, $until)
     {
-        if (env('CORE_TEST') == 1)
-            return $this->fake();
+        Log::debug("Core Thing Data");
         $url = '/api/things/' . $thing['interface']['devEUI'];
         $response = $this->send($url, ['since' => (int)$since, 'until' => (int)$until], 'get', $this->dmPort);
         if ($response->status == 200)
@@ -148,8 +133,7 @@ class CoreService
      */
     public function thingsData($ids, $since, $until)
     {
-        if (env('CORE_TEST') == 1)
-            return $this->fake();
+        Log::debug("Core Things Data");
         $url = '/api/things';
         $response = $this->send($url, ['since' => (int)$since, 'until' => (int)$until, 'thing_ids' => $ids], 'post', $this->dmPort);
         if ($response->status == 200)
@@ -168,8 +152,7 @@ class CoreService
      */
     public function sendScenario(Project $project, Scenario $scenario)
     {
-        if (env('CORE_TEST') == 1)
-            return $this->fake();
+        Log::debug("Core Send Scenario\t" . $project['_id']);
         $url = '/api/scenario/' . $project['container']['name'];
         $response = $this->send($url, $scenario->code, 'post', $project['container']['runner']['port'], 0);
         if ($response->status == 200)
@@ -187,8 +170,7 @@ class CoreService
      */
     public function lint(Project $project, $code)
     {
-        if (env('CORE_TEST') == 1)
-            return $this->fake();
+        Log::debug("Core Lint\t" . $project['_id']);
         $url = '/api/lint';
         $response = $this->send($url, $code, 'post', $project['container']['runner']['port'], 0);
         if ($response->status == 200)
@@ -198,16 +180,15 @@ class CoreService
     }
 
     /**
-     * @param $data
+     * @param $mac
      * @return string
      * @throws GeneralException
      */
-    public function sendGateway($data)
+    public function enableGateway($mac)
     {
-        if (env('CORE_TEST') == 1)
-            return $this->fake();
-        $url = '/api/gateway';
-        $response = $this->send($url, $data, 'post', $this->gmPort);
+        Log::debug("Core Enable Gateway\t" . $mac);
+        $url = '/api/gateway/' . $mac . '/enable';
+        $response = $this->send($url, [], 'get', $this->dmPort);
         if ($response->status == 200)
             return $response->content;
         throw new GeneralException($response->content->error ?: '', $response->status);
@@ -221,8 +202,7 @@ class CoreService
      */
     public function projectList()
     {
-        if (env('CORE_TEST') == 1)
-            return $this->fake();
+        Log::debug("Core Project List");
         $url = '/api/project';
         $response = $this->send($url, [], 'get');
         if ($response->status == 200)
@@ -239,8 +219,7 @@ class CoreService
      */
     public function projectLogs($project_id, $limit)
     {
-        if (env('CORE_TEST') == 1)
-            return $this->fake();
+        //Log::debug("Core Project Log");
         $url = '/api/project/' . $project_id . '/logs?limit=' . $limit;
         $response = $this->send($url, [], 'get');
         if ($response->status == 200)
@@ -250,8 +229,7 @@ class CoreService
 
     public function downLinkThing(Project $project, Thing $thing, $data)
     {
-        if (env('CORE_TEST') == 1)
-            return $this->fake();
+        Log::debug("DownLink Project List\t" . $thing['dev_eui']);
         $url = '/api/send';
         $data = ['thing' => $thing->toArray(), 'data' => $data, 'project_id' => $project->application_id];
         $response = $this->send($url, $data, 'post', $this->downLinkPort);
@@ -263,6 +241,9 @@ class CoreService
 
     private function send($url, $data, $method = 'get', $port = '', $json_request = 1)
     {
+        if (env('CORE_TEST') == 1)
+            return $this->fake();
+
         $port = $port == '' ? $this->port : $port;
         $url = $this->base_url . ':' . $port . $url;
 
@@ -287,9 +268,12 @@ class CoreService
                 $new_response = $response->get();
                 break;
         }
-        // TODO remove debug
-        Log::notice('Core Service Response');
+        /*
+        Log::debug('-----------------------------------------------------');
+        Log::debug(print_r($data, true));
         Log::debug(print_r($new_response, true));
+        Log::debug('-----------------------------------------------------');
+        */
 
         if ($new_response->status == 0) {
             throw new GeneralException($new_response->error, 0);

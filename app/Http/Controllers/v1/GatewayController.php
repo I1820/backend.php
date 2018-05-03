@@ -63,6 +63,7 @@ class GatewayController extends Controller
         $data['longitude'] = floatval($data['longitude']);
         $data['ping'] = $request->get('ping') === '1' ? true : false;
         $this->loraService->sendGateway($data);
+        $this->coreService->enableGateway($request->get('mac'));
         $gateway = $this->gatewayService->insertGateway($request, $id);
         return Response::body(compact('gateway'));
     }
