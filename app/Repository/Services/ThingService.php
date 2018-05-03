@@ -87,10 +87,11 @@ class ThingService
             'things' => 'required|file',
         ], $messages);
 
+        $extension = $request->file('things')->clientExtension();
         if ($validator->fails())
             throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
-        if ($request->file('things')->clientExtension() != 'csv')
-            throw new  GeneralException('لطفا فایل با فرمت csv انتخاب کنید', GeneralException::VALIDATION_ERROR);
+        if ($extension != 'csv' && $extension != 'xls' && $extension != 'xlsx')
+            throw new  GeneralException('لطفا فایل با فرمت اکسل انتخاب کنید', GeneralException::VALIDATION_ERROR);
     }
 
     /**
