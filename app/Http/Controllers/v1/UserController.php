@@ -120,7 +120,7 @@ class UserController extends Controller
                         ->map(function ($data) use ($widget) {
                             $data = json_decode(json_encode($data), True);
                             return ['timestamp' => $data['timestamp'], 'value' => $data['data'][$widget['key']]];
-                        })];
+                        })->values()];
             } catch (\Error $e) {
                 return [];
             } catch (\Exception $e) {
