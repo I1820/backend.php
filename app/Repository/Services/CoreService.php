@@ -272,11 +272,12 @@ class CoreService
         Log::debug('-----------------------------------------------------');
         */
 
-        $content = [];
         $code = $new_response->status;
         try {
             if ($code != 200 && gettype($new_response->content) == 'string')
                 $content = json_decode($new_response->content);
+            else
+                $content = $new_response->content;
         } catch (\Exception $e) {
             $content = $new_response->content;
         }
