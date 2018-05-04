@@ -91,6 +91,21 @@ class GatewayController extends Controller
     }
 
     /**
+     * @param Gateway $gateway
+     * @param Request $request
+     * @return array
+     * @throws GeneralException
+     */
+    public function frames(Gateway $gateway, Request $request)
+    {
+        $since = $request->get('since') ?: 5;
+        $since = Carbon::now()->subSecond($since)->getTimestamp();
+        $frames = $this->coreService->enableGateway($gateway['mac'], $since);
+        return Response::body(compact('frames'));
+    }
+
+
+    /**
      * @return array
      */
     public function list()

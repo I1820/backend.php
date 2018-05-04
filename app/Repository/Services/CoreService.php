@@ -15,6 +15,7 @@ use App\Gateway;
 use App\Project;
 use App\Scenario;
 use App\Thing;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Ixudra\Curl\CurlService;
@@ -222,6 +223,21 @@ class CoreService
         //Log::debug("Core Project Log");
         $url = '/api/project/' . $project_id . '/logs?limit=' . $limit;
         $response = $this->send($url, [], 'get');
+        if ($response->status == 200)
+            return $response->content;
+        throw new GeneralException($response->content->error ?: '', $response->status);
+    }
+
+    /**
+     * @param $mac
+     * @return string
+     * @throws GeneralException
+     */
+    public function gatewayFrames($mac, $since)
+    {
+        //Log::debug("Core Project Log");
+        $url = '/api/gateway/' . $mac;
+        $response = $this->send($url, ['since' => $since], 'get');
         if ($response->status == 200)
             return $response->content;
         throw new GeneralException($response->content->error ?: '', $response->status);
