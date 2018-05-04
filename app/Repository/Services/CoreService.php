@@ -284,7 +284,7 @@ class CoreService
         if ($new_response->status == 0) {
             throw new GeneralException($new_response->error, 0);
         }
-        if ($response->status == 200)
+        if ($new_response->status == 200)
             return $content ?: [];
         throw new GeneralException($content['error'] ?: '', $code);
 
