@@ -230,6 +230,7 @@ class CoreService
 
     /**
      * @param $mac
+     * @param $since
      * @return string
      * @throws GeneralException
      */
