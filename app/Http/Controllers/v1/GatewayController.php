@@ -100,7 +100,7 @@ class GatewayController extends Controller
     {
         $since = $request->get('since') ?: 5;
         $since = Carbon::now()->subSecond($since)->getTimestamp();
-        $frames = $this->coreService->enableGateway($gateway['mac'], $since);
+        $frames = $this->coreService->gatewayFrames($gateway['mac'], $since);
         return Response::body(compact('frames'));
     }
 
