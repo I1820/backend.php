@@ -273,7 +273,7 @@ class CoreService
         */
 
         $content = [];
-        $code = $new_response->code;
+        $code = $new_response->status;
         try {
             if ($code != 200 && gettype($new_response->content) == 'string')
                 $content = json_decode($new_response->content);
