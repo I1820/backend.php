@@ -101,6 +101,12 @@ class GatewayController extends Controller
         $since = $request->get('since') ?: 5;
         $since = Carbon::now()->subSecond($since)->getTimestamp();
         $frames = $this->coreService->gatewayFrames($gateway['mac'], $since);
+		$frames = collect(json_decode(json_encode($frames), true));
+        $frames = $frames->map(function ($item) {
+            if (isset($item['uplinkframe']['phypayloadjson']))
+                $item['uplinkframe']['phypayloadjson'] = json_decode($item['uplinkframe']['phypayloadjson'], true);
+            return $item;
+        });
         return Response::body(compact('frames'));
     }
 
