@@ -238,7 +238,7 @@ class CoreService
     {
         //Log::debug("Core Project Log");
         $url = '/api/gateway/' . $mac;
-        $response = $this->send($url, ['since' => $since], 'get');
+        $response = $this->send($url, ['since' => $since], 'get', $this->dmPort);
         if ($response->status == 200)
             return $response->content;
         throw new GeneralException($response->content->error ?: '', $response->status);

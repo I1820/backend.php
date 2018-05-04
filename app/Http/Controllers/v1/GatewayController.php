@@ -72,14 +72,12 @@ class GatewayController extends Controller
     /**
      * @param Gateway $gateway
      * @return array
-     * @throws GeneralException
      */
     public function info(Gateway $gateway)
     {
         //$gateway['firstSeenAt'] = $info->firstSeenAt;
         try {
             $info = $this->loraService->getGW($gateway['mac']);
-            $this->coreService->enableGateway($gateway['mac']);
             $time = lora_time($info->lastSeenAt);
             $last_seen = [
                 'time' => (string)lora_time($info->lastSeenAt),
