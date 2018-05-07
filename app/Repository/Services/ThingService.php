@@ -216,9 +216,11 @@ class ThingService
 
         if ($request->get('thing_profile_slug')) {
             $profile = ThingProfile::where('thing_profile_slug', (int)$request->get('thing_profile_slug'))->first();
+
             if ($profile && Auth::user()->can('view', $profile)) {
                 $lora_data['deviceProfileID'] = (string)$profile['device_profile_id'];
                 $thing['profile_id'] = $profile['_id'];
+                $thing['type'] = $profile['data']['deviceProfile']['supportsJoin'] ? 'OTAA' : 'ABP';
             } else
                 $lora_data['deviceProfileID'] = (string)$thing['profile']['device_profile_id'];
         }
