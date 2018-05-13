@@ -247,13 +247,11 @@ class CoreService
         $response = $this->curlService->to($url)
             ->withData($data)
             ->withOption('SSL_VERIFYHOST', false)
-            ->returnResponseObject()->withTimeout('5');
-        if ($method == 'post' && $json_request)
-            $response = $response->asJson();
+            ->returnResponseObject()->asJsonResponse()->withTimeout('5');
         $new_response = null;
         switch ($method) {
             case 'get':
-                $new_response = $response->asJsonResponse()->get();
+                $new_response = $response->get();
                 break;
             case 'post':
                 $new_response = $response->post();
@@ -272,6 +270,7 @@ class CoreService
         Log::debug('-----------------------------------------------------');
         */
 
+        /*
         $code = $new_response->status;
         try {
             if ($code != 200 && gettype($new_response->content) == 'string')
@@ -281,6 +280,7 @@ class CoreService
         } catch (\Exception $e) {
             $content = $new_response->content;
         }
+        */
 
         if ($new_response->status == 0) {
             throw new GeneralException($new_response->error, 0);
