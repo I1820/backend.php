@@ -105,6 +105,8 @@ class GatewayController extends Controller
         $frames = $frames->map(function ($item) {
             if (isset($item['uplinkframe']['phypayloadjson']))
                 $item['uplinkframe']['phypayloadjson'] = json_decode($item['uplinkframe']['phypayloadjson'], true);
+            if (isset($item['downlinkframe']['phypayloadjson']))
+                $item['downlinkframe']['phypayloadjson'] = json_decode($item['downlinkframe']['phypayloadjson'], true);
             $item['timestamp'] = substr($item['timestamp'], strpos($item['timestamp'], 'T') + 1, 8);
             return $item;
         });
