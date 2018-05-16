@@ -247,7 +247,10 @@ class CoreService
         $response = $this->curlService->to($url)
             ->withData($data)
             ->withOption('SSL_VERIFYHOST', false)
-            ->returnResponseObject()->asJsonResponse()->withTimeout('5');
+            ->returnResponseObject()
+            ->asJsonRequest()
+            ->asJsonResponse()
+            ->withTimeout('5');
         $new_response = null;
         switch ($method) {
             case 'get':
