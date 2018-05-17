@@ -99,6 +99,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::post('/', 'ThingProfileController@create');
         Route::delete('/{thing_profile}', 'ThingProfileController@delete');
         Route::get('/{thing_profile}', 'ThingProfileController@get');
+        Route::get('/{thing_profile}/things-excel', 'ThingProfileController@thingsExcel');
 
     });
 
