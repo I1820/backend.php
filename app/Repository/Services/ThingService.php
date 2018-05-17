@@ -156,8 +156,6 @@ class ThingService
     public function activateOTAA($request, Thing $thing)
     {
         $key = $request->get('appKey');
-        if (!$key)
-            $key = $request->get('appSKey');
         $data = ['deviceKeys' => ['appKey' => $key]];
         $data['devEUI'] = $thing['interface']['devEUI'];
         $this->loraService->SendKeys($data);
@@ -235,6 +233,63 @@ class ThingService
         $thing->save();
 
         return $thing;
+    }
+
+
+    /**
+     * @param $things
+     * @return $this|\Illuminate\Database\Eloquent\Model
+     */
+    public function toExcel($things)
+    {
+        $excel = resolve('Maatwebsite\Excel\Excel');
+        $res = [[
+            'operation',
+            'name',
+            'type',
+            'description',
+            'lat',
+            'long',
+            'period',
+            'devEUI',
+            'thing_profile_slug',
+            'appKey',
+            'appSKey',
+            'nwkSKey',
+            'devAddr',
+            'fCntDown',
+            'fCntUp',
+            'skipFCntCheck',
+
+        ]];
+        $res = array_merge($res, $things->map(function ($item) {
+            return [
+                'add',
+                $item['name'],
+                'lora',
+                $item['description'],
+                $item['loc']['coordinates'][0],
+                $item['loc']['coordinates'][1],
+                $item['period'],
+                $item['dev_eui'],
+                $item['profile']['thing_profile_slug'],
+                isset($item['keys']['appKey']) ? $item['keys']['appKey'] : '',
+                isset($item['keys']['appSKey']) ? $item['keys']['appSKey'] : '',
+                isset($item['keys']['nwkSKey']) ? $item['keys']['nwkSKey'] : '',
+                isset($item['keys']['devAddr']) ? $item['keys']['devAddr'] : '',
+                isset($item['keys']['fCntDown']) ? $item['keys']['fCntDown'] : '',
+                isset($item['keys']['fCntUp']) ? $item['keys']['fCntUp'] : '',
+                isset($item['keys']['skipFCntCheck']) && $item['keys']['skipFCntCheck'] ? 'true' : '',
+            ];
+        })->toArray());
+
+        return response($excel->create('things.csv', function ($excel) use ($res) {
+            $excel->sheet('Things', function ($sheet) use ($res) {
+                $sheet->fromArray($res, null, 'A1', false, false);
+            });
+        })->string('csv'))
+            ->header('Content-Disposition', 'attachment; filename="things.csv.csv"')
+            ->header('Content-Type', 'application/csv; charset=UTF-8');
     }
 
 

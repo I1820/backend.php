@@ -90,6 +90,18 @@ class ThingProfileController extends Controller
         return Response::body(['success' => 'true']);
     }
 
+    /**
+     * @param ThingProfile $thing_profile
+     * @return array
+     * @throws LoraException
+     * @throws \Exception
+     */
+    public function things(ThingProfile $thing_profile)
+    {
+        $thing_profile->things();
+        return Response::body(['success' => 'true']);
+    }
+
 
     private function prepareDeviceProfileData(Collection $data)
     {
