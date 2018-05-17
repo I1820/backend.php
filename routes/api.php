@@ -107,6 +107,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::get('/', 'GatewayController@list');
         Route::delete('/{gateway}', 'GatewayController@delete');
         Route::get('/{gateway}', 'GatewayController@info');
+        Route::put('/{gateway}', 'GatewayController@update');
         Route::get('/{gateway}/frames', 'GatewayController@frames');
     });
 
