@@ -100,7 +100,7 @@ class ThingProfileController extends Controller
      */
     public function thingsExcel(ThingProfile $thing_profile)
     {
-        $things = $thing_profile->things();
+        $things = $thing_profile->things()->get();
         return $this->thingService->toExcel($things);
     }
 
