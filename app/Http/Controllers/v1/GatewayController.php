@@ -76,9 +76,9 @@ class GatewayController extends Controller
     {
         $this->gatewayService->validateCreateGateway($request);
         $data = $request->only(['altitude', 'latitude', 'longitude', 'description', 'name']);
+        $gateway['name'] = $data['name'];
+        $gateway['description'] = $data['description'];
         $gateway['altitude'] = intval($data['altitude']);
-        $gateway['name'] = intval($data['name']);
-        $gateway['description'] = intval($data['description']);
         $gateway['loc'] = [
             'type' => 'Point',
             'coordinates' => [$request->get('latitude'), $request->get('longitude')]
