@@ -51,20 +51,40 @@ class GatewayController extends Controller
     public function create(Request $request)
     {
         $this->gatewayService->validateCreateGateway($request);
-        $data = $request->only(['altitude', 'mac', 'latitude', 'longitude', 'description']);
+        $data = $request->only(['altitude', 'mac', 'latitude', 'longitude', 'description', 'name']);
         $data = array_merge($data, [
             'organizationID' => $this->loraService->getOrganizationId(),
             'networkServerID' => $this->loraService->getNetworkServerID(),
         ]);
-        $id = new ObjectId();
-        $data['name'] = (string)$id;
         $data['altitude'] = intval($data['altitude']);
         $data['latitude'] = floatval($data['latitude']);
         $data['longitude'] = floatval($data['longitude']);
         $data['ping'] = $request->get('ping') === '1' ? true : false;
         $this->loraService->sendGateway($data);
         $this->coreService->enableGateway($request->get('mac'));
-        $gateway = $this->gatewayService->insertGateway($request, $id);
+        $gateway = $this->gatewayService->insertGateway($request);
+        return Response::body(compact('gateway'));
+    }
+
+    /**
+     * @param Gateway $gateway
+     * @param Request $request
+     * @return array
+     * @throws GeneralException
+     */
+    public function update(Gateway $gateway, Request $request)
+    {
+        $this->gatewayService->validateCreateGateway($request);
+        $data = $request->only(['altitude', 'latitude', 'longitude', 'description', 'name']);
+        $gateway['altitude'] = intval($data['altitude']);
+        $gateway['name'] = intval($data['name']);
+        $gateway['description'] = intval($data['description']);
+        $gateway['loc'] = [
+            'type' => 'Point',
+            'coordinates' => [$request->get('latitude'), $request->get('longitude')]
+        ];
+        $this->coreService->enableGateway($gateway['mac']);
+        $gateway->save();
         return Response::body(compact('gateway'));
     }
 
@@ -89,6 +109,7 @@ class GatewayController extends Controller
         }
         return Response::body(compact('gateway'));
     }
+
 
     /**
      * @param Gateway $gateway
