@@ -85,6 +85,7 @@ class GatewayController extends Controller
         ];
         $this->coreService->enableGateway($gateway['mac']);
         $gateway->save();
+        $gateway->load_last_seen();
         return Response::body(compact('gateway'));
     }
 

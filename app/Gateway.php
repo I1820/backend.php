@@ -32,4 +32,20 @@ class Gateway extends Eloquent
         return $this->belongsTo(User::class);
     }
 
+
+    public function load_last_seen()
+    {
+        try {
+            $info = resolve('App\Repository\Services\LoraService')->getGW($this['mac']);
+            $time = lora_time($info->lastSeenAt);
+            $last_seen = [
+                'time' => (string)lora_time($info->lastSeenAt),
+                'status' => Carbon::now()->subHour() > $time ? 'red' : 'green'
+            ];
+            $this['last_seen_at'] = $last_seen;
+        } catch (LoraException $e) {
+            $this['last_seen_at'] = ['time' => '', 'status' => ''];
+        }
+    }
+
 }
