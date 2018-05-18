@@ -51,18 +51,20 @@ class GatewayController extends Controller
     public function create(Request $request)
     {
         $this->gatewayService->validateCreateGateway($request);
-        $data = $request->only(['altitude', 'mac', 'latitude', 'longitude', 'description', 'name']);
+        $data = $request->only(['altitude', 'mac', 'latitude', 'longitude', 'description']);
         $data = array_merge($data, [
             'organizationID' => $this->loraService->getOrganizationId(),
             'networkServerID' => $this->loraService->getNetworkServerID(),
         ]);
+        $id = new ObjectId();
+        $data['name'] = (string)$id;
         $data['altitude'] = intval($data['altitude']);
         $data['latitude'] = floatval($data['latitude']);
         $data['longitude'] = floatval($data['longitude']);
         $data['ping'] = $request->get('ping') === '1' ? true : false;
         $this->loraService->sendGateway($data);
         $this->coreService->enableGateway($request->get('mac'));
-        $gateway = $this->gatewayService->insertGateway($request);
+        $gateway = $this->gatewayService->insertGateway($request, $id);
         return Response::body(compact('gateway'));
     }
 
