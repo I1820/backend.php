@@ -137,7 +137,7 @@ class CoreService
     {
         Log::debug("Core Send Scenario\t" . $project['_id']);
         $url = '/api/scenario'; 
-        $response = $this->send($url, ['code' => $scenario->code, 'id' => $project['container']['name']], 'post', $project['container']['runner']['port'], 0);
+        $response = $this->send($url, ['code' => $scenario->code, 'id' => $project['container']['name']], 'post', $project['container']['runner']['port']);
         return $response;
     }
 
