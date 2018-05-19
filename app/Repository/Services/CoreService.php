@@ -217,11 +217,11 @@ class CoreService
      * @return array
      * @throws GeneralException
      */
-    public function downLinkThing(Project $project, Thing $thing, $data)
+    public function downLinkThing(Project $project, Thing $thing, $data, $fport = 2, $confirmed = false)
     {
         Log::debug("DownLink Project List\t" . $thing['dev_eui']);
         $url = '/api/send';
-        $data = ['thing' => $thing->toArray(), 'data' => $data, 'project_id' => $project->application_id];
+        $data = ['thing_id' => $thing->toArray(), 'data' => $data, 'confirmed' => $confirmed, 'fport' => $fport];
         $response = $this->send($url, $data, 'post', $this->downLinkPort);
         return $response;
     }
