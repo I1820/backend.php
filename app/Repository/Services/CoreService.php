@@ -152,7 +152,7 @@ class CoreService
     {
         Log::debug("Core Lint\t" . $project['_id']);
         $url = '/api/lint';
-        $response = $this->send($url, $code, 'post', $project['container']['runner']['port'], 0);
+        $response = $this->send($url, $code, 'post', $project['container']['runner']['port']);
         return $response;
     }
 
