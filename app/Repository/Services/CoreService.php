@@ -221,7 +221,7 @@ class CoreService
     {
         Log::debug("DownLink Project List\t" . $thing['dev_eui']);
         $url = '/api/send';
-        $data = ['thing_id' => $thing->toArray(), 'data' => $data, 'confirmed' => $confirmed, 'fport' => $fport];
+        $data = ['thing_id' => $thing['interface']['devEUI'], 'data' => $data, 'confirmed' => $confirmed, 'fport' => $fport];
         $response = $this->send($url, $data, 'post', $this->downLinkPort);
         return $response;
     }
