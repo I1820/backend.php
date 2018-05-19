@@ -91,8 +91,8 @@ class CoreService
     public function sendCodec(Project $project, Thing $thing, $codec)
     {
         Log::debug("Core Send Codec\t" . $project['_id']);
-        $url = '/api/codec/' . $thing['interface']['devEUI'];
-        $response = $this->send($url, $codec, 'post', $project['container']['runner']['port'], 0);
+        $url = '/api/codec'; 
+        $response = $this->send($url, ['code' => $codec, 'id' => $thing['interface']['devEUI']], 'post', $project['container']['runner']['port']);
         return $response;
     }
 
@@ -136,8 +136,8 @@ class CoreService
     public function sendScenario(Project $project, Scenario $scenario)
     {
         Log::debug("Core Send Scenario\t" . $project['_id']);
-        $url = '/api/scenario/' . $project['container']['name'];
-        $response = $this->send($url, $scenario->code, 'post', $project['container']['runner']['port'], 0);
+        $url = '/api/scenario'; 
+        $response = $this->send($url, ['code' => $scenario->code, 'id' => $project['container']['name']], 'post', $project['container']['runner']['port'], 0);
         return $response;
     }
 
