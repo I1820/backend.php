@@ -27,14 +27,16 @@ class PaymentController extends Controller
         if ($code && !$discount)
             throw new GeneralException('کد تخفیف اشتباه است', GeneralException::NOT_FOUND);
         if ($invoice)
-            return $invoice;
+            return compact('invoice');
         throw new GeneralException(GeneralException::M_UNKNOWN, GeneralException::UNKNOWN_ERROR);
 
     }
 
-    public function pay(Invoice $invoice){
+    public function pay(Invoice $invoice)
+    {
         return $this->zarinPalService->pay($invoice);
     }
+
     private function discount($code)
     {
         $discount = Discount::where('code', $code)->where('expired', false)->first();
