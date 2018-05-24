@@ -113,8 +113,23 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
     });
 
     Route::group(['prefix' => 'packages', 'middleware' => ['auth.jwt']], function () {
+        Route::post('/', 'PackageController@create');
+        Route::get('/all', 'PackageController@all');
+        Route::delete('/{package}', 'PackageController@delete');
+        Route::get('/{package}/activate', 'PackageController@activate');
+
         Route::get('/', 'PackageController@list');
         Route::get('/{package}', 'PackageController@get');
+        Route::get('/{package}/pay', 'PaymentController@pay');
+    });
+    Route::group(['prefix' => 'discount', 'middleware' => ['auth.jwt']], function () {
+        Route::post('/', 'DiscountController@create');
+        Route::get('/', 'DiscountController@all');
+        Route::delete('/{discount}', 'DiscountController@delete');
+    });
+
+    Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt']], function () {
+        Route::get('/callback/{invoice}', 'PaymentController@callback')->name('payment.verify');
     });
 
 
