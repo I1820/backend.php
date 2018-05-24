@@ -116,6 +116,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::post('/', 'PackageController@create');
         Route::get('/all', 'PackageController@all');
         Route::delete('/{package}', 'PackageController@delete');
+        Route::patch('/{package}', 'PackageController@update');
         Route::get('/{package}/activate', 'PackageController@activate');
 
         Route::get('/', 'PackageController@list');
