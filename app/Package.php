@@ -26,7 +26,6 @@ class Package extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'is_active'
     ];
 
     public function things()
