@@ -121,7 +121,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
 
         Route::get('/', 'PackageController@list');
         Route::get('/{package}', 'PackageController@get');
-        Route::get('/{package}/pay', 'PaymentController@pay');
+        Route::get('/{package}/invoice', 'PaymentController@createInvoice');
     });
     Route::group(['prefix' => 'discount', 'middleware' => ['auth.jwt']], function () {
         Route::post('/', 'DiscountController@create');
@@ -130,7 +130,8 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
     });
 
     Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt']], function () {
-        Route::get('/callback/{invoice}', 'PaymentController@callback')->name('payment.verify');
+        Route::get('/{invoice}/pay', 'PaymentController@pay');
+        Route::get('/{invoice}/callback', 'PaymentController@callback')->name('payment.verify');
     });
 
 

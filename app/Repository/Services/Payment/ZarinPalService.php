@@ -35,7 +35,7 @@ class ZarinPalService
      * @param $discount
      * @return void
      */
-    public function pay(Package $package, $discount)
+    public function createInvoice(Package $package, $discount)
     {
         $user = Auth::user();
         $invoice = Invoice::create([
@@ -57,10 +57,16 @@ class ZarinPalService
             $authority = $response['Authority'];
             $invoice['authority'] = $authority;
             $invoice->save();
-            return $this->zarinpal->getRedirectUrl($authority);
+            return $invoice;
         }
         return false;
 
+    }
+
+    public function pay(Invoice $invoice, Request $request)
+    {
+        return redirect($this->zarinpal->getRedirectUrl($invoice['authority']))
+            ->header('Authorization', $request->header('Authorization'));
     }
 
 }
