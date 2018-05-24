@@ -125,7 +125,7 @@ class PackageController extends Controller
     public function activate(Package $package, Request $request)
     {
         if ($package['default'])
-            throw new GeneralException('بسته پیش فرض را نمیتوانید غیر فعال کنید', GeneralException::ACCESS_DENIED);
+            throw new GeneralException('بسته پیش فرض را نمیتوانید برای خرید فعال کنید', GeneralException::ACCESS_DENIED);
 
         if ($request->get('active'))
             $package->is_active = true;
