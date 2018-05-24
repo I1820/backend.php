@@ -17,7 +17,7 @@ class Package extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'node_num', 'project_num', 'time', 'price'
+        'name', 'node_num', 'project_num', 'time', 'price','is_active'
     ];
 
     /**
