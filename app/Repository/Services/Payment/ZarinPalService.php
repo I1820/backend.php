@@ -63,10 +63,22 @@ class ZarinPalService
 
     }
 
-    public function pay(Invoice $invoice, Request $request)
+    public function verify(Request $request, Invoice $invoice)
     {
-        return redirect($this->zarinpal->getRedirectUrl($invoice['authority']))
-            ->header('Authorization', $request->header('Authorization'));
+        $payment = [
+            'Authority' => $request->get('Authority'),
+            'Status' => $request->get('Status'),
+            'Amount' => $invoice['price']
+        ];
+        $response = $this->zarinpal->verify($payment);
+        if ($response['Status'] === 100)
+            return true;
+        return false;
+    }
+
+    public function pay(Invoice $invoice)
+    {
+        return redirect($this->zarinpal->getRedirectUrl($invoice['authority']));
     }
 
 }
