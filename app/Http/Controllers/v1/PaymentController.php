@@ -6,6 +6,7 @@ use App\Discount;
 use App\Exceptions\GeneralException;
 use App\Invoice;
 use App\Package;
+use App\Repository\Helper\Response;
 use App\Repository\Services\Payment\ZarinPalService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -27,7 +28,7 @@ class PaymentController extends Controller
         if ($code && !$discount)
             throw new GeneralException('کد تخفیف اشتباه است', GeneralException::NOT_FOUND);
         if ($invoice)
-            return compact('invoice');
+            return Response::body(compact('invoice'));
         throw new GeneralException(GeneralException::M_UNKNOWN, GeneralException::UNKNOWN_ERROR);
 
     }
