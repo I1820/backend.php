@@ -43,7 +43,7 @@ class ZarinPalService
             'price' => $package['price'] - $discount,
             'discount' => $discount,
             'gate' => 'zarinpal',
-            'package' => $package,
+            'package' => $package->toArray(),
             'status' => false,
         ]);
         $payment = [

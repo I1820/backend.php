@@ -51,8 +51,10 @@ class PaymentController extends Controller
 
     public function callback(Invoice $invoice, Request $request)
     {
-        if ($this->zarinPalService->verify($invoice, $request))
-            return redirect(env('FRONT_URL'))->with($invoice);
-        dd($request->all());
+        if ($this->zarinPalService->verify($invoice, $request)) {
+            $uri = 'payment/success?price=' . $invoice['price'] . '&authority=' . $invoice['authority'];
+            return redirect(env('FRONT_URL') . $uri);
+        }
+        return redirect(env('FRONT_URL') . 'payment/failure');
     }
 }
