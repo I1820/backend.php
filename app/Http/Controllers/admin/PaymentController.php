@@ -15,6 +15,12 @@ class PaymentController extends Controller
             ->take(intval($request->get('limit')) ?: 10)
             ->with('user')
             ->get();
-        return Response::body(compact('invoices'));
+        $overview = [
+            'all_transactions' => $invoices->count(),
+            'success_transactions' => $invoices->where('status', true)->count(),
+            'failed_transactions' => $invoices->where('status', false)->count(),
+            'total_income' => $invoices->sum('price')
+        ];
+        return Response::body(compact('overview', 'invoices'));
     }
 }

@@ -43,8 +43,22 @@ class UserController extends Controller
 
     public function get(User $user)
     {
-        $user->makeVisible(['_id', 'active','is_admin']);
-        return Response::body(compact('user'));
+        $user->makeVisible(['_id', 'active', 'is_admin']);
+        $overview = [
+            'projects' => $user->projects()->count(),
+            'things' => $user->things()->count(),
+            'thing_profiles' => $user->thingProfiles()->count(),
+            'gateways' => $user->gateways()->count(),
+            'success_payment' => $user->invoices()->where('status', true)->count(),
+            'failed_payment' => $user->invoices()->where('status', false)->count(),
+        ];
+        return Response::body(compact('overview', 'user'));
+    }
+
+    public function transactions(User $user)
+    {
+        $invoices = $user->invoices()->get();
+        return Response::body(compact('invoices'));
     }
 
     public function setPassword(User $user, Request $request)

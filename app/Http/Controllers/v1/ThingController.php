@@ -262,6 +262,7 @@ class ThingController extends Controller
         ]);
         $thing->permissions()->save($permission);
         $user->permissions()->save($permission);
+        $this->thingService->addToProject($project, $thing);
         return $thing;
     }
 

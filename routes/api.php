@@ -144,6 +144,7 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () use ($ro
         Route::get('/{user}', 'UserController@get');
         Route::get('/{user}/ban', 'UserController@ban');
         Route::post('/{user}/password', 'UserController@setPassword');
+        Route::get('/{user}/transactions', 'UserController@transactions');
     });
 
     Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt', 'admin']], function () {

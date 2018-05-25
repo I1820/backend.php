@@ -128,7 +128,6 @@ class ThingService
             ],
         ]);
         $thing->profile()->associate($thingProfile);
-        $this->addToProject($project, $thing);
         return $thing;
     }
 
