@@ -110,7 +110,7 @@ class ThingController extends Controller
      */
     public function sampleData(Request $request)
     {
-        return $this->data($request, false);
+        return $this->data($request, true);
     }
 
     /**
