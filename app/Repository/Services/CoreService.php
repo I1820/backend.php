@@ -72,7 +72,7 @@ class CoreService
     public function deleteThing($devEUI)
     {
         Log::debug("Core Delete Thing\t" . $devEUI);
-        $url = '/api/thing/' . $devEUI;
+        $url = '/api/things/' . $devEUI;
         $response = $this->send($url, [], 'delete');
         return $response;
     }
