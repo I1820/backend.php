@@ -141,6 +141,13 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
 Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () use ($router) {
     Route::group(['prefix' => 'users', 'middleware' => ['auth.jwt', 'admin']], function () {
         Route::get('/', 'UserController@list');
+        Route::get('/{user}', 'UserController@get');
+        Route::get('/{user}/ban', 'UserController@ban');
+        Route::post('/{user}/password', 'UserController@setPassword');
+    });
+
+    Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt', 'admin']], function () {
+        Route::get('/', 'PaymentController@list');
     });
 });
 
