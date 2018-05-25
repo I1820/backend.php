@@ -26,7 +26,7 @@ class Thing extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'loc', 'description', 'period', 'interface', 'type', 'dev_eui'
+        'name', 'loc', 'description', 'period', 'interface', 'type', 'dev_eui','active'
     ];
 
     /**

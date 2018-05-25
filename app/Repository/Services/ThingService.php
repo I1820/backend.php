@@ -121,6 +121,7 @@ class ThingService
             'interface' => $device->toArray(),
             'period' => $request->get('period'),
             'dev_eui' => $request->get('devEUI'),
+            'active' => true,
             'type' => $thingProfile['data']['deviceProfile']['supportsJoin'] ? 'OTAA' : 'ABP',
             'loc' => [
                 'type' => 'Point',
@@ -132,7 +133,7 @@ class ThingService
     }
 
 
-    public function activateABP($request, Thing $thing)
+    public function ABPKeys($request, Thing $thing)
     {
         $validator = Validator::make($request->all(), [
             'devAddr' => 'required',
@@ -152,13 +153,28 @@ class ThingService
         return $data;
     }
 
-    public function activateOTAA($request, Thing $thing)
+    public function OTAAKeys($request, Thing $thing)
     {
         $key = $request->get('appKey');
         $data = ['deviceKeys' => ['appKey' => $key]];
         $data['devEUI'] = $thing['interface']['devEUI'];
         $this->loraService->SendKeys($data);
         return $data['deviceKeys'];
+    }
+
+    public function activate(Thing $thing)
+    {
+        $project = $thing->project()->first();
+        $this->coreService->postThing($project, $thing);
+        $thing->active = true;
+        $thing->save();
+    }
+
+    public function deactivate(Thing $thing)
+    {
+        $this->coreService->deleteThing($thing['dev_eui']);
+        $thing->active = false;
+        $thing->save();
     }
 
     /**

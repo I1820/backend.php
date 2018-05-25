@@ -65,6 +65,20 @@ class CoreService
 
 
     /**
+     * @param $devEUI
+     * @return array
+     * @throws GeneralException
+     */
+    public function deleteThing($devEUI)
+    {
+        Log::debug("Core Delete Thing\t" . $devEUI);
+        $url = '/api/thing/' . $devEUI;
+        $response = $this->send($url, [], 'delete');
+        return $response;
+    }
+
+
+    /**
      * @param Project $project
      * @param Thing $thing
      * @return array
@@ -118,7 +132,23 @@ class CoreService
      * @return array
      * @throws GeneralException
      */
-    public function thingsData($ids, $since, $until)
+    public function thingsSampleData($ids, $since, $until)
+    {
+        Log::debug("Core Things Sample Data");
+        $url = '/api/things/w';
+        $response = $this->send($url, ['since' => (int)$since, 'until' => (int)$until, 'thing_ids' => $ids], 'post', $this->dmPort);
+        return $response;
+    }
+
+
+    /**
+     * @param array $ids
+     * @param $since
+     * @param $until
+     * @return array
+     * @throws GeneralException
+     */
+    public function thingsMainData($ids, $since, $until)
     {
         Log::debug("Core Things Data");
         $url = '/api/things';

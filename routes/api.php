@@ -82,13 +82,14 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::post('/from-excel', 'ThingController@fromExcel');
         Route::get('/{thing}', 'ThingController@get');
 
-        Route::get('/{thing}/data', 'ThingController@data');
-        Route::post('data', 'ThingController@multiThingData');
+        Route::post('data', 'ThingController@mainData');
+        Route::post('data/sample', 'ThingController@sampleData');
 
         Route::patch('/{thing}', 'ThingController@update');
         Route::delete('/{thing}', 'ThingController@delete');
-        Route::post('/{thing}/activate', 'ThingController@activate');
+        Route::post('/{thing}/keys', 'ThingController@keys');
         Route::post('/{thing}/send', 'DownLinkController@sendThing');
+        Route::post('/{thing}/activate', 'DownLinkController@activate');
 
         Route::post('/{thing}/codec', 'CodecController@send');
         Route::get('/{thing}/codec', 'CodecController@getThing');
