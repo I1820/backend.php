@@ -8,6 +8,7 @@ use App\Invoice;
 use App\Package;
 use App\Repository\Helper\Response;
 use App\Repository\Services\Payment\ZarinPalService;
+use function GuzzleHttp\Promise\all;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -46,5 +47,12 @@ class PaymentController extends Controller
         $discount->expired = true;
         $discount->save();
         return $discount->value;
+    }
+
+    public function callback(Invoice $invoice, Request $request)
+    {
+        if ($this->zarinPalService->verify($invoice, $request))
+            return redirect(env('FRONT_URL'))->with($invoice);
+        dd($request->all());
     }
 }

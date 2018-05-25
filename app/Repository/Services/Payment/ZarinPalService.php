@@ -63,7 +63,7 @@ class ZarinPalService
 
     }
 
-    public function verify(Request $request, Invoice $invoice)
+    public function verify(Invoice $invoice, Request $request)
     {
         $payment = [
             'Authority' => $request->get('Authority'),

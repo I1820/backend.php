@@ -10,7 +10,7 @@
                     <div class="panel-body" style="text-align: center;">
                         {{'حساب شما با موفقیت فعال شد'}}
                         <br><br>
-                        <div><a class="btn btn-success" href="http://platform.ceit.aut.ac.ir:50009/">{{'هدایت به سایت'}}</a></div>
+                        <div><a class="btn btn-success" href="{{env('FRONT_URL')}}">{{'هدایت به سایت'}}</a></div>
                     </div>
                 </div>
             </div>
