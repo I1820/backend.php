@@ -71,8 +71,11 @@ class ZarinPalService
             'Amount' => $invoice['price']
         ];
         $response = $this->zarinpal->verify($payment);
-        if ($response['Status'] === 100)
+        if ($response['Status'] === 100) {
             return true;
+            $invoice->status = true;
+            $invoice->save();
+        }
         return false;
     }
 
