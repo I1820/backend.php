@@ -89,7 +89,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::delete('/{thing}', 'ThingController@delete');
         Route::post('/{thing}/keys', 'ThingController@keys');
         Route::post('/{thing}/send', 'DownLinkController@sendThing');
-        Route::post('/{thing}/activate', 'DownLinkController@activate');
+        Route::get('/{thing}/activate', 'DownLinkController@activate');
 
         Route::post('/{thing}/codec', 'CodecController@send');
         Route::get('/{thing}/codec', 'CodecController@getThing');
