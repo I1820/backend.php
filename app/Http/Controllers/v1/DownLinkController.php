@@ -19,8 +19,9 @@ class DownLinkController extends Controller
         $this->coreService = $coreService;
     }
 
-    public function sendThing(Project $project, Thing $thing, Request $request)
+    public function sendThing(Thing $thing, Request $request)
     {
+        $project = $thing->project()->first();
         $validator = Validator::make($request->all(), ['data' => 'required|json']);
         if ($validator->fails())
             throw new GeneralException('اطلاعات را کامل و درست وارد کنید', 407);
