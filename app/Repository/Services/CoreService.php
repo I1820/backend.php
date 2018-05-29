@@ -110,6 +110,35 @@ class CoreService
         return $response;
     }
 
+   /**
+     * @param Project $project
+     * @param Thing $thing
+     * @param $data
+     * @return array
+     * @throws GeneralException
+     */
+    public function encode(Project $project, Thing %thing, $data)
+    {
+        $url = '/api/encode/' . $thing['interface']['devEUI'];
+        $response = $this->send($url, $data, 'post', $project['container']['runner']['port']));
+        return $response; 
+    }
+ 
+    /**
+     * @param Project $project
+     * @param Thing $thing
+     * @param $data
+     * @return array
+     * @throws GeneralException
+     */
+    public function decode(Project $project, Thing %thing, $data)
+    {
+        $url = '/api/decode/' . $thing['interface']['devEUI'];
+        $response = $this->send($url, $data, 'post', $project['container']['runner']['port']));
+        return $response; 
+    }
+
+
     /**
      * @param Thing $thing
      * @param $since
