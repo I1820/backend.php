@@ -11,7 +11,6 @@ use App\Repository\Services\PermissionService;
 use App\Repository\Services\ProjectService;
 use App\Permission;
 use App\Repository\Services\ThingService;
-use App\Thing;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;

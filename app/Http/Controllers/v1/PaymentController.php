@@ -8,6 +8,7 @@ use App\Invoice;
 use App\Package;
 use App\Repository\Helper\Response;
 use App\Repository\Services\Payment\ZarinPalService;
+use App\Repository\Services\UserService;
 use function GuzzleHttp\Promise\all;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -15,10 +16,13 @@ use App\Http\Controllers\Controller;
 class PaymentController extends Controller
 {
     protected $zarinPalService;
+    protected $userService;
 
-    public function __construct(ZarinPalService $zarinPalService)
+    public function __construct(ZarinPalService $zarinPalService,
+                                UserService $userService)
     {
         $this->zarinPalService = $zarinPalService;
+        $this->userService = $userService;
     }
 
     public function createInvoice(Package $package, Request $request)
@@ -53,6 +57,7 @@ class PaymentController extends Controller
     {
         if ($this->zarinPalService->verify($invoice, $request)) {
             $uri = 'payment/success?price=' . $invoice['price'] . '&authority=' . $invoice['authority'];
+            $this->userService->updatePackage($invoice->user(), $invoice['package']);
             return redirect(env('FRONT_URL') . $uri);
         }
         return redirect(env('FRONT_URL') . 'payment/failure');

@@ -13,6 +13,7 @@ use App\Exceptions\GeneralException;
 use App\Repository\Traits\RegisterUser;
 use App\Repository\Traits\UpdateUser;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
@@ -76,6 +77,14 @@ class UserService
         } catch (TokenBlacklistedException $exception) {
             throw new GeneralException(GeneralException::M_UNKNOWN, 701);
         }
+    }
+
+    public function updatePackage(User $user, $package)
+    {
+        $remaining = Carbon::createFromTimestamp($user['package']['start_date']->toDateTime()->getTimestamp())->diffInDays() * $user['package']['node_num'];
+        $package['time'] += (int)$remaining / $package['node_num'];
+        $user['package'] = $package;
+        $user->save();
     }
 
 }
