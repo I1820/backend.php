@@ -16,6 +16,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use MongoDB\BSON\UTCDateTime;
 use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -83,6 +84,7 @@ class UserService
     {
         $remaining = ($user['package']['time'] - Carbon::createFromTimestamp($user['package']['start_date']->toDateTime()->getTimestamp())->diffInDays()) * $user['package']['node_num'];
         $package['time'] += (int)$remaining / $package['node_num'];
+        $package['start_date'] = new UTCDateTime(Carbon::now());
         $user['package'] = $package;
         $user->save();
     }
