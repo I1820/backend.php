@@ -73,9 +73,10 @@ class UserController extends Controller
     }
 
 
-    public function impersonate(User $user, Request $request)
+    public function impersonate($user, Request $request)
     {
-        if ($request->get('active')) {
+        $user = User::where('_id', $user)->first();
+        if ($request->get('active') && $user) {
             $user['impersonated'] = true;
             return Response::body($this->userService->activateImpersonate($user));
         }
