@@ -117,10 +117,10 @@ class CoreService
      * @return array
      * @throws GeneralException
      */
-    public function encode(Project $project, Thing %thing, $data)
+    public function encode(Project $project, Thing $thing, $data)
     {
         $url = '/api/encode/' . $thing['interface']['devEUI'];
-        $response = $this->send($url, $data, 'post', $project['container']['runner']['port']));
+        $response = $this->send($url, $data, 'post', $project['container']['runner']['port']);
         return $response; 
     }
  
@@ -131,10 +131,10 @@ class CoreService
      * @return array
      * @throws GeneralException
      */
-    public function decode(Project $project, Thing %thing, $data)
+    public function decode(Project $project, Thing $thing, $data)
     {
         $url = '/api/decode/' . $thing['interface']['devEUI'];
-        $response = $this->send($url, $data, 'post', $project['container']['runner']['port']));
+        $response = $this->send($url, $data, 'post', $project['container']['runner']['port']);
         return $response; 
     }
 
