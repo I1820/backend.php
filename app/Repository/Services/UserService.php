@@ -60,6 +60,7 @@ class UserService
         $main_user = isset($main_user_id['impersonate_id']) ? User::where('_id', $main_user_id['impersonate_id'])->first() : null;
         if (!$main_user)
             $main_user = Auth::user();
+        $main_user['impersonated'] = false;
         return ['user' => $main_user, 'token' => JWTAuth::fromUser($main_user)];
     }
 
