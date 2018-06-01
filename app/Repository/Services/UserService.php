@@ -12,7 +12,9 @@ use App\Exceptions\AuthException;
 use App\Exceptions\GeneralException;
 use App\Repository\Traits\RegisterUser;
 use App\Repository\Traits\UpdateUser;
+use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -41,6 +43,26 @@ class UserService
 
         return $token;
     }
+
+    public function activateImpersonate(User $user)
+    {
+        $main_user_id = JWTAuth::getPayload()->toArray();
+        $main_user = isset($main_user_id['impersonate_id']) ? User::where('_id', $main_user_id['impersonate_id'])->first() : null;
+        if (!$main_user)
+            $main_user = Auth::user();
+        $token = JWTAuth::fromUser($user, ['impersonate_id' => $main_user['_id']]);
+        return ['user' => $user, 'token' => $token];
+    }
+
+    public function deactivateImpersonate()
+    {
+        $main_user_id = JWTAuth::getPayload()->toArray();
+        $main_user = isset($main_user_id['impersonate_id']) ? User::where('_id', $main_user_id['impersonate_id'])->first() : null;
+        if (!$main_user)
+            $main_user = Auth::user();
+        return ['user' => $main_user, 'token' => JWTAuth::fromUser($main_user)];
+    }
+
 
     /**
      * @return string

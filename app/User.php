@@ -9,6 +9,7 @@ use Illuminate\Auth\Authenticatable;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class User extends Eloquent implements AuthenticatableContract, AuthorizableContract
 {
@@ -73,6 +74,11 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
 
     public function isAdmin()
     {
+
+        $main_user = JWTAuth::getPayload()->toArray();
+        $main_user = isset($main_user['impersonate_id']) ? User::where('_id', $main_user['impersonate_id'])->first() : null;
+        if ($main_user)
+            return (isset($main_user['is_admin']) && $main_user['is_admin']);
         return (isset($this['is_admin']) && $this['is_admin']);
     }
 
