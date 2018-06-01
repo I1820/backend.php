@@ -57,7 +57,7 @@ class PaymentController extends Controller
     {
         if ($this->zarinPalService->verify($invoice, $request)) {
             $uri = 'payment/success?price=' . $invoice['price'] . '&authority=' . $invoice['authority'];
-            $this->userService->updatePackage($invoice->user(), $invoice['package']);
+            $this->userService->updatePackage($invoice->user()->first(), $invoice['package']);
             return redirect(env('FRONT_URL') . $uri);
         }
         return redirect(env('FRONT_URL') . 'payment/failure');
