@@ -81,7 +81,7 @@ class UserService
 
     public function updatePackage(User $user, $package)
     {
-        $remaining = Carbon::createFromTimestamp($user['package']['start_date']->toDateTime()->getTimestamp())->diffInDays() * $user['package']['node_num'];
+        $remaining = ($user['package']['time'] - Carbon::createFromTimestamp($user['package']['start_date']->toDateTime()->getTimestamp())->diffInDays()) * $user['package']['node_num'];
         $package['time'] += (int)$remaining / $package['node_num'];
         $user['package'] = $package;
         $user->save();
