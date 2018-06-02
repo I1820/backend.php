@@ -35,7 +35,7 @@ class Thing extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'updated_at', 'created_at', 'user_id', 'id', 'project_id', 'profile_id', 'codec'
+        'updated_at', 'created_at', 'user_id', 'id', 'project_id', 'profile_id', 'codec', 'permissions'
     ];
 
 
