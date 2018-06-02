@@ -46,6 +46,7 @@ class ConfigService
             'devEUI',
             'key',
             'window',
+            'type'
         ])->map(function ($value) {
             return $value ?: 0;
         })->toArray();
