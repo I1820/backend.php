@@ -105,12 +105,12 @@ class CoreService
     public function sendCodec(Project $project, Thing $thing, $codec)
     {
         Log::debug("Core Send Codec\t" . $project['_id']);
-        $url = '/api/codec'; 
+        $url = '/api/codec';
         $response = $this->send($url, ['code' => $codec, 'id' => $thing['interface']['devEUI']], 'post', $project['container']['runner']['port']);
         return $response;
     }
 
-   /**
+    /**
      * @param Project $project
      * @param Thing $thing
      * @param $data
@@ -121,9 +121,9 @@ class CoreService
     {
         $url = '/api/encode/' . $thing['interface']['devEUI'];
         $response = $this->send($url, $data, 'post', $project['container']['runner']['port']);
-        return $response; 
+        return $response;
     }
- 
+
     /**
      * @param Project $project
      * @param Thing $thing
@@ -135,7 +135,7 @@ class CoreService
     {
         $url = '/api/decode/' . $thing['interface']['devEUI'];
         $response = $this->send($url, $data, 'post', $project['container']['runner']['port']);
-        return $response; 
+        return $response;
     }
 
 
@@ -195,7 +195,7 @@ class CoreService
     public function sendScenario(Project $project, Scenario $scenario)
     {
         Log::debug("Core Send Scenario\t" . $project['_id']);
-        $url = '/api/scenario'; 
+        $url = '/api/scenario';
         $response = $this->send($url, ['code' => $scenario->code, 'id' => $project['container']['name']], 'post', $project['container']['runner']['port']);
         return $response;
     }
@@ -282,7 +282,7 @@ class CoreService
     {
         Log::debug("DownLink Project List\t" . $thing['dev_eui']);
         $url = '/api/send';
-        $data = ['application_id' => $project['application_id'], 'thing_id' => $thing['interface']['devEUI'], 'data' => $data, 'confirmed' => $confirmed, 'fport' => $fport];
+        $data = ['application_id' => $project['application_id'], 'thing_id' => $thing['interface']['devEUI'], 'data' => $data, 'confirmed' => $confirmed, 'fport' => intval($fport)];
         $response = $this->send($url, $data, 'post', $this->downLinkPort);
         return $response;
     }
