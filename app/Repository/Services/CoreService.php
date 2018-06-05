@@ -273,6 +273,8 @@ class CoreService
      * @param Project $project
      * @param Thing $thing
      * @param $data
+     * @param int $fport
+     * @param bool $confirmed
      * @return array
      * @throws GeneralException
      */
