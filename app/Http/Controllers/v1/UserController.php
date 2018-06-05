@@ -112,6 +112,7 @@ class UserController extends Controller
                 $until = Carbon::now()->getTimestamp();
                 return [
                     'title' => $widget['title'],
+                    'type' => $widget['type'],
                     'thing' => $thing,
                     'data' => collect($this->coreService->thingData($thing, $since, $until))
                         ->filter(function ($data) use ($widget) {
