@@ -13,5 +13,10 @@ return [
         'dmPort' => '1372',
         'downLinkPort' => '1373'
     ],
+    'lan' => [
+        'serverBaseUrl' => env('LAN_BASE_URL','172.23.132.50:9000'),
+//        'serverBaseUrl' => env('LAN_BASE_URL','172.23.191.134:9000'),
+    ],
+
 
 ];

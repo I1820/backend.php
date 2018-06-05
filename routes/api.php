@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/delete-all-things', 'TestController@delete')->middleware('auth.jwt');
-Route::get('/itest', 'TestController@index')->middleware('auth.jwt');
+Route::post('/itest', 'TestController@index');
 Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) {
 
     Route::post('/register', 'AuthController@register');
