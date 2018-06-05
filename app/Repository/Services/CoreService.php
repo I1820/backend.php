@@ -31,7 +31,7 @@ class CoreService
     public function __construct(CurlService $curlService)
     {
         $this->base_url = config('iot.core.serverBaseUrl');
-        $this->port = config('iot.core.port');
+        $this->pmPort = config('iot.core.pmPort');
         $this->dmPort = config('iot.core.dmPort');
         $this->downLinkPort = config('iot.core.downLinkPort');
         $this->gmPort = config('iot.core.gmPort');
@@ -47,7 +47,8 @@ class CoreService
     {
         Log::debug("Core Send Project\t" . $id);
         $url = '/api/project';
-        $response = $this->send($url, ['name' => (string)$id], 'post');
+        $data = ['name' => (string)$id];
+        $response = $this->_send($url, $data, 'post', $this->pmPort);
         return $response;
     }
 
@@ -60,7 +61,7 @@ class CoreService
     {
         Log::debug("Core Delete Project\t" . $project_id);
         $url = '/api/project/' . $project_id;
-        $response = $this->send($url, [], 'delete');
+        $response = $this->_send($url, [], 'delete', $this->pmPort);
         return $response;
     }
 
@@ -74,10 +75,9 @@ class CoreService
     {
         Log::debug("Core Delete Thing\t" . $devEUI);
         $url = '/api/things/' . $devEUI;
-        $response = $this->send($url, [], 'delete');
+        $response = $this->_send($url, [], 'delete', $this->pmPort);
         return $response;
     }
-
 
     /**
      * @param Project $project
@@ -92,7 +92,7 @@ class CoreService
         $data = [
             'name' => $thing['interface']['devEUI'],
         ];
-        $response = $this->send($url, $data, 'post');
+        $response = $this->_send($url, $data, 'post', $this->pmPort);
         return $response;
     }
 
@@ -107,7 +107,7 @@ class CoreService
     {
         Log::debug("Core Send Codec\t" . $project['_id']);
         $url = '/api/codec';
-        $response = $this->send($url, ['code' => $codec, 'id' => $thing['interface']['devEUI']], 'post', $project['container']['runner']['port']);
+        $response = $this->_send($url, ['code' => $codec, 'id' => $thing['interface']['devEUI']], 'post', $project['container']['runner']['port']);
         return $response;
     }
 
@@ -121,7 +121,7 @@ class CoreService
     public function encode(Project $project, Thing $thing, $data)
     {
         $url = '/api/encode/' . $thing['interface']['devEUI'];
-        $response = $this->send($url, $data, 'post', $project['container']['runner']['port']);
+        $response = $this->_send($url, $data, 'post', $project['container']['runner']['port']);
         return $response;
     }
 
@@ -135,7 +135,7 @@ class CoreService
     public function decode(Project $project, Thing $thing, $data)
     {
         $url = '/api/decode/' . $thing['interface']['devEUI'];
-        $response = $this->send($url, $data, 'post', $project['container']['runner']['port']);
+        $response = $this->_send($url, $data, 'post', $project['container']['runner']['port']);
         return $response;
     }
 
@@ -151,7 +151,7 @@ class CoreService
     {
         Log::debug("Core Thing Data");
         $url = '/api/things/' . $thing['interface']['devEUI'];
-        $response = $this->send($url, ['since' => (int)$since, 'until' => (int)$until], 'get', $this->dmPort);
+        $response = $this->_send($url, ['since' => (int)$since, 'until' => (int)$until], 'get', $this->dmPort);
         return $response;
     }
 
@@ -166,7 +166,7 @@ class CoreService
     {
         Log::debug("Core Things Sample Data");
         $url = '/api/things/w';
-        $response = $this->send($url, ['since' => (int)$since, 'until' => (int)$until, 'thing_ids' => $ids], 'post', $this->dmPort);
+        $response = $this->_send($url, ['since' => (int)$since, 'until' => (int)$until, 'thing_ids' => $ids], 'post', $this->dmPort);
         return $response;
     }
 
@@ -182,7 +182,7 @@ class CoreService
     {
         Log::debug("Core Things Data");
         $url = '/api/things';
-        $response = $this->send($url, ['since' => (int)$since, 'until' => (int)$until, 'thing_ids' => $ids], 'post', $this->dmPort);
+        $response = $this->_send($url, ['since' => (int)$since, 'until' => (int)$until, 'thing_ids' => $ids], 'post', $this->dmPort);
         return $response;
     }
 
@@ -197,7 +197,7 @@ class CoreService
     {
         Log::debug("Core Send Scenario\t" . $project['_id']);
         $url = '/api/scenario';
-        $response = $this->send($url, ['code' => $scenario->code, 'id' => $project['container']['name']], 'post', $project['container']['runner']['port']);
+        $response = $this->_send($url, ['code' => $scenario->code, 'id' => $project['container']['name']], 'post', $project['container']['runner']['port']);
         return $response;
     }
 
@@ -212,7 +212,7 @@ class CoreService
     {
         Log::debug("Core Lint\t" . $project['_id']);
         $url = '/api/lint';
-        $response = $this->send($url, $code, 'post', $project['container']['runner']['port']);
+        $response = $this->_send($url, $code, 'post', $project['container']['runner']['port']);
         return $response;
     }
 
@@ -225,7 +225,7 @@ class CoreService
     {
         Log::debug("Core Enable Gateway\t" . $mac);
         $url = '/api/gateway/' . $mac . '/enable';
-        $response = $this->send($url, [], 'get', $this->dmPort);
+        $response = $this->_send($url, [], 'get', $this->dmPort);
         return $response;
     }
 
@@ -238,7 +238,7 @@ class CoreService
     {
         Log::debug("Core Project List");
         $url = '/api/project';
-        $response = $this->send($url, [], 'get');
+        $response = $this->_send($url, [], 'get', $this->pmPort);
         return $response;
     }
 
@@ -252,7 +252,7 @@ class CoreService
     {
         //Log::debug("Core Project Log");
         $url = '/api/project/' . $project_id . '/logs?limit=' . $limit;
-        $response = $this->send($url, [], 'get');
+        $response = $this->_send($url, [], 'get', $this->pmPort);
         return $response;
     }
 
@@ -266,7 +266,7 @@ class CoreService
     {
         //Log::debug("Core Project Log");
         $url = '/api/gateway/' . $mac;
-        $response = $this->send($url, ['since' => $since], 'get', $this->dmPort);
+        $response = $this->_send($url, ['since' => $since], 'get', $this->dmPort);
         return $response;
     }
 
@@ -286,7 +286,7 @@ class CoreService
             'netskey' => $netskey,
             'phy_payload' => $phyPayload,
         ];
-        $response = $this->send($url, $data, 'post', $this->gmPort);
+        $response = $this->_send($url, $data, 'post', $this->gmPort);
         return $response;
     }
 
@@ -308,7 +308,7 @@ class CoreService
             'thing_id' => $thing['interface']['devEUI'],
             'data' => $data, 'confirmed' => $confirmed, 'fport' => intval($fport)
         ];
-        $response = $this->send($url, $data, 'post', $this->downLinkPort);
+        $response = $this->_send($url, $data, 'post', $this->downLinkPort);
         return $response;
     }
 
@@ -318,16 +318,15 @@ class CoreService
      * @param $data
      * @param string $method
      * @param string $port
-     * @param int $json_request
      * @return array|object
      * @throws GeneralException
      */
-    private function send($url, $data, $method = 'get', $port = '', $json_request = 1)
+    private function _send($url, $data, $method, $port)
     {
-        if (env('CORE_TEST') == 1)
+        if (env('CORE_TEST') == 1) {
             return $this->fake();
+        }
 
-        $port = $port == '' ? $this->port : $port;
         $url = $this->base_url . ':' . $port . $url;
 
         $response = $this->curlService->to($url)
@@ -339,18 +338,18 @@ class CoreService
             ->withTimeout('5');
         $new_response = null;
         switch ($method) {
-            case 'get':
-                $new_response = $response->get();
-                break;
-            case 'post':
-                $new_response = $response->post();
-                break;
-            case 'delete':
-                $new_response = $response->delete();
-                break;
-            default:
-                $new_response = $response->get();
-                break;
+        case 'get':
+            $new_response = $response->get();
+            break;
+        case 'post':
+            $new_response = $response->post();
+            break;
+        case 'delete':
+            $new_response = $response->delete();
+            break;
+        default:
+            $new_response = $response->get();
+            break;
         }
         /*
         Log::debug('-----------------------------------------------------');
@@ -359,24 +358,16 @@ class CoreService
         Log::debug('-----------------------------------------------------');
         */
 
-        /*
-        $code = $new_response->status;
-        try {
-            if ($code != 200 && gettype($new_response->content) == 'string')
-                $content = json_decode($new_response->content);
-            else
-                $content = $new_response->content;
-        } catch (\Exception $e) {
-            $content = $new_response->content;
-        }
-        */
-
         if ($new_response->status == 0) {
             throw new GeneralException($new_response->error, 0);
         }
-        if ($new_response->status == 200)
+        if ($new_response->status == 200) {
             return $new_response->content ?: [];
-        throw new GeneralException($new_response->content->error ?: '', $new_response->status);
+        }
+        throw new GeneralException(
+            $new_response->content->error ?: '',
+            $new_response->status
+        );
 
     }
 
