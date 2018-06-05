@@ -130,6 +130,9 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::delete('/{discount}', 'DiscountController@delete');
     });
 
+    Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt']], function () {
+        Route::get('', 'PaymentController@list');
+    });
     Route::group(['prefix' => 'payment'], function () {
         Route::get('/{invoice}/pay', 'PaymentController@pay');
         Route::get('/{invoice}/callback', 'PaymentController@callback')->name('payment.verify');

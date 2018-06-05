@@ -12,6 +12,7 @@ use App\Repository\Services\UserService;
 use function GuzzleHttp\Promise\all;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
@@ -61,5 +62,13 @@ class PaymentController extends Controller
             return redirect(env('FRONT_URL') . $uri);
         }
         return redirect(env('FRONT_URL') . 'payment/failure');
+    }
+
+    public function list(Request $request)
+    {
+        $invoices = Auth::user()->invoices()->skip(intval($request->get('offset')))
+            ->take(intval($request->get('limit')) ?: 10)
+            ->get();
+        return Response::body(compact('invoices'));
     }
 }
