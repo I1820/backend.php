@@ -34,6 +34,7 @@ class CoreService
         $this->port = config('iot.core.port');
         $this->dmPort = config('iot.core.dmPort');
         $this->downLinkPort = config('iot.core.downLinkPort');
+        $this->gmPort = config('iot.core.gmPort');
         $this->curlService = $curlService;
     }
 
@@ -270,6 +271,26 @@ class CoreService
     }
 
     /**
+     * @param $appskey
+     * @param $netskey
+     * @param $phyPayload
+     * @return array
+     * @throws GeneralException
+     */
+    public function decryptPhyPayload($appskey, $netskey, $phyPayload)
+    {
+        Log::debug("Core Decrypt PhyPalayload");
+        $url = '/api/decrypt';
+        $data = [
+            'appskey' => $appskey,
+            'netskey' => $netskey,
+            'phy_payload' => $phyPayload,
+        ];
+        $response = $this->send($url, $data, 'post', $this->gmPort);
+        return $response;
+    }
+
+    /**
      * @param Project $project
      * @param Thing $thing
      * @param $data
@@ -282,7 +303,11 @@ class CoreService
     {
         Log::debug("DownLink Project List\t" . $thing['dev_eui']);
         $url = '/api/send';
-        $data = ['application_id' => $project['application_id'], 'thing_id' => $thing['interface']['devEUI'], 'data' => $data, 'confirmed' => $confirmed, 'fport' => intval($fport)];
+        $data = [
+            'application_id' => $project['application_id'],
+            'thing_id' => $thing['interface']['devEUI'],
+            'data' => $data, 'confirmed' => $confirmed, 'fport' => intval($fport)
+        ];
         $response = $this->send($url, $data, 'post', $this->downLinkPort);
         return $response;
     }
