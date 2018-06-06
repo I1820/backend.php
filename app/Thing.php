@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 class Thing extends Eloquent
 {
 
-    protected $appends = ['last_seen_at','last_parsed_at', 'keys', 'owner'];
+    protected $appends = ['last_seen_at', 'last_parsed_at', 'keys', 'owner'];
     protected $lora_thing;
     protected $core_thing;
     protected $lora_activation;
@@ -105,6 +105,7 @@ class Thing extends Eloquent
             return $this->core_thing->lastParsedAt ? $this->core_thing->lastParsedAt : 0;
         } catch (\Exception $e) {
             Log::error("Core Get Thing\t" . $this['dev_eui']);
+            return 0;
         }
     }
 
