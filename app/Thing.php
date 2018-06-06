@@ -4,6 +4,7 @@ namespace App;
 
 use App\Repository\Services\LoraService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,8 +17,9 @@ use Illuminate\Database\Eloquent\Model;
 class Thing extends Eloquent
 {
 
-    protected $appends = ['last_seen_at', 'keys', 'owner'];
+    protected $appends = ['last_seen_at','last_parsed_at', 'keys', 'owner'];
     protected $lora_thing;
+    protected $core_thing;
     protected $lora_activation;
 
     /**
@@ -26,7 +28,7 @@ class Thing extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'loc', 'description', 'period', 'interface', 'type', 'dev_eui','active'
+        'name', 'loc', 'description', 'period', 'interface', 'type', 'dev_eui', 'active'
     ];
 
     /**
@@ -84,13 +86,26 @@ class Thing extends Eloquent
         }
         $time = $this->lora_thing->lastSeenAt;
         $status = 'green';
-        if (Carbon::now()->subSecond(2 * $this->period) > $time)
+        if (Carbon::now()->subMinutes(2 * $this->period) > $time)
             $status = 'orange';
-        if (Carbon::now()->subSecond(3 * $this->period) > $time)
+        if (Carbon::now()->subMinutes(3 * $this->period) > $time)
             $status = 'red';
-        if (Carbon::now()->subSecond(4 * $this->period) > $time)
+        if (Carbon::now()->subMinutes(4 * $this->period) > $time)
             $status = 'gray';
         return ['status' => $status, 'time' => $time ? (string)lora_time($time) : ''];
+    }
+
+    public function getLastParsedAtAttribute($value)
+    {
+        try {
+            if (!$this->core_thing) {
+                $coreService = resolve('App\Repository\Services\CoreService');
+                $this->core_thing = $coreService->getThing($this);
+            }
+            return $this->core_thing->lastParsedAt ? $this->core_thing->lastParsedAt : 0;
+        } catch (\Exception $e) {
+            Log::error("Core Get Thing\t" . $this['dev_eui']);
+        }
     }
 
     public function getKeysAttribute()

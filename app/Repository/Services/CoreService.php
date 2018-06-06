@@ -97,6 +97,20 @@ class CoreService
     }
 
     /**
+     * @param Thing $thing
+     * @return array
+     * @throws GeneralException
+     */
+    public function getThing(Thing $thing)
+    {
+        $project = $thing->project()->first();
+        Log::debug("Core Get Thing\t" . $thing['dev_eui']);
+        $url = '/api/project/' . $project['container']['name'] . '/things/' . $thing['dev_eui'];
+        $response = $this->_send($url, [], 'get', $this->pmPort);
+        return $response;
+    }
+
+    /**
      * @param Project $project
      * @param Thing $thing
      * @param $codec
@@ -338,18 +352,18 @@ class CoreService
             ->withTimeout('5');
         $new_response = null;
         switch ($method) {
-        case 'get':
-            $new_response = $response->get();
-            break;
-        case 'post':
-            $new_response = $response->post();
-            break;
-        case 'delete':
-            $new_response = $response->delete();
-            break;
-        default:
-            $new_response = $response->get();
-            break;
+            case 'get':
+                $new_response = $response->get();
+                break;
+            case 'post':
+                $new_response = $response->post();
+                break;
+            case 'delete':
+                $new_response = $response->delete();
+                break;
+            default:
+                $new_response = $response->get();
+                break;
         }
         /*
         Log::debug('-----------------------------------------------------');
