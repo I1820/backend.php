@@ -302,7 +302,6 @@ class ThingService
             $excel->create(
                 'things.csv',
                 function ($excel) use ($res) {
-                    $excel->setCreator('ISRC IoT Platform');
                     $excel->sheet(
                         'Things',
                         function ($sheet) use ($res) {
@@ -310,7 +309,7 @@ class ThingService
                         }
                     );
                 }
-            )->export('csv')
+            )->string('csv')
         )
         ->header('Content-Disposition', 'attachment; filename="things.csv"')
         ->header('Content-Type', 'application/csv; charset=UTF-8');
