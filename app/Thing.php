@@ -105,7 +105,7 @@ class Thing extends Eloquent
             return $this->core_thing->lastParsedAt ? $this->core_thing->lastParsedAt : 0;
         } catch (\Exception $e) {
             Log::error("Core Get Thing\t" . $this['dev_eui']);
-            return 0;
+            return "";
         }
     }
 
