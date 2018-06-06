@@ -158,14 +158,20 @@ class CoreService
      * @param Thing $thing
      * @param $since
      * @param $until
+     * @param $limit
      * @return array
      * @throws GeneralException
      */
-    public function thingData(Thing $thing, $since, $until)
+    public function thingData(Thing $thing, $since, $until, $limit)
     {
         Log::debug("Core Thing Data");
         $url = '/api/things/' . $thing['interface']['devEUI'];
-        $response = $this->_send($url, ['since' => (int)$since, 'until' => (int)$until], 'get', $this->dmPort);
+        $data = ['since' => (int)$since];
+        if ($until)
+            $data['until'] = (int)$until;
+        else
+            $data['limit'] = (int)$limit;
+        $response = $this->_send($url, $data, 'get', $this->dmPort);
         return $response;
     }
 
@@ -326,7 +332,7 @@ class CoreService
         $data = [
             'application_id' => $project['application_id'],
             'thing_id' => $thing['interface']['devEUI'],
-            'data' => $data, 'confirmed' => $confirmed, 'fport' => intval($fport)
+            'data' => $data, 'confirmed' => $confirmed, 'fport' => (int)$fport
         ];
         $response = $this->_send($url, $data, 'post', $this->downLinkPort);
         return $response;

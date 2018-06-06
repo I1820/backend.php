@@ -230,11 +230,12 @@ class ThingController extends Controller
         $thing_ids = json_decode($request->get('thing_ids'), true)['ids'] ?: [];
         $thing_ids = $project->things()->whereIn('_id', $thing_ids)->get()->pluck('dev_eui');
         if ($sample) {
-            $cluster_number = intval($request->get('cn')) ?: 200;
+            $cluster_number = (int)($request->get('cn')) ?: 200;
             $data = $this->coreService->thingsSampleData($thing_ids, $since, $until, $cluster_number);
-        } else
-            $data = $this->coreService->thingsMainData($thing_ids, $since, $until);
-
+        } else {
+            $limit = (int)($request->get('limit')) ?: 0;
+            $data = $this->coreService->thingsMainData($thing_ids, $since, $until, $limit);
+        }
         $data = $this->alias($data, $aliases);
 
         return Response::body(compact('data'));
