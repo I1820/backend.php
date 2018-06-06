@@ -103,10 +103,9 @@ class ThingController extends Controller
     }
 
     /**
-     * @param Thing $thing
      * @param Request $request
      * @return array
-     * @throws \App\Exceptions\GeneralException
+     * @throws GeneralException
      */
     public function sampleData(Request $request)
     {
@@ -114,10 +113,9 @@ class ThingController extends Controller
     }
 
     /**
-     * @param Thing $thing
      * @param Request $request
      * @return array
-     * @throws \App\Exceptions\GeneralException
+     * @throws GeneralException
      */
     public function mainData(Request $request)
     {
@@ -231,9 +229,10 @@ class ThingController extends Controller
         }
         $thing_ids = json_decode($request->get('thing_ids'), true)['ids'] ?: [];
         $thing_ids = $project->things()->whereIn('_id', $thing_ids)->get()->pluck('dev_eui');
-        if ($sample)
-            $data = $this->coreService->thingsSampleData($thing_ids, $since, $until);
-        else
+        if ($sample) {
+            $cluster_number = intval($request->get('cn')) ?: 200;
+            $data = $this->coreService->thingsSampleData($thing_ids, $since, $until, $cluster_number);
+        } else
             $data = $this->coreService->thingsMainData($thing_ids, $since, $until);
 
         $data = $this->alias($data, $aliases);

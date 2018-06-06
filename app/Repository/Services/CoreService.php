@@ -173,14 +173,20 @@ class CoreService
      * @param array $ids
      * @param $since
      * @param $until
+     * @param int $cluster_number
      * @return array
      * @throws GeneralException
      */
-    public function thingsSampleData($ids, $since, $until)
+    public function thingsSampleData($ids, $since, $until, $cluster_number = 200)
     {
         Log::debug("Core Things Sample Data");
         $url = '/api/things/w';
-        $response = $this->_send($url, ['since' => (int)$since, 'until' => (int)$until, 'thing_ids' => $ids], 'post', $this->dmPort);
+        $response = $this->_send($url, [
+            'since' => (int)$since,
+            'until' => (int)$until,
+            'thing_ids' => $ids,
+            'cn' => $cluster_number
+        ], 'post', $this->dmPort);
         return $response;
     }
 
