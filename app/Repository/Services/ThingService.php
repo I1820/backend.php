@@ -298,13 +298,22 @@ class ThingService
             ];
         })->toArray());
 
-        return response($excel->create('things.csv', function ($excel) use ($res) {
-            $excel->sheet('Things', function ($sheet) use ($res) {
-                $sheet->fromArray($res, null, 'A1', false, false);
-            });
-        })->string('csv'))
-            ->header('Content-Disposition', 'attachment; filename="things.csv.csv"')
-            ->header('Content-Type', 'application/csv; charset=UTF-8');
+        return response(
+            $excel->create(
+                'things.csv',
+                function ($excel) use ($res) {
+                    $excel->setCreator('ISRC IoT Platform');
+                    $excel->sheet(
+                        'Things',
+                        function ($sheet) use ($res) {
+                            $sheet->fromArray($res, null, 'A1', false, false);
+                        }
+                    );
+                }
+            )->export('csv')
+        )
+        ->header('Content-Disposition', 'attachment; filename="things.csv"')
+        ->header('Content-Type', 'application/csv; charset=UTF-8');
     }
 
 
