@@ -132,6 +132,20 @@ class CoreService
 
     /**
      * @param Thing $thing
+     * @return array
+     * @throws GeneralException
+     */
+    public function getThingLastParsed(Thing $thing)
+    {
+        Log::debug("Core Get Thing\t" . $thing['dev_eui']);
+        $url = '/api/things/' . $thing['dev_eui'] . '/p';
+        $response = $this->_send($url, [], 'get', $this->dmPort);
+        return $response;
+    }
+
+
+    /**
+     * @param Thing $thing
      * @param bool $active
      * @return array
      * @throws GeneralException
