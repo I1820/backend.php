@@ -45,7 +45,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
         Route::patch('/{project}', 'ProjectController@update');
         Route::delete('/{project}', 'ProjectController@stop');
         Route::get('/{project}', 'ProjectController@get');
-        Route::get('/{project}/activate', 'ProjectController@activatae');
+        Route::get('/{project}/activate', 'ProjectController@activaae');
 
         Route::get('/{project}/things', 'ProjectController@things');
         Route::get('/{project}/things/export', 'ProjectController@exportThings');
