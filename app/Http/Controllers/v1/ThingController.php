@@ -177,6 +177,7 @@ class ThingController extends Controller
     public function delete(Thing $thing)
     {
         $this->loraService->deleteDevice($thing['interface']['devEUI']);
+        $this->coreService->deleteThing($thing['dev_eui']);
         $thing->permissions()->delete();
         $thing->delete();
         return Response::body(['success' => 'true']);
