@@ -53,6 +53,27 @@ class CoreService
     }
 
     /**
+     * @param Project $project
+     * @param bool $active
+     * @return array
+     * @throws GeneralException
+     */
+    public function activateProject(Project $project, $active = true)
+    {
+        if ($active) {
+            Log::debug("Core Activate Thing\t" . $project['container']['name']);
+            $url = '/api/project/' . $project['container']['name'] . '/activate';
+        } else {
+            Log::debug("Core Deactivate Thing\t" . $project['container']['name']);
+            $url = '/api/project/' . $project['container']['name'] . '/activate';
+        }
+        $response = $this->_send($url, [], 'get', $this->pmPort);
+        return $response;
+    }
+
+
+
+    /**
      * @param $project_id
      * @return array
      * @throws GeneralException
@@ -103,12 +124,31 @@ class CoreService
      */
     public function getThing(Thing $thing)
     {
-        $project = $thing->project()->first();
         Log::debug("Core Get Thing\t" . $thing['dev_eui']);
-        $url = '/api/project/' . $project['container']['name'] . '/things/' . $thing['dev_eui'];
+        $url = '/api/things/' . $thing['dev_eui'];
         $response = $this->_send($url, [], 'get', $this->pmPort);
         return $response;
     }
+
+    /**
+     * @param Thing $thing
+     * @param bool $active
+     * @return array
+     * @throws GeneralException
+     */
+    public function activateThing(Thing $thing, $active = true)
+    {
+        if ($active) {
+            Log::debug("Core Activate Thing\t" . $thing['dev_eui']);
+            $url = '/api/things/' . $thing['dev_eui'] . '/activate';
+        } else {
+            Log::debug("Core Deactivate Thing\t" . $thing['dev_eui']);
+            $url = '/api/things/' . $thing['dev_eui'] . '/deactivate';
+        }
+        $response = $this->_send($url, [], 'get', $this->pmPort);
+        return $response;
+    }
+
 
     /**
      * @param Project $project
@@ -201,14 +241,20 @@ class CoreService
      * @param array $ids
      * @param $since
      * @param $until
+     * @param $limit
      * @return array
      * @throws GeneralException
      */
-    public function thingsMainData($ids, $since, $until)
+    public function thingsMainData($ids, $since, $until, $limit)
     {
         Log::debug("Core Things Data");
         $url = '/api/things';
-        $response = $this->_send($url, ['since' => (int)$since, 'until' => (int)$until, 'thing_ids' => $ids], 'post', $this->dmPort);
+        $data = ['since' => (int)$since, 'thing_ids' => $ids];
+        if ($limit)
+            $data['limit'] = (int)$limit;
+        else
+            $data['until'] = (int)$until;
+        $response = $this->_send($url, $data, 'post', $this->dmPort);
         return $response;
     }
 
@@ -305,7 +351,7 @@ class CoreService
      */
     public function decryptPhyPayload($appskey, $netskey, $phyPayload)
     {
-        Log::debug("Core Decrypt PhyPalayload");
+        Log::debug("Core Decrypt PhyPayload");
         $url = '/api/decrypt';
         $data = [
             'appskey' => $appskey,

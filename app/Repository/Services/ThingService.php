@@ -162,18 +162,10 @@ class ThingService
         return $data['deviceKeys'];
     }
 
-    public function activate(Thing $thing)
+    public function activate(Thing $thing, $active)
     {
-        $project = $thing->project()->first();
-        $this->coreService->postThing($project, $thing);
-        $thing->active = true;
-        $thing->save();
-    }
-
-    public function deactivate(Thing $thing)
-    {
-        $this->coreService->deleteThing($thing['dev_eui']);
-        $thing->active = false;
+        $this->coreService->activateThing($thing, $active);
+        $thing->active = $active;
         $thing->save();
     }
 
@@ -311,8 +303,8 @@ class ThingService
                 }
             )->string('csv')
         )
-        ->header('Content-Disposition', 'attachment; filename="things.csv"')
-        ->header('Content-Type', 'application/csv; charset=UTF-8');
+            ->header('Content-Disposition', 'attachment; filename="things.csv"')
+            ->header('Content-Type', 'application/csv; charset=UTF-8');
     }
 
 

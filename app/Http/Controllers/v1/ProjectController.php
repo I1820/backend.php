@@ -146,6 +146,23 @@ class ProjectController extends Controller
         return Response::body(['project' => $result]);
     }
 
+    /**
+     * @param Project $project
+     * @param Request $request
+     * @return array
+     * @throws GeneralException
+     */
+    public function activate(Project $project, Request $request)
+    {
+        $active = $request->get('active') ? true : false;
+        $this->coreService->activateProject($project, $active);
+        $project->things()->update(['active' => $active]);
+        $project['active'] = false;
+        $project->save();
+
+        return Response::body(['success' => true]);
+    }
+
 
     /**
      * @param Request $request

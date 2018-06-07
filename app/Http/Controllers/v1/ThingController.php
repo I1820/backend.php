@@ -190,10 +190,7 @@ class ThingController extends Controller
     public function activate(Thing $thing, Request $request)
     {
         $active = $request->get('active') ? true : false;
-        if ($active)
-            $this->thingService->activate($thing);
-        else
-            $this->thingService->deactivate($thing);
+        $this->thingService->activate($thing, $active);
         return Response::body(['success' => 'true']);
     }
 
