@@ -24,6 +24,9 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
     Route::get('/verify/{user}/{token}', 'AuthController@verifyEmail')->name('verify-email');
 
 
+    Route::post('/decrypt-phy-payload', 'OtherController@decryptPhyPayload');
+
+
     Route::group(['prefix' => 'authorization', 'middleware' => ['auth.jwt']], function () {
         Route::get('/permissions', 'PermissionController@permissionsList');
         Route::get('/roles', 'PermissionController@rolesList');
