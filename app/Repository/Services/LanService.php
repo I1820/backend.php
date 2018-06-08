@@ -19,10 +19,6 @@ use Ixudra\Curl\CurlService;
 
 class LanService
 {
-//    protected $token;
-//    protected $organization_id;
-//    protected $networkServerID;
-//    protected $serviceProfileID;
     protected $base_url;
     protected $curlService;
 
@@ -41,28 +37,25 @@ class LanService
      */
     public function postDevice(Collection $data, $application_id, $deviceProfileID)
     {
-        Log::debug("Lan Send Device:\t" . $data['devEUI']);
+        Log::debug("LAN Send Device:\t" . $data['devEUI']);
         $url = $this->base_url . '/application/' . $application_id . '/device';
-        $data = $data->only([
-            'name',
-            'token',
-            'devEUI',
-            'devAddr',
-        ])->merge([
-            'applicationID' => $application_id,
-            'deviceProfileID' => $deviceProfileID
-        ]);
-//        if (!$data['description'])
-//            $data['description'] = '';
-//        return $data;
+        $data = $data->only(
+            [
+                'name',
+                'devEUI',
+            ]
+        )->merge(
+            [
+                'applicationID' => $application_id,
+                'deviceProfileID' => $deviceProfileID
+            ]
+        );
         try {
             $data['devEUI'] = (int)$data['devEUI'];
         } catch (\Exception $e){
             throw new GeneralException('خطا در پارامترها', GeneralException::VALIDATION_ERROR);
         }
         $response = $this->send($url, $data, 'post');
-//        return $response->content;
-//        return $data;
         return json_encode($response);
     }
 
@@ -76,130 +69,19 @@ class LanService
         Log::debug("Lan Send Device Profile");
         $url = $this->base_url . '/device-profile';
         return $this->send($url, ['name' => $name], 'post');
-
     }
 
-
-    /////////////////////////we want//////////
-
-    /**
-     * @param $deviceProfileId
-     * @return string
-     * @throws LoraException
-     */
-    public function deleteDeviceProfile($deviceProfileId)
-    {
-        Log::debug("Lan Delete Device Profile:\t" . $deviceProfileId);
-        try {
-            $url = $url = $this->base_url . '/api/device-profiles/' . $deviceProfileId;
-            return $this->send($url, [], 'delete');
-        } catch (LoraException $exception) {
-            if ($exception->getCode() == 9)
-                throw new LoraException('ابتدا اشیای متصل را حذف کنید.', GeneralException::ACCESS_DENIED);
-        }
-    }
-    ///////////////////////////////////////
-
-    /**
-     * @param $deviceId
-     * @return string
-     * @throws LoraException
-     */
-    public function deleteDevice($application_id, $deviceId)
-    {
-        Log::debug("Lan Delete Device:\t" . $deviceId);
-        $url = $url = $this->base_url . '/application/' . $application_id . '/device/' . $deviceId;
-        return $this->send($url, [], 'delete');
-    }
-
-    /////////////////////////we want//////////
-
-    /**
-     * @param $data
-     * @param $dev_eui
-     * @return string
-     * @throws LoraException
-     */
-    /*
-    public function updateDevice($data, $dev_eui)
-    {
-        Log::debug("Lan Update Device:\t" . $dev_eui);
-        $url = $url = $this->base_url . '/api/devices/' . $dev_eui;
-        $this->send($url, $data, 'put');
-        return true;
-    }*/
-//
-//    /**
-//     * @param $data
-//     * @return string
-//     * @throws LoraException
-//     */
-//    public function sendGateway($data)
-//    {
-//        Log::debug("Lan Send Gateway");
-//        $url = $url = $this->base_url . '/api/gateways';
-//        $this->send($url, $data, 'post', 409);
-//        return true;
-//    }
-//
-//    /**
-//     * @param $mac
-//     * @return string
-//     * @throws LoraException
-//     */
-//    public function deleteGateway($mac)
-//    {
-//        Log::debug("Lan Delete Gateway\t" . $mac);
-//        $url = $url = $this->base_url . '/api/gateways/' . $mac;
-//        return $this->send($url, [], 'delete');
-//    }
-
-    /**
+   /**
      * @param $data
      * @return string
      * @throws LoraException
      */
-    /*
     public function activateDevice($data)
     {
         Log::debug("Lan Active Device ABP\t" . $data['devEUI']);
-        $url = $url = $this->base_url . '/api/devices/' . $data['devEUI'] . '/activate';
+        $url = $this->base_url . '/api/device/' . $data['devEUI'] . '/activate';
         return $this->send($url, $data, 'post');
-    }*/
-
-    /**
-     * @param $data
-     * @return string
-     * @throws LoraException
-     */
-    /*
-    public function sendKeys($data)
-    {
-        Log::debug("Lan Active Device OTAA\t" . $data['devEUI']);
-        $url = $url = $this->base_url . '/api/devices/' . $data['devEUI'] . '/keys';
-        try {
-            return $this->send($url, $data, 'post');
-        } catch (\Exception $e) {
-            return $this->send($url, $data, 'put');
-        }
-    }*/
-    ///////////////////////////
-//
-//    /**
-//     * @return \Illuminate\Config\Repository|mixed
-//     */
-//    public function getOrganizationId()
-//    {
-//        return $this->organization_id;
-//    }
-//
-//    /**
-//     * @return \Illuminate\Config\Repository|mixed
-//     */
-//    public function getNetworkServerID()
-//    {
-//        return $this->networkServerID;
-//    }
+    }
 
     /**
      * @param $description
@@ -209,11 +91,9 @@ class LanService
      */
     public function postApp($description, $id)
     {
-        Log::debug("Lan Create Project\t" . $id);
+        Log::debug("LAN Create Project\t" . $id);
         $url = $this->base_url . '/application';
         $data = [
-//            'organizationID' => $this->organization_id,
-//            'serviceProfileID' => $this->serviceProfileID,
             'name' => (string)$id,
             'description' => $description
         ];
@@ -224,142 +104,77 @@ class LanService
 
     public function getDevices($application_id)
     {
-        Log::debug("Lan Get Device\t" . $application_id);
+        Log::debug("LAN Get Device\t" . $application_id);
         $url = $this->base_url . '/application/' . $application_id . '/device';
         return $this->send($url, [], 'get');
 
     }
-    /////////////////////////we want//////////
 
-    /**
-     * @param $applicationId
-     * @return string
-     * @throws LoraException
+   /**
+     * @param $url
+     * @param $data
+     * @param string $method
+     * @param string $port
+     * @return array|object
+     * @throws GeneralException
      */
-    /*
-    public function deleteApp($applicationId)
+    private function _send($url, $data, $method, $port)
     {
-        Log::debug("Lan Delete Project\t" . $applicationId);
-        $url = $url = $this->base_url . '/api/applications/' . $applicationId;
-        return $this->send($url, [], 'delete');
+        if (env('LAN_TEST') == 1) {
+            return $this->fake();
+        }
 
-    }*/
+        $url = $this->base_url . ':' . $port . $url;
 
-//    /**
-//     * @param $mac
-//     * @return string
-//     * @throws LoraException
-//     */
-//    public function getGW($mac)
-//    {
-//        Log::debug("Lan Get Gateway\t" . $mac);
-//        $url = $url = $this->base_url . '/api/gateways/' . $mac;
-//        return $this->send($url, [], 'get');
-//
-//    }
-
-    /**
-     * @param $dev_eui
-     * @return string
-     * @throws LoraException
-     */
-    /*
-    public function getDevice($dev_eui)
-    {
-        Log::debug("Lan Get Device\t" . $dev_eui);
-        $url = $url = $this->base_url . '/api/devices/' . $dev_eui;
-        return $this->send($url, [], 'get');
-    }*/
-
-    /**
-     * @param $dev_eui
-     * @return string
-     * @throws LoraException
-     */
-    /*
-    public function getActivation($dev_eui)
-    {
-        Log::debug("Lan Get Device Activation\t" . $dev_eui);
-        $url = $url = $this->base_url . '/api/devices/' . $dev_eui . '/activation';
-        return $this->send($url, [], 'get');
-    }*/
-
-    ///////////////////////////////////////
-
-    private function send($url, $data, $method = 'get', $accept = 200)
-    {
-        if (env('LORA_TEST'))
-            return (object)[
-                'status' => 200,
-                'content' => [
-                    'key' => 'value'
-                ]
-            ];
         $response = $this->curlService->to($url)
             ->withData($data)
+            ->withOption('SSL_VERIFYHOST', false)
+            ->returnResponseObject()
+            ->asJsonRequest()
             ->asJsonResponse()
-//            ->withOption('SSL_VERIFYHOST', false)
-//            ->withHeader('Authorization: ' . $this->token)
-            ->returnResponseObject();
-        $new_response = $this->sendMethods($method, $response);
+            ->withTimeout('5');
+        $new_response = null;
+        switch ($method) {
+        case 'get':
+            $new_response = $response->get();
+            break;
+        case 'post':
+            $new_response = $response->post();
+            break;
+        case 'delete':
+            $new_response = $response->delete();
+            break;
+        default:
+            $new_response = $response->get();
+            break;
+        }
         /*
         Log::debug('-----------------------------------------------------');
         Log::debug(print_r($data, true));
         Log::debug(print_r($new_response, true));
         Log::debug('-----------------------------------------------------');
         */
-        if ($new_response->status == 401 | $new_response->status == 403) {
-//            $this->authenticate();
-//            $response = $response->withHeader('Authorization: ' . $this->token);
-            $new_response = $this->sendMethods($method, $response);
-        }
+
         if ($new_response->status == 0) {
-            throw new LoraException($new_response->error, 0);
+            throw new GeneralException($new_response->error, 0);
         }
-        if ($new_response->status == 200 || $new_response->status == $accept)
-            return $new_response->content;
-        throw new LoraException($new_response->content->error, $new_response->content->code);
+        if ($new_response->status == 200) {
+            return $new_response->content ?: [];
+        }
+        throw new GeneralException(
+            $new_response->content->error ?: '',
+            $new_response->status
+        );
+
     }
 
-//    private function authenticate()
-//    {
-//        $response = $this->curlService->to($this->base_url . '/api/internal/login')
-//            ->withData(['username' => 'admin', 'password' => 'admin'])
-//            ->asJson()
-//            ->withOption('SSL_VERIFYHOST', false)
-//            ->post();;
-//        $this->token = $response->jwt;
-//        Storage::put('jwt.token', $this->token);
-//    }
-
-
-    /**
-     * @param $method string
-     * @param $response \Ixudra\Curl\Builder
-     * @return mixed
-     */
-    private function sendMethods($method, $response)
+    public function fake()
     {
-
-        switch ($method) {
-            case 'get':
-                $new_response = $response->asJsonResponse()->get();
-                break;
-            case 'post':
-                $new_response = $response->asJson()->post();
-                break;
-            case 'put':
-                $new_response = $response->asJson()->put();
-                break;
-            case 'delete':
-                $new_response = $response->asJsonResponse()->delete();
-                break;
-            default:
-                $new_response = $response->asJsonResponse()->get();
-                break;
-        }
-        return $new_response;
+        return (object)[
+            'status' => 200,
+            'content' => [
+                'key' => 'value'
+            ]
+        ];
     }
-
-
 }
