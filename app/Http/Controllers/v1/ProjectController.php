@@ -157,7 +157,7 @@ class ProjectController extends Controller
         $active = $request->get('active') ? true : false;
         $this->coreService->activateProject($project, $active);
         $project->things()->update(['active' => $active]);
-        $project['active'] = false;
+        $project['active'] = $active;
         $project->save();
 
         return Response::body(['success' => true]);
