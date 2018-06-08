@@ -40,6 +40,6 @@ class OtherController extends Controller
         if ($validator->fails())
             throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
         $data = $request->only(['appskey', 'netskey', 'phyPayload']);
-        return Response::body(['result' => $this->coreService->decryptPhyPayload($data['appskey'], $data['netskey'], $data['phyPayload'])]);
+        return Response::body($this->coreService->decryptPhyPayload($data['appskey'], $data['netskey'], $data['phyPayload']));
     }
 }
