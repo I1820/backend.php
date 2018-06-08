@@ -57,13 +57,15 @@ class CodecController extends Controller
         $codec = null;
         if ($request->get('codec_id')) {
             $codec = Codec::where('global', true)->where('_id', $request->get('codec_id'))->first();
-            $thing->codec = $request->get('codec_id');
+            $thing['codec_id'] = $request->get('codec_id');
+            $thing['codec'] = '';
             if ($codec)
                 $codec = $codec['code'];
         }
         if (!$codec) {
             $codec = $request->get('codec');
-            $thing->codec = $codec;
+            $thing['codec_id'] = '';
+            $thing['codec'] = $codec;
         }
         $project = $thing->project()->first();
         $this->coreService->sendCodec($project, $thing, $codec);
