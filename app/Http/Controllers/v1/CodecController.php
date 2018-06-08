@@ -80,8 +80,9 @@ class CodecController extends Controller
      */
     public function getThing(Thing $thing, Request $request)
     {
-        $codec = $thing['codec_id'] ?: $thing['codec'];
-        return Response::body(compact('codec'));
+        $codec = $thing['codec'];
+        $codec_id = $thing['codec_id'];
+        return Response::body($codec_id ? compact('codec_id') : compact('codec'));
     }
 
 
