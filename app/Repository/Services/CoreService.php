@@ -255,16 +255,19 @@ class CoreService
      * @param $since
      * @param $until
      * @param $limit
+     * @param $offset
      * @return array
      * @throws GeneralException
      */
-    public function thingsMainData($ids, $since, $until, $limit)
+    public function thingsMainData($ids, $since, $until, $limit, $offset)
     {
         Log::debug("Core Things Data");
         $url = '/api/things';
         $data = ['since' => (int)$since, 'thing_ids' => $ids];
-        if ($limit)
+        if ($limit){
             $data['limit'] = (int)$limit;
+            $data['offset'] = (int)$offset;
+        }
         else
             $data['until'] = (int)$until;
         $response = $this->_send($url, $data, 'post', $this->dmPort);

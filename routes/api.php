@@ -155,6 +155,13 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () use ($ro
         Route::get('/{user}/transactions', 'UserController@transactions');
         Route::get('/{user}/impersonate', 'UserController@impersonate');
     });
+    Route::group(['prefix' => 'codec', 'middleware' => ['auth.jwt', 'admin']], function () {
+        Route::post('/', 'CodecController@create');
+        Route::get('/', 'CodecController@list');
+        Route::delete('/{codec}', 'CodecController@delete');
+        Route::patch('/{codec}', 'CodecController@update');
+        Route::get('/{codec}', 'CodecController@get');
+    });
 
     Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt', 'admin']], function () {
         Route::get('/', 'PaymentController@list');
