@@ -25,12 +25,16 @@ class ThingService
     protected $coreService;
     protected $projectService;
 
-    public function __construct(LoraService $loraService,
-                                CoreService $coreService,
-                                ProjectService $projectService)
+    public function __construct(
+        LoraService $loraService,
+        CoreService $coreService,
+        LanService $lanService,
+        ProjectService $projectService
+    )
     {
         $this->loraService = $loraService;
         $this->coreService = $coreService;
+        $this->lanService = $lanService;
         $this->projectService = $projectService;
     }
 
@@ -114,6 +118,12 @@ class ThingService
             $project['application_id'],
             $thingProfile['device_profile_id']
         );
+        $this->lanService->postDevice(
+            $request,
+            $project['application_id'],
+            $thingProfile['device_profile_id']
+        );
+
         $this->validateInsert($request);
         $thing = Thing::create([
             'name' => $request->get('name'),
