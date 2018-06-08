@@ -14,7 +14,6 @@ use App\Exceptions\LoraException;
 use App\Thing;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Ixudra\Curl\CurlService;
 
 class LanService
@@ -110,17 +109,15 @@ class LanService
      * @param $url
      * @param $data
      * @param string $method
-     * @param string $port
+
      * @return array|object
      * @throws GeneralException
      */
-    private function send($url, $data, $method, $port)
+    private function send($url, $data, $method)
     {
         if (env('LAN_TEST') == 1) {
             return $this->fake();
         }
-
-        $url = $this->base_url . ':' . $port . $url;
 
         $response = $this->curlService->to($url)
             ->withData($data)
