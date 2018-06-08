@@ -232,7 +232,7 @@ class ThingController extends Controller
             $data = $this->coreService->thingsSampleData($thing_ids, $since, $until, $cluster_number);
         } else {
             $limit = (int)($request->get('limit')) ?: 0;
-            $offset = (int)($request->get('offset')) ?: 10;
+            $offset = (int)($request->get('offset')) ?: 0;
             $data = $this->coreService->thingsMainData($thing_ids, $since, $until, $limit,$offset);
         }
         $data = $this->alias($data, $aliases);
