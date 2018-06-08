@@ -33,26 +33,22 @@ class LanService
      * @param $application_id
      * @param $deviceProfileID
      * @return string
-     * @throws LoraException
+     * @throws GeneralException
      */
     public function postDevice(Collection $data, $application_id, $deviceProfileID)
     {
         Log::debug("LAN Send Device:\t" . $data['devEUI']);
         $url = $this->base_url . '/application/' . $application_id . '/device';
-        $data = $data->only(
-            [
-                'name',
-                'devEUI',
-            ]
-        )->merge(
-            [
-                'applicationID' => $application_id,
-                'deviceProfileID' => $deviceProfileID
-            ]
-        );
+        $data = $data->only([
+            'name',
+            'devEUI',
+        ])->merge([
+            'applicationID' => $application_id,
+            'deviceProfileID' => $deviceProfileID
+        ]);
         try {
             $data['devEUI'] = (int)$data['devEUI'];
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             throw new GeneralException('خطا در پارامترها', GeneralException::VALIDATION_ERROR);
         }
         $response = $this->send($url, $data, 'post');
@@ -60,9 +56,9 @@ class LanService
     }
 
     /**
-     * @param $data
-     * @return void
-     * @throws LoraException
+     * @param $name
+     * @return array|object
+     * @throws GeneralException
      */
     public function postDeviceProfile($name)
     {
@@ -71,10 +67,10 @@ class LanService
         return $this->send($url, ['name' => $name], 'post');
     }
 
-   /**
+    /**
      * @param $data
      * @return string
-     * @throws LoraException
+     * @throws GeneralException
      */
     public function activateDevice($data)
     {
@@ -87,7 +83,7 @@ class LanService
      * @param $description
      * @param $id
      * @return string
-     * @throws LoraException
+     * @throws GeneralException
      */
     public function postApp($description, $id)
     {
@@ -110,7 +106,7 @@ class LanService
 
     }
 
-   /**
+    /**
      * @param $url
      * @param $data
      * @param string $method
@@ -118,7 +114,7 @@ class LanService
      * @return array|object
      * @throws GeneralException
      */
-    private function _send($url, $data, $method, $port)
+    private function send($url, $data, $method, $port)
     {
         if (env('LAN_TEST') == 1) {
             return $this->fake();
@@ -135,18 +131,18 @@ class LanService
             ->withTimeout('5');
         $new_response = null;
         switch ($method) {
-        case 'get':
-            $new_response = $response->get();
-            break;
-        case 'post':
-            $new_response = $response->post();
-            break;
-        case 'delete':
-            $new_response = $response->delete();
-            break;
-        default:
-            $new_response = $response->get();
-            break;
+            case 'get':
+                $new_response = $response->get();
+                break;
+            case 'post':
+                $new_response = $response->post();
+                break;
+            case 'delete':
+                $new_response = $response->delete();
+                break;
+            default:
+                $new_response = $response->get();
+                break;
         }
         /*
         Log::debug('-----------------------------------------------------');
