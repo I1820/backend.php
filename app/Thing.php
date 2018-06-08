@@ -19,7 +19,7 @@ class Thing extends Eloquent
 
     protected $appends = ['last_seen_at', 'last_parsed_at', 'keys', 'owner'];
     protected $lora_thing;
-    protected $core_thing;
+    protected $last_parsed;
     protected $lora_activation;
 
     /**
@@ -100,9 +100,10 @@ class Thing extends Eloquent
         try {
             if (!$this->core_thing) {
                 $coreService = resolve('App\Repository\Services\CoreService');
-                $this->core_thing = $coreService->getThing($this);
+                $this->last_parsed = $coreService->getThingLastParsed($this);
             }
-            return $this->core_thing->lastParsedAt ? $this->core_thing->lastParsedAt : 0;
+            return $this->last_parsed ?
+                $this->last_parsed : 0;
         } catch (\Exception $e) {
             Log::error("Core Get Thing\t" . $this['dev_eui']);
             return "";
