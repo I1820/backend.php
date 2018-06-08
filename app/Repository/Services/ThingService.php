@@ -24,6 +24,7 @@ class ThingService
     protected $loraService;
     protected $coreService;
     protected $projectService;
+    protected $lanService;
 
     public function __construct(
         LoraService $loraService,

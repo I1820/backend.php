@@ -80,9 +80,14 @@ class Thing extends Eloquent
 
     public function getLastSeenAtAttribute($value)
     {
-        if (!$this->lora_thing) {
-            $loraService = resolve('App\Repository\Services\LoraService');
-            $this->lora_thing = $loraService->getDevice($this->dev_eui);
+        try {
+            if (!$this->lora_thing) {
+                $loraService = resolve('App\Repository\Services\LoraService');
+                $this->lora_thing = $loraService->getDevice($this->dev_eui);
+            }
+        } catch (\Exception $e) {
+            Log::error("Lora Get Thing\t" . $this['dev_eui']);
+            return "";
         }
         $time = $this->lora_thing->lastSeenAt;
         $status = 'green';

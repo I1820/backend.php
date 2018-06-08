@@ -54,21 +54,29 @@ class CodecController extends Controller
      */
     public function send(Thing $thing, Request $request)
     {
-        $codec = $request->get('codec');
+        $codec = null;
+        if ($request->get('codec_id')) {
+            $codec = Codec::where('global', true)->where('_id', $request->get('codec_id'))->first();
+            $thing->codec = $request->get('codec_id');
+            if ($codec)
+                $codec = $codec['code'];
+        }
+        if (!$codec) {
+            $codec = $request->get('codec');
+            $thing->codec = $codec;
+        }
         $project = $thing->project()->first();
         $this->coreService->sendCodec($project, $thing, $codec);
-        $thing->codec = $codec;
         $thing->save();
         return Response::body(['success' => 'true']);
     }
 
     /**
-     * @param Project $project
      * @param Thing $thing
      * @param Request $request
      * @return array
      */
-    public function getThing(Project $project, Thing $thing, Request $request)
+    public function getThing(Thing $thing, Request $request)
     {
         $codec = $thing->codec;
         return Response::body(compact('codec'));
@@ -82,7 +90,8 @@ class CodecController extends Controller
     public function list(Project $project)
     {
         $codecs = $project->codecs()->get();
-        return Response::body(compact('codecs'));
+        $globals = Codec::where('global', true)->select('name', '_id')->get();
+        return Response::body(['codecs' => $codecs, 'globals' => $globals]);
     }
 
     /**
