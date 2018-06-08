@@ -72,7 +72,6 @@ class CoreService
     }
 
 
-
     /**
      * @param $project_id
      * @return array
