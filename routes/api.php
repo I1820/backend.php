@@ -15,13 +15,15 @@ use Illuminate\Http\Request;
 
 Route::get('/delete-all-things', 'TestController@delete')->middleware('auth.jwt');
 Route::post('/itest', 'TestController@index');
-Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) {
+Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
 
     Route::post('/register', 'AuthController@register');
     Route::post('/login', 'AuthController@login');
     Route::post('/logout', 'AuthController@logout');
     Route::put('/refresh', 'AuthController@refresh');
     Route::get('/verify/{user}/{token}', 'AuthController@verifyEmail')->name('verify-email');
+
+    Route::post('/password/email', 'PasswordController@sendLink')->name('send-password-email');
 
 
     Route::post('/decrypt-phy-payload', 'OtherController@decryptPhyPayload');
@@ -147,7 +149,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () use ($router) 
 });
 
 
-Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () use ($router) {
+Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
 
 
     Route::group(['prefix' => 'users', 'middleware' => ['auth.jwt', 'admin']], function () {
