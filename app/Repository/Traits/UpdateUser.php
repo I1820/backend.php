@@ -74,6 +74,7 @@ trait UpdateUser
 
     private function validateUpdateLegal(Request $request)
     {
+        $data = collect(json_decode($request->get('legal_info'), true));
         $messages = [
             'org_interface_name.filled' => 'لطفا نام رابط سازمان را وارد کنید',
             'org_interface_last_name.filled' => 'لطفا نام خانوادگی رابط سازمان را وارد کنید',
@@ -85,7 +86,7 @@ trait UpdateUser
             'ec_code.filled' => 'لطفا کد اقتصادی را وارد کنید',
         ];
 
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($data->all(), [
             'org_interface_name' => 'filled',
             'org_interface_last_name' => 'filled',
             'org_interface_phone' => 'filled',
@@ -122,11 +123,10 @@ trait UpdateUser
             $other_info[$key] = $value;
         }
         $user->other_info = $other_info;
-        if(!$request->get('legal')){
+        if (!$request->get('legal')) {
             unset($user['legal_info']);
             $user['legal'] = false;
-        }
-        else
+        } else
             $user['legal'] = true;
 
 
@@ -138,8 +138,9 @@ trait UpdateUser
     private function updateLegalUser(Request $request)
     {
         $user = Auth::user();
+        $data = collect(json_decode($request->get('legal_info'), true));
 
-        $updated_legal_info = $request->only([
+        $updated_legal_info = $data->only([
             'org_interface_name',
             'org_interface_last_name',
             'org_interface_phone',
