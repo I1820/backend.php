@@ -289,7 +289,7 @@ class ThingController extends Controller
         if ($thing['type'] == 'OTAA')
             $keys = $this->thingService->OTAAKeys($data, $thing);
         else
-            $keys = $this->thingService->ABPKey($data, $thing);
+            $keys = $this->thingService->ABPKeys($data, $thing);
         $thing['keys'] = $keys;
         $thing->save();
         return $keys;
