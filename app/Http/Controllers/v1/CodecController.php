@@ -77,6 +77,23 @@ class CodecController extends Controller
      * @param Thing $thing
      * @param Request $request
      * @return array
+     * @throws GeneralException
+     */
+    public function test(Thing $thing, Request $request)
+    {
+        $project = $thing->project()->first();
+        $decode = $request->get('decode') ? true : false;
+        if ($decode)
+            $response = $this->coreService->decode($project, $thing, $request->get('data'));
+        else
+            $response = $this->coreService->encode($project, $thing, $request->get('data'));
+        return Response::body($response);
+    }
+
+    /**
+     * @param Thing $thing
+     * @param Request $request
+     * @return array
      */
     public function getThing(Thing $thing, Request $request)
     {

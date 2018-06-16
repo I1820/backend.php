@@ -100,6 +100,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
 
         Route::post('/{thing}/codec', 'CodecController@send');
         Route::get('/{thing}/codec', 'CodecController@getThing');
+        Route::post('/{thing}/test', 'CodecController@test');
     });
 
     Route::group(['prefix' => 'thing-profile', 'middleware' => ['auth.jwt']], function () {
