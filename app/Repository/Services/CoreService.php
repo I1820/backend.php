@@ -215,7 +215,7 @@ class CoreService
      * @return array
      * @throws GeneralException
      */
-    public function thingData(Thing $thing, $since, $until, $limit)
+    public function thingData(Thing $thing, $since, $until, $limit = 0)
     {
         Log::debug("Core Thing Data");
         $url = '/api/things/' . $thing['interface']['devEUI'];
@@ -264,11 +264,10 @@ class CoreService
         Log::debug("Core Things Data");
         $url = '/api/things';
         $data = ['since' => (int)$since, 'thing_ids' => $ids];
-        if ($limit){
+        if ($limit) {
             $data['limit'] = (int)$limit;
             $data['offset'] = (int)$offset;
-        }
-        else
+        } else
             $data['until'] = (int)$until;
         $response = $this->_send($url, $data, 'post', $this->dmPort);
         return $response;
