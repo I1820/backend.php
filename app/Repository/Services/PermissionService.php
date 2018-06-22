@@ -8,6 +8,8 @@
 
 namespace App\Repository\Services;
 
+use App\Permission;
+use App\User;
 use Illuminate\Support\Facades\DB;
 
 class PermissionService
@@ -26,14 +28,27 @@ class PermissionService
         return DB::collection('permissions')->get()->map(function ($item, $key) {
             $item['_id'] = (string)($item['_id']);
             return $item;
-        });;
+        });
     }
 
     public function rolesList()
     {
         return DB::collection('roles')->get()->map(function ($item, $key) {
             $item['_id'] = (string)($item['_id']);
+            $item['permissions'] = DB::collection('permissions')->whereIn('_id', $item['permissions'])->get()->map(function ($item, $key) {
+                $item['_id'] = (string)($item['_id']);
+                return $item;
+            });
             return $item;
         });;
+    }
+
+    public function loadById($id)
+    {
+        $permission = DB::collection('permissions')->where('_id', $id)->first();
+        if (!$permission)
+            return [];
+        $permission['_id'] = (string)($permission['_id']);
+        return $permission;
     }
 }

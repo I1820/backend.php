@@ -4,7 +4,6 @@ namespace App\Http\Controllers\v1;
 
 use App\Exceptions\GeneralException;
 use App\Exceptions\LoraException;
-use App\Permission;
 use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
@@ -30,17 +29,14 @@ class ThingController extends Controller
     /**
      * ProjectController constructor.
      * @param ThingService $thingService
-     * @param PermissionService $permissionService
      * @param CoreService $coreService
      * @param LoraService $loraService
      */
     public function __construct(ThingService $thingService,
-                                PermissionService $permissionService,
                                 CoreService $coreService,
                                 LoraService $loraService)
     {
         $this->thingService = $thingService;
-        $this->permissionService = $permissionService;
         $this->coreService = $coreService;
         $this->loraService = $loraService;
 
@@ -69,9 +65,6 @@ class ThingController extends Controller
     public function all()
     {
         $things = Auth::user()->things()->get();
-        $things = $things->map(function ($item) {
-            return $item['thing'];
-        });
         return Response::body(compact('things'));
     }
 
@@ -178,7 +171,6 @@ class ThingController extends Controller
     {
         $this->loraService->deleteDevice($thing['interface']['devEUI']);
         $this->coreService->deleteThing($thing['dev_eui']);
-        $thing->permissions()->delete();
         $thing->delete();
         return Response::body(['success' => 'true']);
     }
@@ -272,14 +264,6 @@ class ThingController extends Controller
         $thing_profile = ThingProfile::where('thing_profile_slug', (int)$data->get('thing_profile_slug'))->first();
         $thing = $this->thingService->insertThing($data, $project, $thing_profile);
         $user->things()->save($thing);
-        $owner_permission = $this->permissionService->get('THING-OWNER');
-        $permission = Permission::create([
-            'name' => $owner_permission['name'],
-            'permission_id' => (string)$owner_permission['_id'],
-            'item_type' => 'thing'
-        ]);
-        $thing->permissions()->save($permission);
-        $user->permissions()->save($permission);
         $this->thingService->addToProject($project, $thing);
         return $thing;
     }

@@ -43,7 +43,7 @@ class Thing extends Eloquent
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'user_id');
     }
 
     public function project()
@@ -51,12 +51,6 @@ class Thing extends Eloquent
         return $this->belongsTo(Project::class);
     }
 
-    public function permissions()
-    {
-        return $this->hasMany(Permission::class, 'item_id')
-            ->where('item_type', 'thing')
-            ->with('user');
-    }
 
     public function profile()
     {
@@ -72,9 +66,9 @@ class Thing extends Eloquent
 
     public function getOwnerAttribute($value)
     {
-        foreach ($this->permissions as $permissions)
-            if ($permissions['name'] == 'THING-OWNER')
-                return $permissions['user'];
+        $user = $this->user()->first();
+        if ($user)
+            return $user;
         return null;
     }
 

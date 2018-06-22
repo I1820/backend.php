@@ -7,9 +7,7 @@ use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
 use App\Repository\Services\LoraService;
-use App\Repository\Services\PermissionService;
 use App\Repository\Services\ProjectService;
-use App\Permission;
 use App\Repository\Services\ThingService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -19,7 +17,6 @@ use Maatwebsite\Excel\Excel;
 class ProjectController extends Controller
 {
     protected $projectService;
-    protected $permissionService;
     protected $coreService;
     protected $loraService;
     protected $thingService;
@@ -27,19 +24,16 @@ class ProjectController extends Controller
     /**
      * ProjectController constructor.
      * @param ProjectService $projectService
-     * @param PermissionService $permissionService
      * @param CoreService $coreService
      * @param LoraService $loraService
      * @param ThingService $thingService
      */
     public function __construct(ProjectService $projectService,
-                                PermissionService $permissionService,
                                 CoreService $coreService,
                                 LoraService $loraService,
                                 ThingService $thingService)
     {
         $this->projectService = $projectService;
-        $this->permissionService = $permissionService;
         $this->coreService = $coreService;
         $this->thingService = $thingService;
         $this->loraService = $loraService;
@@ -61,17 +55,8 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
         $this->projectService->validateCreateProject($request);
-
         $project = $this->projectService->insertProject($request);
-        $owner_permission = $this->permissionService->get('PROJECT-OWNER');
-        $permission = Permission::create([
-            'name' => $owner_permission['name'],
-            'permission_id' => (string)$owner_permission['_id'],
-            'item_type' => 'project',
-        ]);
-        $project->permissions()->save($permission);
-        $user->permissions()->save($permission);
-
+        $user->projects()->save($project);
         return Response::body(compact('project'));
     }
 
@@ -89,7 +74,6 @@ class ProjectController extends Controller
             throw new GeneralException('ابتدا اشیا این پروژه رو پاک کنید', 700);
         $response = $this->coreService->deleteProject($project->container['name']);
         $this->loraService->deleteApp($project['application_id']);
-        $project->permissions()->delete();
         $project->delete();
         return Response::body($response);
     }
@@ -100,9 +84,6 @@ class ProjectController extends Controller
     public function all()
     {
         $projects = collect(Auth::user()->projects()->get());
-        $projects = $projects->map(function ($item) {
-            return $item['project'];
-        });
         return Response::body(compact('projects'));
     }
 

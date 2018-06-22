@@ -15,7 +15,7 @@ class Permission extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'item_type', 'permission_id'
+        'permission','user_id'
     ];
 
     /**

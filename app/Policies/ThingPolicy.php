@@ -38,8 +38,9 @@ class ThingPolicy
      */
     public function create(User $user)
     {
+        $permission = $user->permissions()->where('permission.slug', 'CREATE-THING')->first();
         $project = Project::where('_id', $this->request->get('project_id'))->first();
-        return $project && $project['owner']['_id'] == $user['_id'];
+        return $project && $project['owner']['_id'] == $user['_id'] && $permission;
     }
 
     /**
@@ -51,7 +52,8 @@ class ThingPolicy
      */
     public function update(User $user, Thing $thing)
     {
-        return $this->isOwner($user, $thing);
+        $permission = $user->permissions()->where('permission.slug', 'EDIT-THING')->first();
+        return $this->isOwner($user, $thing) && $permission;
     }
 
     /**
@@ -63,7 +65,8 @@ class ThingPolicy
      */
     public function delete(User $user, Thing $thing)
     {
-        return $this->isOwner($user, $thing);
+        $permission = $user->permissions()->where('permission.slug', 'DELETE-THING')->first();
+        return $this->isOwner($user, $thing) && $permission;
     }
 
 

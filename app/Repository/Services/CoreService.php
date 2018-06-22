@@ -464,7 +464,10 @@ class CoreService
             'status' => 200,
             'content' => [
                 'key' => 'value'
-            ]
+            ],
+            'name' => 'project',
+            'port' => 1212,
+            'lastSeenAt' => ''
         ];
     }
 }

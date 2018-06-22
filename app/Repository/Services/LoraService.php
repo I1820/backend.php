@@ -263,7 +263,9 @@ class LoraService
                 'status' => 200,
                 'content' => [
                     'key' => 'value'
-                ]
+                ],
+                'id' => 'SajjadRahnamaId',
+                'lastSeenAt' => ''
             ];
 
         $response = $this->curlService->to($url)

@@ -172,6 +172,13 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
     Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt', 'admin']], function () {
         Route::get('/', 'PaymentController@list');
     });
+
+    Route::group(['prefix' => 'permission', 'middleware' => ['auth.jwt', 'admin']], function () {
+        Route::get('/', 'PermissionController@permissionsList');
+        Route::get('/roles', 'PermissionController@rolesList');
+        Route::get('/admin/{user}', 'PermissionController@admin');
+        Route::post('/{user}/{id}', 'PermissionController@setPermission');
+    });
 });
 
 

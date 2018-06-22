@@ -28,15 +28,8 @@ class Project extends Eloquent
      * @var array
      */
     protected $hidden = [
-        'updated_at', 'created_at', 'user_id', 'permissions','aliases'
+        'updated_at', 'created_at', 'user_id', 'aliases'
     ];
-
-    public function permissions()
-    {
-        return $this->hasMany(Permission::class, 'item_id')
-            ->where('item_type', 'project')
-            ->with('user');
-    }
 
 
     public function things()
@@ -61,11 +54,11 @@ class Project extends Eloquent
     }
 
 
-    public function getOwnerAttribute($value)
+    public function getOwnerAttribute()
     {
-        foreach ($this->permissions as $permissions)
-            if ($permissions['name'] == 'PROJECT-OWNER')
-                return $permissions['user'];
+        $user = $this->user()->first();
+        if ($user)
+            return $user;
         return null;
     }
 
