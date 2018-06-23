@@ -140,7 +140,7 @@ class ThingService
             'dev_eui' => $request->get('devEUI'),
             'active' => true,
             'interface' => $device->toArray(),
-            'type' => $lora ? 'LoRa' : 'LAN',
+            'type' => $lora ? 'lora' : 'lan',
             'activation' => $lora ? ($thingProfile['data']['deviceProfile']['supportsJoin'] ? 'OTAA' : 'ABP') : 'JWT',
             'keys' => $lora ? [] : ['JWT' => $device['token']],
             'loc' => [
@@ -225,7 +225,7 @@ class ThingService
             if ($profile && Auth::user()->can('view', $profile)) {
                 $lora_data['deviceProfileID'] = (string)$profile['device_profile_id'];
                 $thing['profile_id'] = $profile['_id'];
-                $thing['type'] = $profile['data']['deviceProfile']['supportsJoin'] ? 'OTAA' : 'ABP';
+                $thing['activation'] = $profile['data']['deviceProfile']['supportsJoin'] ? 'OTAA' : 'ABP';
             } else
                 $lora_data['deviceProfileID'] = (string)$thing['profile']['device_profile_id'];
         }
