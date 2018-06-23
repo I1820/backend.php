@@ -10,10 +10,12 @@ namespace App\Repository\Traits;
 
 use App\Exceptions\GeneralException;
 use App\Package;
+use App\Permission;
 use App\Repository\Helper\MobileFactory;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use MongoDB\BSON\UTCDateTime;
 
@@ -28,7 +30,7 @@ trait RegisterUser
     {
         $package = Package::where('default', true)->first()->toArray();
         $package['start_date'] = new UTCDateTime(Carbon::now());
-        return User::create([
+        $user = User::create([
             'legal' => $request->get('legal') ? true : false,
             'active' => false,
             'name' => $request->get('name'),
@@ -37,11 +39,8 @@ trait RegisterUser
             'package' => $package
         ]);
 
-        if ($request->has('legal') && $request->get('legal') == 1) {
-            return $this->insertLegalUser($request);
-        } else {
-            return $this->insertRealUser($request);
-        }
+        $this->defaultPermissions($user);
+        return $user;
     }
 
     /**
@@ -77,102 +76,16 @@ trait RegisterUser
 
     }
 
-    // Todo delete
-    private function validateRegisterReal(Request $request)
+    private function defaultPermissions(User $user)
     {
-        $messages = [
-            'email.required' => 'لطفا ایمیل را وارد کنید',
-            'email.email' => 'لطفا ایمیل را درست وارد کنید',
-            'email.unique' => 'این ایمیل قبلا ثبت شده است',
-            'password.required' => 'لطفا رمزعبور را وارد کنید',
-            'password.min' => 'رمز عبور حداقل باید ۶ کارکتر باشد',
-            'other_info.json' => 'لطفا سایر اطلاعات را درست وارد کنید',
-        ];
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
-            'other_info' => 'json',
-        ], $messages);
-
-        if ($validator->fails())
-            throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
-    }
-
-    // Todo delete
-    private function validateRegisterLegal(Request $request)
-    {
-        $messages = [
-            'org_interface_name.required' => 'لطفا نام رابط سازمان را وارد کنید',
-            'org_interface_last_name.required' => 'لطفا نام خانوادگی رابط سازمان را وارد کنید',
-            'org_interface_phone.required' => 'لطفا شماره تلفن ثابت رابط سازمان را وارد کنید',
-            'org_interface_mobile.required' => 'لطفا شماره موبایل شخصی را وارد کنید',
-            'type.required' => 'لطفا نوع حقوقی را وارد کنید',
-            'org_name.required' => 'لطفا نام سازمان را وارد کنید',
-            'reg_number.required' => 'لطفا شماره ثبت را وارد کنید',
-            'ec_code.required' => 'لطفا کد اقتصادی را وارد کنید',
-
-            'mobile.required' => 'لطفا شماره موبایل را وارد کنید',
-            'mobile.regex' => 'لطفا شماره موبایل را درست وارد کنید',
-            'mobile.unique' => ' شماره موبایل قبلا وجود دارد',
-            'email.email' => 'لطفا ایمیل را درست وارد کنید',
-            'email.unique' => 'این ایمیل قبلا ثبت شده است',
-            'password.required' => 'لطفا رمزعبور را وارد کنید',
-            'password.min' => 'رمز عبور حداقل باید ۶ کارکتر باشد',
-        ];
-
-        $validator = Validator::make($request->all(), [
-            'org_interface_name' => 'required',
-            'org_interface_last_name' => 'required',
-            'org_interface_phone' => 'required',
-            'org_interface_mobile' => 'required',
-            'type' => 'required',
-            'org_name' => 'required',
-            'reg_number' => 'required',
-            'ec_code' => 'required',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
-            'mobile' => 'regex:/^\d{11}$/|unique:users|required',
-        ], $messages);
-
-        if ($validator->fails())
-            throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
-    }
-
-    // Todo delete
-    private function insertRealUser(Request $request)
-    {
-        MobileFactory::sendWelcome($request->get('mobile'));
-        return User::create([
-            'legal' => false,
-            'active' => false,
-            'mobile' => $request->get('mobile'),
-            'name' => $request->get('name'),
-            'email' => $request->get('email'),
-            'password' => bcrypt($request->get('password')),
-            'other_info' => json_decode($request->get('other_info'), true)
-        ]);
-    }
-
-    // Todo delete
-    private function insertLegalUser(Request $request)
-    {
-        return User::create([
-            'legal' => true,
-            'active' => false,
-            'email' => $request->get('email'),
-            'password' => bcrypt($request->get('password')),
-            'other_info' => $request->only([
-                'org_interface_name',
-                'org_interface_last_name',
-                'org_interface_phone',
-                'org_interface_mobile',
-                'type',
-                'org_name',
-                'reg_number',
-                'ec_code'
-            ])
-        ]);
+        $permissions = DB::collection('permissions')->get()->map(function ($item, $key) {
+            $item['_id'] = (string)($item['_id']);
+            return $item;
+        });
+        foreach ($permissions as $permission)
+            Permission::create([
+                'user_id' => $user['_id'],
+                'permission' => $permission
+            ]);
     }
 }

@@ -110,7 +110,7 @@ class CoreService
         Log::debug("Core Send Thing\t" . $project['_id']);
         $url = '/api/project/' . $project['container']['name'] . '/things';
         $data = [
-            'name' => $thing['interface']['devEUI'],
+            'name' => (string)$thing['interface']['devEUI'],
         ];
         $response = $this->_send($url, $data, 'post', $this->pmPort);
         return $response;

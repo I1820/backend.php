@@ -28,7 +28,7 @@ class Thing extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'loc', 'description', 'period', 'interface', 'type', 'dev_eui', 'active'
+        'name', 'loc', 'description', 'period', 'interface', 'type', 'dev_eui', 'active', 'activation','keys'
     ];
 
     /**
@@ -43,7 +43,7 @@ class Thing extends Eloquent
 
     public function user()
     {
-        return $this->belongsTo(User::class,'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function project()
@@ -111,7 +111,7 @@ class Thing extends Eloquent
 
     public function getKeysAttribute()
     {
-        if ($this->type == 'ABP')
+        if ($this->activation == 'ABP' || $this->activation == 'JWT')
             return isset($this->attributes['keys']) ? $this->attributes['keys'] : [];
         try {
             if (!$this->lora_activation) {

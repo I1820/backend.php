@@ -60,19 +60,28 @@ class ThingService
             'devEUI.required' => 'لطفا devEUI سنسور را وارد کنید',
             'thing_profile_slug.required' => 'لطفا شناسه پروفایل شی را وارد کنید',
         ];
-
-        $validator = Validator::make($request->all(), [
+        $rules = [
             'name' => 'required|string|max:255',
             'devEUI' => 'required|min:16|max:16',
             'type' => 'required|',
             'lat' => 'required|numeric',
             'long' => 'required|numeric',
             'period' => 'required|numeric',
-            'thing_profile_slug' => 'required',
-        ], $messages);
+        ];
+        if ($request->get('type') == 'lora') {
+            $rules['thing_profile_slug'] = 'required';
+            $messages['thing_profile_slug.required'] = 'لطفا شناسه پروفایل شی را وارد کنید';
+        } else {
+            $rules['ip'] = 'required|ip';
+            $messages['ip.required'] = 'لطفا شناسه IP شی را وارد کنید';
+            $messages['ip.ip'] = 'لطفا شناسه IP شی را درست وارد کنید';
+        }
 
+        $validator = Validator::make($request->all(), $rules, $messages);
         if ($validator->fails())
             throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
+        if (Thing::where('dev_eui', $request->get('devEUI'))->first())
+            throw new  GeneralException('این DEV EUI قبلا ثبت شده است.', GeneralException::VALIDATION_ERROR);
     }
 
 
@@ -109,37 +118,38 @@ class ThingService
      */
     public function insertThing($request, Project $project = null, ThingProfile $thingProfile = null)
     {
-        if (!$thingProfile)
+        $lora = $request->get('type') == 'lora';
+        if (!$thingProfile && $lora)
             throw new GeneralException('پروفایل شی یافت نشد', 700);
         if (!$project)
             throw new GeneralException('پروژه یافت نشد', 700);
 
-        $device = $this->loraService->postDevice(
-            $request,
-            $project['application_id'],
-            $thingProfile['device_profile_id']
-        );
-        $this->lanService->postDevice(
-            $request,
-            $project['application_id'],
-            $thingProfile['device_profile_id']
-        );
+        if ($lora)
+            $device = $this->loraService->postDevice(
+                $request,
+                $project['application_id'],
+                $thingProfile['device_profile_id']
+            );
+        else
+            $device = $this->lanService->postDevice($request);
 
-        $this->validateInsert($request);
         $thing = Thing::create([
             'name' => $request->get('name'),
             'description' => $request->get('description') ?: '',
-            'interface' => $device->toArray(),
             'period' => $request->get('period'),
             'dev_eui' => $request->get('devEUI'),
             'active' => true,
-            'type' => $thingProfile['data']['deviceProfile']['supportsJoin'] ? 'OTAA' : 'ABP',
+            'interface' => $device->toArray(),
+            'type' => $lora ? 'LoRa' : 'LAN',
+            'activation' => $lora ? ($thingProfile['data']['deviceProfile']['supportsJoin'] ? 'OTAA' : 'ABP') : 'JWT',
+            'keys' => $lora ? [] : ['JWT' => $device['token']],
             'loc' => [
                 'type' => 'Point',
                 'coordinates' => [$request->get('lat'), $request->get('long')]
             ],
         ]);
-        $thing->profile()->associate($thingProfile);
+        if ($lora)
+            $thing->profile()->associate($thingProfile);
         return $thing;
     }
 
@@ -173,6 +183,12 @@ class ThingService
         return $data['deviceKeys'];
     }
 
+    public function JWTKey(Thing $thing)
+    {
+        $result = $this->lanService->getKey($thing);
+        return ['JWT' => $result['token']];
+    }
+
     public function activate(Thing $thing, $active)
     {
         $this->coreService->activateThing($thing, $active);
@@ -180,33 +196,6 @@ class ThingService
         $thing->save();
     }
 
-    /**
-     * @param $data
-     * @return void
-     * @throws GeneralException
-     */
-    public function validateInsert(Collection $data)
-    {
-        $messages = [
-            'name.required' => 'لطفا نام شی را وارد کنید',
-            'description.filled' => 'لطفا توضیحات را درست وارد کنید',
-            'period.*' => 'لطفا بازه ارسال را درست وارد کنید',
-            'lat.*' => 'لطفا محل سنسور را درست وارد کنید',
-            'long.*' => 'لطفا محل سنسور را درست وارد کنید',
-        ];
-
-        $validator = Validator::make($data->all(), [
-            'name' => 'required|string|max:255',
-            'description' => 'max:255',
-            'period' => 'numeric',
-            'lat' => 'required|numeric',
-            'long' => 'required|numeric',
-            'devEUI' => 'required|size:16',
-        ], $messages);
-
-        if ($validator->fails())
-            throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
-    }
 
     /**
      * @param Collection $request

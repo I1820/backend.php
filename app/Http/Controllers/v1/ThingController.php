@@ -225,7 +225,7 @@ class ThingController extends Controller
         } else {
             $limit = (int)($request->get('limit')) ?: 0;
             $offset = (int)($request->get('offset')) ?: 0;
-            $data = $this->coreService->thingsMainData($thing_ids, $since, $until, $limit,$offset);
+            $data = $this->coreService->thingsMainData($thing_ids, $since, $until, $limit, $offset);
         }
         $data = $this->alias($data, $aliases);
 
@@ -261,19 +261,26 @@ class ThingController extends Controller
     {
         $user = Auth::user();
         $this->thingService->validateCreateThing($data);
-        $thing_profile = ThingProfile::where('thing_profile_slug', (int)$data->get('thing_profile_slug'))->first();
+        if ($data->get('type') == 'lora')
+            $thing_profile = ThingProfile::where('thing_profile_slug', (int)$data->get('thing_profile_slug'))->first();
+        else
+            $thing_profile = null;
         $thing = $this->thingService->insertThing($data, $project, $thing_profile);
+
         $user->things()->save($thing);
         $this->thingService->addToProject($project, $thing);
         return $thing;
     }
 
+
     private function sendKeys(Thing $thing, Collection $data)
     {
-        if ($thing['type'] == 'OTAA')
+        if ($thing['activation'] == 'OTAA')
             $keys = $this->thingService->OTAAKeys($data, $thing);
-        else
+        elseif($thing['activation'] == 'ABP')
             $keys = $this->thingService->ABPKeys($data, $thing);
+        else
+            $keys = $this->thingService->JWTKey($thing);
         $thing['keys'] = $keys;
         $thing->save();
         return $keys;

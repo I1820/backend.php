@@ -29,87 +29,36 @@ class LanService
 
     /**
      * @param Collection $data
-     * @param $application_id
-     * @param $deviceProfileID
      * @return string
      * @throws GeneralException
      */
-    public function postDevice(Collection $data, $application_id, $deviceProfileID)
+    public function postDevice(Collection $data)
     {
         Log::debug("LAN Send Device:\t" . $data['devEUI']);
-        $url = $this->base_url . '/application/' . $application_id . '/device';
+        $url = $this->base_url . '/device';
         $data = $data->only([
             'name',
             'devEUI',
-        ])->merge([
-            'applicationID' => $application_id,
-            'deviceProfileID' => $deviceProfileID
+            'ip'
         ]);
-        try {
-            $data['devEUI'] = (int)$data['devEUI'];
-        } catch (\Exception $e) {
-            throw new GeneralException('خطا در پارامترها', GeneralException::VALIDATION_ERROR);
-        }
         $response = $this->send($url, $data, 'post');
-        return json_encode($response);
+        return collect(json_decode(json_encode($response), true));
     }
 
-    /**
-     * @param $name
-     * @return array|object
-     * @throws GeneralException
-     */
-    public function postDeviceProfile($name)
+    public function getKey(Thing $thing)
     {
-        Log::debug("Lan Send Device Profile");
-        $url = $this->base_url . '/device-profile';
-        return $this->send($url, ['name' => $name], 'post');
+        Log::debug("LAN Get Key:\t" . $thing['dev_eui']);
+        $url = $this->base_url . '/device/' . $thing['dev_eui'] . '/refresh';
+
+        $response = $this->send($url, [], 'post');
+        return collect(json_decode(json_encode($response), true));
     }
 
-    /**
-     * @param $data
-     * @return string
-     * @throws GeneralException
-     */
-    public function activateDevice($data)
-    {
-        Log::debug("Lan Active Device ABP\t" . $data['devEUI']);
-        $url = $this->base_url . '/api/device/' . $data['devEUI'] . '/activate';
-        return $this->send($url, $data, 'post');
-    }
-
-    /**
-     * @param $description
-     * @param $id
-     * @return string
-     * @throws GeneralException
-     */
-    public function postApp($description, $id)
-    {
-        Log::debug("LAN Create Project\t" . $id);
-        $url = $this->base_url . '/application';
-        $data = [
-            'name' => (string)$id,
-            'description' => $description
-        ];
-        $response = $this->send($url, $data, 'post');
-        return $response->ID;
-    }
-
-
-    public function getDevices($application_id)
-    {
-        Log::debug("LAN Get Device\t" . $application_id);
-        $url = $this->base_url . '/application/' . $application_id . '/device';
-        return $this->send($url, [], 'get');
-
-    }
 
     /**
      * @param $url
      * @param $data
      * @param string $method
-
      * @return array|object
      * @throws GeneralException
      */
