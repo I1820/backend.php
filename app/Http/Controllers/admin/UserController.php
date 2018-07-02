@@ -28,6 +28,7 @@ class UserController extends Controller
     {
         $users = User::skip(intval($request->get('offset')))
             ->take(intval($request->get('limit')) ?: 10)
+            ->with('role')
             ->get()->makeVisible(['_id', 'active']);
         return Response::body(compact('users'));
     }

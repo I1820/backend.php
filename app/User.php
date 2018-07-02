@@ -47,9 +47,9 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
     }
 
 
-    public function permissions()
+    public function role()
     {
-        return $this->hasMany(Permission::class, 'user_id');
+        return $this->belongsTo(Role::class);
     }
 
     public function gateways()

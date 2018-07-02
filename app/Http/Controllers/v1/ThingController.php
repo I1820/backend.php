@@ -220,7 +220,7 @@ class ThingController extends Controller
         $thing_ids = json_decode($request->get('thing_ids'), true)['ids'] ?: [];
         $thing_ids = $project->things()->whereIn('_id', $thing_ids)->get()->pluck('dev_eui');
         if ($sample) {
-            $cluster_number = (int)($request->get('cn')) ?: 200;
+            $cluster_number = (int)($request->get('cn')) ?: 50;
             $data = $this->coreService->thingsSampleData($thing_ids, $since, $until, $cluster_number);
         } else {
             $limit = (int)($request->get('limit')) ?: 0;
@@ -277,7 +277,7 @@ class ThingController extends Controller
     {
         if ($thing['activation'] == 'OTAA')
             $keys = $this->thingService->OTAAKeys($data, $thing);
-        elseif($thing['activation'] == 'ABP')
+        elseif ($thing['activation'] == 'ABP')
             $keys = $this->thingService->ABPKeys($data, $thing);
         else
             $keys = $this->thingService->JWTKey($thing);

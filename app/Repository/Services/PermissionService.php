@@ -9,6 +9,7 @@
 namespace App\Repository\Services;
 
 use App\Permission;
+use App\Role;
 use App\User;
 use Illuminate\Support\Facades\DB;
 
@@ -33,22 +34,35 @@ class PermissionService
 
     public function rolesList()
     {
-        return DB::collection('roles')->get()->map(function ($item, $key) {
-            $item['_id'] = (string)($item['_id']);
-            $item['permissions'] = DB::collection('permissions')->whereIn('_id', $item['permissions'])->get()->map(function ($item, $key) {
-                $item['_id'] = (string)($item['_id']);
-                return $item;
-            });
-            return $item;
-        });;
+        $roles = Role::all();
+        foreach ($roles as $role) {
+            $role['permissions'] = Permission::whereIn('_id', $role['permissions'])->get();
+        }
+        return $roles;
+    }
+
+    public function getRole($id)
+    {
+        $role = Role::wehre('_id', $id)->first();
+        if($role)
+            $role['permissions'] = Permission::whereIn('_id', $role['permissions'])->get();
+        else return false;
+        return $role;
+
     }
 
     public function loadById($id)
     {
-        $permission = DB::collection('permissions')->where('_id', $id)->first();
+        if (is_array($id))
+            $permission = DB::collection('permissions')->whereIn('_id', $id)->get();
+        else
+            $permission = DB::collection('permissions')->where('_id', $id)->get();
         if (!$permission)
-            return [];
-        $permission['_id'] = (string)($permission['_id']);
+            return collect([]);
+        $permission = $permission->map(function ($item) {
+            $item['_id'] = (string)($item['_id']);
+            return $item;
+        });
         return $permission;
     }
 }

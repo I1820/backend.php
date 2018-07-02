@@ -175,9 +175,12 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
 
     Route::group(['prefix' => 'permission', 'middleware' => ['auth.jwt', 'admin']], function () {
         Route::get('/', 'PermissionController@permissionsList');
-        Route::get('/roles', 'PermissionController@rolesList');
+        Route::get('/role', 'PermissionController@rolesList');
+        Route::post('/role', 'PermissionController@createRole');
+        Route::post('/{user}/{role}', 'PermissionController@setRole');
+        Route::post('/{user}', 'PermissionController@setRole');
+        Route::patch('/role/{role}', 'PermissionController@updateRole');
         Route::get('/admin/{user}', 'PermissionController@admin');
-        Route::post('/{user}/{id}', 'PermissionController@setPermission');
     });
 });
 

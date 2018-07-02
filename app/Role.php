@@ -5,10 +5,9 @@ namespace App;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Model;
 
-
-class Permission extends Eloquent
+class Role extends Eloquent
 {
-    protected $collection = 'permissions';
+    protected $collection = 'roles';
     /**
      * The attributes that are mass assignable.
      *
@@ -23,6 +22,8 @@ class Permission extends Eloquent
      * @var array
      */
     protected $hidden = [
+        'created_at', 'updated_at'
     ];
+
 
 }

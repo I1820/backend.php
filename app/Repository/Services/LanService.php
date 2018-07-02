@@ -69,6 +69,7 @@ class LanService
         }
 
         $response = $this->curlService->to($url)
+            ->withHeader('Accept: application/json')
             ->withData($data)
             ->withOption('SSL_VERIFYHOST', false)
             ->returnResponseObject()
@@ -96,17 +97,15 @@ class LanService
         Log::debug(print_r($new_response, true));
         Log::debug('-----------------------------------------------------');
         */
-
         if ($new_response->status == 0) {
             throw new GeneralException($new_response->error, 0);
         }
         if ($new_response->status == 200) {
             return $new_response->content ?: [];
         }
-        throw new GeneralException(
-            $new_response->content->error ?: '',
-            $new_response->status
-        );
+        $error = property_exists($new_response->content, 'error') ? $new_response->content->error :
+            (property_exists($new_response->content, 'description') ? $new_response->content->description : 'خطای نامشخص');
+        throw new GeneralException($error, $new_response->status);
 
     }
 
