@@ -29,7 +29,7 @@ class UserController extends Controller
         $users = User::skip(intval($request->get('offset')))
             ->take(intval($request->get('limit')) ?: 10)
             ->with('role')
-            ->get()->makeVisible(['_id', 'active']);
+            ->get()->makeVisible(['_id', 'active','created_at']);
         return Response::body(compact('users'));
     }
 

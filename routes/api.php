@@ -177,6 +177,7 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
         Route::get('/', 'PermissionController@permissionsList');
         Route::get('/role', 'PermissionController@rolesList');
         Route::post('/role', 'PermissionController@createRole');
+        Route::delete('/role/{role}', 'PermissionController@deleteRole');
         Route::post('/{user}/{role}', 'PermissionController@setRole');
         Route::post('/{user}', 'PermissionController@setRole');
         Route::patch('/role/{role}', 'PermissionController@updateRole');

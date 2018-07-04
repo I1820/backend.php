@@ -40,10 +40,11 @@ class ProjectService
     {
         $messages = [
             'name.required' => 'لطفا نام پروژه را وارد کنید',
+            'name.unique' => 'این نام قبلا وجود دارد',
         ];
 
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:projects',
         ], $messages);
 
         if ($validator->fails())

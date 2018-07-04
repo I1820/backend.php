@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\v1;
 
+use App\Exceptions\GeneralException;
 use App\Repository\Helper\Response;
 use App\Repository\Services\ConfigService;
 use App\Repository\Services\CoreService;
@@ -64,6 +65,9 @@ class UserController extends Controller
      */
     public function changePassword(Request $request)
     {
+        $new_password = $request->get('new_password');
+        if (strlen($new_password) < 6)
+            throw new GeneralException('رمز عبور باید حداقل ۶ کاراکتر باشد.', GeneralException::VALIDATION_ERROR);
         $this->userService->changePassword($request);
         return Response::body(['success' => true]);
     }
@@ -75,7 +79,7 @@ class UserController extends Controller
     public function profile()
     {
         $user = Auth::user();
-        return Response::body(['user'=>$user,'token'=>JWTAuth::refresh()]);
+        return Response::body(['user' => $user, 'token' => JWTAuth::refresh()]);
     }
 
     /**

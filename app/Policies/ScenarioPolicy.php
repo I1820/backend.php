@@ -10,6 +10,12 @@ class ScenarioPolicy
 {
     use HandlesAuthorization;
 
+    public function before($user)
+    {
+        if ($user['is_admin']) {
+            return true;
+        }
+    }
     /**
      * Determine whether the user can view the scenario.
      *

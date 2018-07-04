@@ -27,15 +27,6 @@ class PermissionController extends Controller
         return Response::body(compact('roles'));
     }
 
-    public function admin(User $user, Request $request)
-    {
-        if ($user['_id'] == Auth::user()['_id'])
-            throw new GeneralException('انجام عملیات بر روی خود کاربر امکان پذیر نیست.', GeneralException::UNKNOWN_ERROR);
-        $is_admin = $request->get('admin') ? true : false;
-        $user['is_admin'] = $is_admin;
-        $user->save();
-        return Response::body(['success' => true]);
-    }
 
 
     public function createRole(Request $request)
@@ -44,8 +35,8 @@ class PermissionController extends Controller
         $name = $request->get('name');
         if (!$permission_ids)
             throw new GeneralException('پرمیشن‌ها رو وارد کنید', GeneralException::VALIDATION_ERROR);
-        if (!$name)
-            throw new GeneralException('لطفا نام گروه کاربری را وارد کنید.', GeneralException::VALIDATION_ERROR);
+        if (!$name || $name == 'admin')
+            throw new GeneralException('نام گروه کاربری مجاز نمی‌باشد.', GeneralException::VALIDATION_ERROR);
         $permissions = Permission::whereIn('_id', $permission_ids)->get();
         if (!$permissions)
             throw new GeneralException('ایجاد گروه کاربری بدون پرمیشن امکان پذیر نیست.', GeneralException::VALIDATION_ERROR);
@@ -59,6 +50,8 @@ class PermissionController extends Controller
 
     public function setRole(User $user, Role $role = null)
     {
+        if ($user['_id'] == Auth::user()['_id'])
+            throw new GeneralException('انجام عملیات بر روی خود کاربر امکان پذیر نیست.', GeneralException::UNKNOWN_ERROR);
         if (!$role) {
             $user['is_admin'] = true;
             $user['role_id'] = null;
@@ -67,6 +60,15 @@ class PermissionController extends Controller
             $user['role_id'] = $role['_id'];
         }
         $user->save();
+        return Response::body(['success' => true]);
+    }
+
+    public function deleteRole(Role $role)
+    {
+        if ($role['default']) {
+            throw new GeneralException('نقش پیش فرض را نمیتوان حذف کرد', GeneralException::ACCESS_DENIED);
+        }
+        $role->delete();
         return Response::body(['success' => true]);
     }
 

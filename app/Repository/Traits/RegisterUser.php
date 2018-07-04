@@ -12,6 +12,7 @@ use App\Exceptions\GeneralException;
 use App\Package;
 use App\Permission;
 use App\Repository\Helper\MobileFactory;
+use App\Role;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -29,6 +30,7 @@ trait RegisterUser
     public function insertUser(Request $request)
     {
         $package = Package::where('default', true)->first()->toArray();
+        $role = Role::where('default', true)->first()->toArray();
         $package['start_date'] = new UTCDateTime(Carbon::now());
         $user = User::create([
             'legal' => $request->get('legal') ? true : false,
@@ -36,10 +38,10 @@ trait RegisterUser
             'name' => $request->get('name'),
             'email' => $request->get('email'),
             'password' => bcrypt($request->get('password')),
-            'package' => $package
+            'package' => $package,
+            'role_id' => $role['_id']
         ]);
 
-        $this->defaultPermissions($user);
         return $user;
     }
 
@@ -74,18 +76,5 @@ trait RegisterUser
             $this->validateRegisterReal($request);
         }
 
-    }
-
-    private function defaultPermissions(User $user)
-    {
-        $permissions = DB::collection('permissions')->get()->map(function ($item, $key) {
-            $item['_id'] = (string)($item['_id']);
-            return $item;
-        });
-        foreach ($permissions as $permission)
-            Permission::create([
-                'user_id' => $user['_id'],
-                'permission' => $permission
-            ]);
     }
 }

@@ -19,6 +19,13 @@ class ProjectPolicy
         $this->permissionService = $permissionService;
     }
 
+    public function before($user)
+    {
+        if ($user['is_admin']) {
+            return true;
+        }
+    }
+
     /**
      * Determine whether the user can view the project.
      *
@@ -39,7 +46,8 @@ class ProjectPolicy
      */
     public function create(User $user)
     {
-        $permission = $user->permissions()->where('permission.slug', 'CREATE-PROJECT')->first();
+
+        $permission = $user->role()->first()->perms()->where('slug', 'CREATE-PROJECT')->first();
         return $user['active'] && $permission;
     }
 
@@ -52,7 +60,7 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project)
     {
-        $permission = $user->permissions()->where('permission.slug', 'EDIT-PROJECT')->first();
+        $permission = $user->role()->first()->perms()->where('slug', 'EDIT-PROJECT')->first();
         return $this->isOwner($user, $project) && $permission;
     }
 
@@ -65,7 +73,7 @@ class ProjectPolicy
      */
     public function delete(User $user, Project $project)
     {
-        $permission = $user->permissions()->where('permission.slug', 'DELETE-PROJECT')->first();
+        $permission = $user->role()->first()->perms()->where('slug', 'DELETE-PROJECT')->first();
         return $this->isOwner($user, $project) && $permission;
     }
 

@@ -50,19 +50,4 @@ class PermissionService
         return $role;
 
     }
-
-    public function loadById($id)
-    {
-        if (is_array($id))
-            $permission = DB::collection('permissions')->whereIn('_id', $id)->get();
-        else
-            $permission = DB::collection('permissions')->where('_id', $id)->get();
-        if (!$permission)
-            return collect([]);
-        $permission = $permission->map(function ($item) {
-            $item['_id'] = (string)($item['_id']);
-            return $item;
-        });
-        return $permission;
-    }
 }

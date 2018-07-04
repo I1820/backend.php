@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Support\Facades\DB;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,5 +26,16 @@ class Role extends Eloquent
         'created_at', 'updated_at'
     ];
 
+    public function perms()
+    {
+        $permission = DB::collection('permissions')->whereIn('_id', $this['permissions'])->get();
+        if (!$permission)
+            return collect([]);
+        $permission = $permission->map(function ($item) {
+            $item['_id'] = (string)($item['_id']);
+            return $item;
+        });
+        return $permission;
+    }
 
 }
