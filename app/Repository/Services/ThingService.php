@@ -206,9 +206,17 @@ class ThingService
     public function updateThing(Collection $request, Thing $thing)
     {
         $lora_data = [];
+        $lan_data = [];
         if ($request->get('name')) {
             $thing->name = $request->get('name');
             $lora_data['name'] = (string)$request->get('name');
+            $lan_data['name'] = (string)$request->get('name');
+        }
+        if ($request->get('ip')) {
+            $interface = $thing['interface'];
+            $interface['ip'] = $request->get('ip');
+            $thing['interface'] = $interface;
+            $lan_data['ip'] = (string)$request->get('ip');
         }
 
         if ($request->get('description')) {
@@ -221,7 +229,6 @@ class ThingService
 
         if ($request->get('thing_profile_slug')) {
             $profile = ThingProfile::where('thing_profile_slug', (int)$request->get('thing_profile_slug'))->first();
-
             if ($profile && Auth::user()->can('view', $profile)) {
                 $lora_data['deviceProfileID'] = (string)$profile['device_profile_id'];
                 $thing['profile_id'] = $profile['_id'];
@@ -236,7 +243,10 @@ class ThingService
                 'type' => 'Point',
                 'coordinates' => [$request->get('lat'), $request->get('long')]
             ];
-        $this->loraService->updateDevice($lora_data, $thing['dev_eui']);
+        if ($thing['type'] == 'lora')
+            $this->loraService->updateDevice($lora_data, $thing['dev_eui']);
+        if ($thing['type'] == 'lan')
+            $this->lanService->updateDevice(collect($lan_data), $thing['dev_eui']);
         $thing->save();
 
         return $thing;
@@ -260,6 +270,7 @@ class ThingService
             'period',
             'devEUI',
             'thing_profile_slug',
+            'ip',
             'appKey',
             'appSKey',
             'nwkSKey',
@@ -273,13 +284,14 @@ class ThingService
             return [
                 'add',
                 $item['name'],
-                'lora',
+                $item['type'],
                 $item['description'],
                 $item['loc']['coordinates'][0],
                 $item['loc']['coordinates'][1],
                 $item['period'],
                 $item['dev_eui'],
                 $item['profile']['thing_profile_slug'],
+                $item['type'] == 'lan' ? $item['interface']['ip'] : '',
                 isset($item['keys']['appKey']) ? $item['keys']['appKey'] : '',
                 isset($item['keys']['appSKey']) ? $item['keys']['appSKey'] : '',
                 isset($item['keys']['nwkSKey']) ? $item['keys']['nwkSKey'] : '',

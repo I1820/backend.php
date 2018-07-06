@@ -7,6 +7,7 @@ use App\Exceptions\LoraException;
 use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
+use App\Repository\Services\LanService;
 use App\Repository\Services\LoraService;
 use App\Repository\Services\PermissionService;
 use App\ThingProfile;
@@ -24,20 +25,24 @@ class ThingController extends Controller
     protected $thingService;
     protected $permissionService;
     protected $coreService;
+    protected $lanService;
     protected $loraService;
 
     /**
      * ProjectController constructor.
      * @param ThingService $thingService
      * @param CoreService $coreService
+     * @param LanService $lanService
      * @param LoraService $loraService
      */
     public function __construct(ThingService $thingService,
                                 CoreService $coreService,
+                                LanService $lanService,
                                 LoraService $loraService)
     {
         $this->thingService = $thingService;
         $this->coreService = $coreService;
+        $this->lanService = $lanService;
         $this->loraService = $loraService;
 
         $this->middleware('can:create,App\Thing')->only(['multiThingData']);
@@ -169,7 +174,10 @@ class ThingController extends Controller
      */
     public function delete(Thing $thing)
     {
-        $this->loraService->deleteDevice($thing['interface']['devEUI']);
+        if ($thing['type'] == 'lora')
+            $this->loraService->deleteDevice($thing['interface']['devEUI']);
+        if ($thing['type'] == 'lan')
+            $this->lanService->deleteDevice($thing['dev_eui']);
         $this->coreService->deleteThing($thing['dev_eui']);
         $thing->delete();
         return Response::body(['success' => 'true']);

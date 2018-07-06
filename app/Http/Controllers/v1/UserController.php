@@ -13,6 +13,8 @@ use App\Thing;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Psy\Exception\FatalErrorException;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -53,7 +55,6 @@ class UserController extends Controller
 
         $user = $this->userService->updateUser($request);
 
-
         return Response::body(compact('user'));
     }
 
@@ -89,20 +90,37 @@ class UserController extends Controller
     public function upload(Request $request)
     {
         $user = Auth::user();
-        $files = $request->allFiles();
-        $paths = [];
-        foreach ($files as $key => $file) {
-            $paths[$key] = $this->fileService->saveFile($key, $file);
-        }
+        $file = $request->file('file');
+        $path = $this->fileService->saveFile('legal', $file);
 
-        $files = $user['files'] ?: [];
-        foreach ($paths as $key => $value) {
-            $files[$key] = $value;
-        }
-        $user->files = $files;
+        $user->legal_doc = '/data/' . $path;
 
         $user->save();
-        return Response::body(compact('paths'));
+        return Response::body(['path' => $user->legal_doc]);
+    }
+
+    public function picture(Request $request)
+    {
+        $messages = [
+            'picture.required' => 'لطفا عکس را انتخاب کنید',
+            'picture.mimes' => 'نوع فایل را درست وارد کنید',
+        ];
+
+        $validator = Validator::make($request->all(), [
+            'picture' => 'required|file|mimes:jpeg,bmp,png',
+        ], $messages);
+
+        if ($validator->fails())
+            throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
+
+        $user = Auth::user();
+        $file = $request->file('picture');
+        $path = $this->fileService->savePicture($file);
+
+        $user->picture = '/data/' . $path . '?rand=' . str_random(5);
+
+        $user->save();
+        return Response::body(['user' => $user]);
     }
 
     public function dashboard()

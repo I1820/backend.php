@@ -45,6 +45,8 @@ class ThingPolicy
      */
     public function create(User $user)
     {
+        $thing_count = $user->things()->count();
+        dd($thing_count,$user['package']['node_num']);
         $permission = $user->role()->first()->perms()->where('slug', 'CREATE-THING')->first();
         $project = Project::where('_id', $this->request->get('project_id'))->first();
         return $project && $project['owner']['_id'] == $user['_id'] && $permission;

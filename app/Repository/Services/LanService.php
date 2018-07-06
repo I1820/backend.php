@@ -35,7 +35,7 @@ class LanService
     public function postDevice(Collection $data)
     {
         Log::debug("LAN Send Device:\t" . $data['devEUI']);
-        $url = $this->base_url . '/device';
+        $url = $this->base_url . '/api/devices';
         $data = $data->only([
             'name',
             'devEUI',
@@ -45,12 +45,32 @@ class LanService
         return collect(json_decode(json_encode($response), true));
     }
 
+    public function updateDevice(Collection $data, $dev_eui)
+    {
+        Log::debug("LAN Update Device:\t" . $dev_eui);
+        $url = $this->base_url . '/api/devices/' . $dev_eui;
+        $data = $data->only([
+            'name',
+            'ip'
+        ]);
+        $response = $this->send($url, $data, 'put');
+        return collect(json_decode(json_encode($response), true));
+    }
+
+    public function deleteDevice($dev_eui)
+    {
+        Log::debug("LAN Delete Device:\t" . $dev_eui);
+        $url = $this->base_url . '/api/devices/' . $dev_eui;
+        $response = $this->send($url, [], 'delete');
+        return collect(json_decode(json_encode($response), true));
+    }
+
     public function getKey(Thing $thing)
     {
         Log::debug("LAN Get Key:\t" . $thing['dev_eui']);
-        $url = $this->base_url . '/device/' . $thing['dev_eui'] . '/refresh';
+        $url = $this->base_url . '/api/devices/' . $thing['dev_eui'] . '/refresh';
 
-        $response = $this->send($url, [], 'post');
+        $response = $this->send($url, [], 'get');
         return collect(json_decode(json_encode($response), true));
     }
 

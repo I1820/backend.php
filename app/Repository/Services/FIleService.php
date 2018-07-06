@@ -26,9 +26,23 @@ class FileService
     public function saveFile($name, $file): string
     {
         $user = Auth::user();
-        $path = sprintf("users/data/%s", $user->_id);
+        $path = sprintf("users/%s", $user->_id);
         $name = sprintf("%s.%s", $name, $file->getClientOriginalExtension());
-        return Storage::disk('cdn')
+        return Storage::disk('public')
+            ->putFileAs($path, $file, $name);
+    }
+
+
+    /**
+     * @param UploadedFile $file
+     * @return string
+     */
+    public function savePicture($file): string
+    {
+        $user = Auth::user();
+        $path = sprintf("users/%s", $user->_id);
+        $name = sprintf("picture.%s", $file->getClientOriginalExtension());
+        return Storage::disk('public')
             ->putFileAs($path, $file, $name);
     }
 
