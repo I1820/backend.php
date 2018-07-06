@@ -30,6 +30,10 @@ class UserController extends Controller
             ->take(intval($request->get('limit')) ?: 10)
             ->with('role')
             ->get()->makeVisible(['_id', 'active','created_at']);
+        foreach ($users as $user){
+            $user['project_num'] = $user->projects()->count();
+            $user['node_num'] = $user->things()->count();
+        }
         return Response::body(compact('users'));
     }
 

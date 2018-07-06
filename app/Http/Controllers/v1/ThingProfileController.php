@@ -49,7 +49,7 @@ class ThingProfileController extends Controller
         if (!$request->get('name'))
             throw new GeneralException('لطفا نام پروفایل شی را وارد کنید', GeneralException::VALIDATION_ERROR);
         $device_profile_id = $this->loraService->postDeviceProfile(collect($data))->deviceProfileID;
-        dd($device_profile_id);
+
         $thing_profile = ThingProfile::create([
             'thing_profile_slug' => $id,
             'device_profile_id' => $device_profile_id,

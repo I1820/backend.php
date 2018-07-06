@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Excel;
 
 class ThingService
 {
@@ -259,8 +260,9 @@ class ThingService
      */
     public function toExcel($things)
     {
-        $excel = resolve('Maatwebsite\Excel\Excel');
+        $excel = resolve(Excel::class );
         $res = [[
+            '#',
             'operation',
             'name',
             'type',
@@ -280,8 +282,9 @@ class ThingService
             'skipFCntCheck',
 
         ]];
-        $res = array_merge($res, $things->map(function ($item) {
+        $res = array_merge($res, $things->map(function ($item, $key) {
             return [
+                $key + 1,
                 'add',
                 $item['name'],
                 $item['type'],
@@ -304,7 +307,7 @@ class ThingService
 
         return response(
             $excel->create(
-                'things.csv',
+                'things.xls',
                 function ($excel) use ($res) {
                     $excel->sheet(
                         'Things',
@@ -313,10 +316,10 @@ class ThingService
                         }
                     );
                 }
-            )->string('csv')
+            )->string('xls')
         )
-            ->header('Content-Disposition', 'attachment; filename="things.csv"')
-            ->header('Content-Type', 'application/csv; charset=UTF-8');
+            ->header('Content-Disposition', 'attachment; filename="things.xls"')
+            ->header('Content-Type', 'application/vnd.ms-excel; charset=UTF-8');
     }
 
 

@@ -88,6 +88,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
         Route::get('/', 'ThingController@all');
         Route::post('/', 'ThingController@create');
         Route::post('/from-excel', 'ThingController@fromExcel');
+        Route::post('/delete', 'ThingController@deleteMultiple');
         Route::get('/{thing}', 'ThingController@get');
 
         Route::post('data', 'ThingController@mainData');

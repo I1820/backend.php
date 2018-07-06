@@ -69,7 +69,7 @@ class ThingController extends Controller
      */
     public function all()
     {
-        $things = Auth::user()->things()->get();
+        $things = Auth::user()->things()->with('project')->get();
         return Response::body(compact('things'));
     }
 
@@ -180,6 +180,21 @@ class ThingController extends Controller
             $this->lanService->deleteDevice($thing['dev_eui']);
         $this->coreService->deleteThing($thing['dev_eui']);
         $thing->delete();
+        return Response::body(['success' => 'true']);
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     * @throws LoraException
+     */
+    public function deleteMultiple(Request $request)
+    {
+        $thing_ids = json_decode($request->get('thing_ids'), true) ?: [];
+        $things = Auth::user()->things()->whereIn('_id', $thing_ids)->get();
+        foreach ($things as $thing) {
+            $this->delete($thing);
+        }
         return Response::body(['success' => 'true']);
     }
 

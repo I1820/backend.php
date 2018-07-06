@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Exceptions\GeneralException;
 use App\Project;
 use App\User;
 use App\Thing;
@@ -42,11 +43,13 @@ class ThingPolicy
      *
      * @param  \App\User $user
      * @return mixed
+     * @throws GeneralException
      */
     public function create(User $user)
     {
         $thing_count = $user->things()->count();
-        dd($thing_count,$user['package']['node_num']);
+        if ($thing_count >= $user['package']['node_num'])
+            throw new GeneralException('خطا. به بیشترین تعداد نود در بسته خریداری شده رسیدید.', GeneralException::ACCESS_DENIED);
         $permission = $user->role()->first()->perms()->where('slug', 'CREATE-THING')->first();
         $project = Project::where('_id', $this->request->get('project_id'))->first();
         return $project && $project['owner']['_id'] == $user['_id'] && $permission;
