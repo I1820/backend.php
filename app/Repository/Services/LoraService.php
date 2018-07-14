@@ -126,6 +126,11 @@ class LoraService
     {
         Log::debug("Lora Send Gateway");
         $url = $url = $this->base_url . '/api/gateways';
+        $data['location'] = [
+            'altitude' => $data['altitude'],
+            'latitude' => $data['longitude'],
+            'longitude' => $data['latitude']
+        ];
         $this->send($url, ['gateway' => $data], 'post', 409);
         return true;
     }

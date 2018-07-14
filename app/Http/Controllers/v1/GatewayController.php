@@ -58,6 +58,7 @@ class GatewayController extends Controller
         ]);
         $id = new ObjectId();
         $data['name'] = (string)$id;
+        $data['id'] = $data['mac'];
         $data['altitude'] = intval($data['altitude']);
         $data['latitude'] = floatval($data['latitude']);
         $data['longitude'] = floatval($data['longitude']);
