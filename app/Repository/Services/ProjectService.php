@@ -87,7 +87,7 @@ class ProjectService
         ];
 
         $validator = Validator::make($request->all(), [
-            'name' => 'filled|string|max:255',
+            'name' => 'filled|string|max:255|unique:projects',
             'description' => 'filled|string',
         ], $messages);
 
