@@ -220,10 +220,10 @@ class ThingService
             $lan_data['ip'] = (string)$request->get('ip');
         }
 
-        if ($request->get('description')) {
-            $thing->description = $request->get('description');
-            $lora_data['description'] = (string)$request->get('description');
-        }
+
+        $thing->description = $request->get('description');
+        $lora_data['description'] = (string)$request->get('description');
+
 
         if ($request->get('period'))
             $thing->period = $request->get('period');
