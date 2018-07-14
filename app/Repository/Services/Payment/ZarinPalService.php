@@ -40,7 +40,7 @@ class ZarinPalService
         $user = Auth::user();
         $invoice = Invoice::create([
             'user_id' => $user['_id'],
-            'price' => $package['price'] - $discount,
+            'price' => ($package['price'] - $discount) >= 0 ? $package['price'] - $discount : 0,
             'discount' => $discount,
             'gate' => 'zarinpal',
             'package' => $package->toArray(),
