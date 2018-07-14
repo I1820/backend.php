@@ -34,6 +34,9 @@ class EmailVerification extends Mailable
         $this->user['email_token'] = $token;
         $this->user->save();
         $link = route('verify-email', ['user' => $this->user, 'token' => md5($token)]);
-        return $this->view('emails.verification', ['link' => $link]);
+
+        return $this
+            ->subject('سامانه اینترنت اشیا')
+            ->view('emails.verification', ['link' => $link]);
     }
 }
