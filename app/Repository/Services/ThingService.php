@@ -109,6 +109,49 @@ class ThingService
             throw new  GeneralException('لطفا فایل با فرمت اکسل انتخاب کنید', GeneralException::VALIDATION_ERROR);
     }
 
+
+    /**
+     * @param Request $request
+     * @param string $type
+     * @return void
+     * @throws GeneralException
+     */
+    private function validateKeys($request, $type = 'OTAA')
+    {
+        $validator = '';
+        if ($type == 'OTAA') {
+            $messages = [
+                'appKey.required' => 'لطفا کلید Application Session Key را وارد کنید',
+                'appKey.regex' => 'لفطا کلید را درست وارد کنید(۳۲ کاراکتر).',
+            ];
+
+            $validator = Validator::make($request->all(), [
+                'appKey' => 'required|regex:/^[0-9a-fA-F]{32}$/',
+            ], $messages);
+        } else if ($type == 'ABP') {
+            $messages = [
+                'devAddr.required' => 'لطفا کلید Device Address را وارد کنید',
+                'devAddr.regex' => 'لفطا کلید Device Address را درست وارد کنید(۸ کاراکتر).',
+
+                'appSKey.required' => 'لطفا کلید Application Session Key را وارد کنید',
+                'appSKey.regex' => 'لفطا کلید Application Session Key را درست وارد کنید(۳۲ کاراکتر).',
+
+                'nwkSKey.required' => 'لطفا کلید Network Session Key را وارد کنید',
+                'nwkSKey.regex' => 'لفطا کلید Network Session Key را درست وارد کنید(۳۲ کاراکتر).',
+            ];
+
+            $validator = Validator::make($request->all(), [
+                'devAddr' => 'required|regex:/^[0-9a-fA-F]{8}$/',
+                'appSKey' => 'required|regex:/^[0-9a-fA-F]{32}$/',
+                'nwkSKey' => 'required|regex:/^[0-9a-fA-F]{32}$/',
+            ], $messages);
+
+        }
+        if ($validator->fails())
+            throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
+    }
+
+
     /**
      * @param $request
      * @param Project $project
@@ -157,13 +200,7 @@ class ThingService
 
     public function ABPKeys($request, Thing $thing)
     {
-        $validator = Validator::make($request->all(), [
-            'devAddr' => 'required',
-            'nwkSKey' => 'required',
-            'appSKey' => 'required',
-        ]);
-        if ($validator->fails())
-            throw new GeneralException('اطلاعات فعال سازی را کامل وارد کنید', 407);
+        $this->validateKeys($request, 'ABP');
         $data['devAddr'] = (string)$request->get('devAddr');
         $data['nwkSKey'] = (string)$request->get('nwkSKey');
         $data['appSKey'] = (string)$request->get('appSKey');
@@ -177,6 +214,7 @@ class ThingService
 
     public function OTAAKeys($request, Thing $thing)
     {
+        $this->validateKeys($request, 'OTAA');
         $key = $request->get('appKey');
         $data = ['deviceKeys' => ['appKey' => $key]];
         $data['devEUI'] = $thing['interface']['devEUI'];
@@ -221,7 +259,7 @@ class ThingService
         }
 
 
-        $thing->description = $request->get('description');
+        $thing->description = $request->get('description') ?: '';
         $lora_data['description'] = (string)$request->get('description');
 
 
@@ -260,7 +298,7 @@ class ThingService
      */
     public function toExcel($things)
     {
-        $excel = resolve(Excel::class );
+        $excel = resolve(Excel::class);
         $res = [[
             '#',
             'operation',

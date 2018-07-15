@@ -57,20 +57,20 @@ class LoraService
         ]);
         if (!$data['description'])
             $data['description'] = '';
-        $this->send($url, ['device' => $data], 'post');
+        $this->send($url, $data, 'post');
         return $data;
     }
 
     /**
      * @param $data
-     * @return void
+     * @return object
      * @throws LoraException
      */
     public function postDeviceProfile($data)
     {
         Log::debug("Lora Send Device Profile");
         $url = $this->base_url . '/api/device-profiles';
-        return $this->send($url, ['deviceProfile' => $data], 'post');
+        return $this->send($url, $data, 'post');
     }
 
 
@@ -113,7 +113,7 @@ class LoraService
     {
         Log::debug("Lora Update Device:\t" . $dev_eui);
         $url = $url = $this->base_url . '/api/devices/' . $dev_eui;
-        $this->send($url, ['device' => $data], 'put');
+        $this->send($url, $data, 'put');
         return true;
     }
 
@@ -126,12 +126,7 @@ class LoraService
     {
         Log::debug("Lora Send Gateway");
         $url = $url = $this->base_url . '/api/gateways';
-        $data['location'] = [
-            'altitude' => $data['altitude'],
-            'latitude' => $data['longitude'],
-            'longitude' => $data['latitude']
-        ];
-        $this->send($url, ['gateway' => $data], 'post', 409);
+        $this->send($url, $data, 'post', 409);
         return true;
     }
 
@@ -156,7 +151,7 @@ class LoraService
     {
         Log::debug("Lora Active Device ABP\t" . $data['devEUI']);
         $url = $url = $this->base_url . '/api/devices/' . $data['devEUI'] . '/activate';
-        return $this->send($url, ['deviceActivation' => $data], 'post');
+        return $this->send($url, $data, 'post');
     }
 
     /**
@@ -169,9 +164,9 @@ class LoraService
         Log::debug("Lora Active Device OTAA\t" . $data['devEUI']);
         $url = $url = $this->base_url . '/api/devices/' . $data['devEUI'] . '/keys';
         try {
-            return $this->send($url, ['deviceKeys' => $data], 'post');
+            return $this->send($url, $data, 'post');
         } catch (\Exception $e) {
-            return $this->send($url, ['deviceKeys' => $data], 'put');
+            return $this->send($url, $data, 'put');
         }
     }
 
@@ -202,12 +197,10 @@ class LoraService
         Log::debug("Lora Create Project\t" . $id);
         $url = $this->base_url . '/api/applications';
         $data = [
-            'application' => [
-                'organizationID' => $this->organization_id,
-                'serviceProfileID' => $this->serviceProfileID,
-                'name' => (string)$id,
-                'description' => $description
-            ]
+            'organizationID' => $this->organization_id,
+            'serviceProfileID' => $this->serviceProfileID,
+            'name' => (string)$id,
+            'description' => $description
         ];
         $response = $this->send($url, $data, 'post');
         return $response->id;
