@@ -44,8 +44,10 @@ class PaymentController extends Controller
 
     private function discount($code)
     {
+        if (!$code)
+            return 0;
         $discount = Discount::where('code', $code)->first();
-        if ($code && !$discount)
+        if (!$discount)
             throw new GeneralException('کد تخفیف اشتباه است', GeneralException::NOT_FOUND);
         if ($discount['expired'])
             throw new GeneralException('کد تخفیف استفاده شده است', GeneralException::NOT_FOUND);
