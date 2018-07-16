@@ -104,7 +104,7 @@ return [
             'rule-name' => 'custom-message',
         ],
         'g-recaptcha-response' => [
-            'required' => 'روی گزینه من رباط نیستم کلیک کنید.',
+            'required' => 'روی گزینه من ربات نیستم کلیک کنید.',
             'captcha' => 'بعدا تلاش کنید.',
         ],
     ],

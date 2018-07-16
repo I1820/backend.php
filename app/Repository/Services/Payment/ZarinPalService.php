@@ -14,6 +14,7 @@ use App\Exceptions\GeneralException;
 use App\Invoice;
 use App\Package;
 use App\Project;
+use App\Repository\Services\UserService;
 use App\Thing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,10 +25,13 @@ use Zarinpal\Zarinpal;
 class ZarinPalService
 {
     protected $zarinpal;
+    protected $userService;
 
-    public function __construct(Zarinpal $zarinpal)
+    public function __construct(Zarinpal $zarinpal, UserService $userService)
     {
         $this->zarinpal = $zarinpal;
+        $this->userService = $userService;
+
     }
 
     /**
@@ -52,6 +56,12 @@ class ZarinPalService
             'Description' => 'پرداخت بسته ' . $package['name'],
             'Email' => $user['email'],    // Optional
         ];
+        if ($invoice['price'] == 0) {
+            $invoice['status'] = true;
+            $this->userService->updatePackage($user, $invoice['package']);
+            return $invoice;
+        }
+
         $response = $this->zarinpal->request($payment);
         if ($response['Status'] === 100) {
             $authority = $response['Authority'];

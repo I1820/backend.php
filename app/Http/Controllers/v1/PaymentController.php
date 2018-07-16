@@ -31,8 +31,6 @@ class PaymentController extends Controller
         $code = $request->get('code');
         $discount = $this->discount($code);
         $invoice = $this->zarinPalService->createInvoice($package, $discount);
-        if ($code && !$discount)
-            throw new GeneralException('کد تخفیف اشتباه است', GeneralException::NOT_FOUND);
         if ($invoice)
             return Response::body(compact('invoice'));
         throw new GeneralException(GeneralException::M_UNKNOWN, GeneralException::UNKNOWN_ERROR);
@@ -46,9 +44,11 @@ class PaymentController extends Controller
 
     private function discount($code)
     {
-        $discount = Discount::where('code', $code)->where('expired', false)->first();
+        $discount = Discount::where('code', $code)->first();
         if (!$discount)
-            return 0;
+            throw new GeneralException('کد تخفیف اشتباه است', GeneralException::NOT_FOUND);
+        if ($discount['expired'])
+            throw new GeneralException('کد تخفیف استفاده شده است', GeneralException::NOT_FOUND);
         $discount->expired = true;
         $discount->save();
         return $discount->value;
