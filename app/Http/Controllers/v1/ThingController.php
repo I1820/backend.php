@@ -69,8 +69,14 @@ class ThingController extends Controller
      */
     public function all()
     {
-        $things = Auth::user()->things()->with('project')->get();
-        return Response::body(compact('things'));
+        $user = Auth::user();
+        $things = $user->things()->with('project')->get();
+        $aliases = [];
+        foreach ($user->projects()->get()->pluck('aliases') as $item)
+            if ($item)
+                foreach ($item as $key => $alias)
+                    $aliases[] = [$key => $alias];
+        return Response::body(compact('things','aliases'));
     }
 
     /**
