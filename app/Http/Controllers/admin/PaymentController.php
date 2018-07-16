@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Invoice;
 use App\Repository\Helper\Response;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -22,5 +23,16 @@ class PaymentController extends Controller
             'total_income' => $invoices->sum('price')
         ];
         return Response::body(compact('overview', 'invoices'));
+    }
+
+    public function overview()
+    {
+        $all_invoices = Invoice::get();
+        $last_week_invoices = Invoice::where('created_at', Carbon::now()->subDays(7))->get();
+        $overview = [
+            'all_transactions_sum' => $all_invoices->sum('price'),
+            'last_week_transactions_sum' => $last_week_invoices->sum('price'),
+        ];
+        return Response::body(compact('overview'));
     }
 }

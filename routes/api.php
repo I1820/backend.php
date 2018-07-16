@@ -173,6 +173,7 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
 
     Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt', 'admin']], function () {
         Route::get('/', 'PaymentController@list');
+        Route::get('/overview', 'PaymentController@overview');
     });
 
     Route::group(['prefix' => 'permission', 'middleware' => ['auth.jwt', 'admin']], function () {
