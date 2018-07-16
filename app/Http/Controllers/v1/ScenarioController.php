@@ -78,6 +78,7 @@ class ScenarioController extends Controller
      * @param Scenario $scenario
      * @param Request $request
      * @return array
+     * @throws GeneralException
      */
     public function update(Project $project, Scenario $scenario, Request $request)
     {
@@ -87,6 +88,7 @@ class ScenarioController extends Controller
         if ($request->get('code'))
             $scenario->code = $request->get('code');
         $scenario->save();
+        $this->coreService->sendScenario($project, $scenario);
         return Response::body(compact('scenario'));
     }
 
