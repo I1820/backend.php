@@ -31,6 +31,7 @@ class PaymentController extends Controller
         $last_week_invoices = Invoice::where('created_at', Carbon::now()->subDays(7))->get();
         $overview = [
             'all_transactions_sum' => $all_invoices->sum('price'),
+            'all_transactions_num' => $all_invoices->count,
             'last_week_transactions_sum' => $last_week_invoices->sum('price'),
         ];
         return Response::body(compact('overview'));
