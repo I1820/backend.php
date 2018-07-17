@@ -28,7 +28,6 @@ class PermissionController extends Controller
     }
 
 
-
     public function createRole(Request $request)
     {
         $permission_ids = json_decode($request->get('permissions_ids'));
@@ -68,6 +67,8 @@ class PermissionController extends Controller
         if ($role['default']) {
             throw new GeneralException('نقش پیش فرض را نمیتوان حذف کرد', GeneralException::ACCESS_DENIED);
         }
+        if ($role->users()->first())
+            throw new GeneralException('ابتدا نقش کاربران دارای این نقش را تغییر دهید.', GeneralException::ACCESS_DENIED);
         $role->delete();
         return Response::body(['success' => true]);
     }
