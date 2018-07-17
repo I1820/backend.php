@@ -68,9 +68,12 @@ class PaymentController extends Controller
 
     public function list(Request $request)
     {
-        $invoices = Auth::user()->invoices()->skip(intval($request->get('offset')))
-            ->take(intval($request->get('limit')) ?: 10)
-            ->get();
+        $invoices = Auth::user()->invoices();
+        if (intval($request->get('offset')))
+            $invoices = $invoices->skip(intval($request->get('offset')));
+        if (intval($request->get('limit')))
+            $invoices = $invoices->take(intval($request->get('limit')) ?: 10);
+        $invoices = $invoices->get();
         return Response::body(compact('invoices'));
     }
 }

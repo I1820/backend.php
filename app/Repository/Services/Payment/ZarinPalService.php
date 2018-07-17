@@ -58,6 +58,7 @@ class ZarinPalService
         ];
         if ($invoice['price'] == 0) {
             $invoice['status'] = true;
+            $invoice->save();
             $this->userService->updatePackage($user, $invoice['package']);
             return $invoice;
         }
