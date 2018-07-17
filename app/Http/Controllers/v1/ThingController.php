@@ -18,6 +18,7 @@ use App\Repository\Services\ThingService;
 use App\Thing;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ThingController extends Controller
@@ -76,7 +77,7 @@ class ThingController extends Controller
             if ($item)
                 foreach ($item as $key => $alias)
                     $aliases[] = [$key => $alias];
-        return Response::body(compact('things','aliases'));
+        return Response::body(compact('things', 'aliases'));
     }
 
     /**
@@ -145,12 +146,16 @@ class ThingController extends Controller
                 try {
                     $data['devEUI'] = str_repeat("0", 16 - strlen($data['devEUI'])) . $data['devEUI'];
                     $thing = Thing::where('dev_eui', $data['devEUI'])->with('profile')->first();
+                    if ($data['devEUI'] == '0000000000000000')
+                        continue;
+                    Log::debug($data['devEUI']);
                     if (!$user->can('update', $project)) {
                         $res[$data['devEUI']] = 'شما دسترسی این کار را ندارید';
                     } elseif ($row['operation'] == 'add') {
-                        if (!$thing)
+                        if (!$thing) {
+                            Auth::user()->can('create', Thing::class);
                             $thing = $this->createThing(collect($row), $project);
-                        else
+                        } else
                             $thing = $this->thingService->updateThing(collect($row), $thing);
                         $res[$data['devEUI']] = $thing;
                         $this->sendKeys($thing, collect($row));
