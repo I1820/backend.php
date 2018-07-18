@@ -46,7 +46,9 @@ class ProjectPolicy
      */
     public function create(User $user)
     {
-
+        $project_count = $user->projects()->count();
+        if ($project_count >= $user['package']['project_num'])
+            throw new GeneralException('خطا. به بیشترین تعداد پروژه  در بسته خریداری شده رسیدید.', GeneralException::ACCESS_DENIED);
         $permission = $user->role()->first()->perms()->where('slug', 'CREATE-PROJECT')->first();
         return $user['active'] && $permission;
     }
