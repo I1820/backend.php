@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Exceptions\GeneralException;
 use App\Permission;
 use App\Repository\Services\PermissionService;
 use App\User;
@@ -43,6 +44,7 @@ class ProjectPolicy
      *
      * @param  \App\User $user
      * @return mixed
+     * @throws GeneralException
      */
     public function create(User $user)
     {
