@@ -6,6 +6,7 @@ use App\Discount;
 use App\Exceptions\GeneralException;
 use App\Invoice;
 use App\Package;
+use App\PaymentPortal;
 use App\Repository\Helper\Response;
 use App\Repository\Services\Payment\ZarinPalService;
 use App\Repository\Services\UserService;
@@ -75,5 +76,11 @@ class PaymentController extends Controller
             $invoices = $invoices->take(intval($request->get('limit')) ?: 10);
         $invoices = $invoices->get();
         return Response::body(compact('invoices'));
+    }
+
+    public function portals()
+    {
+        $portals = PaymentPortal::where('active', true)->get();
+        return Response::body(compact('portals'));
     }
 }

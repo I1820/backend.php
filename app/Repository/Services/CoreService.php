@@ -25,6 +25,8 @@ class CoreService
     protected $base_url;
     protected $port;
     protected $dmPort;
+    protected $pmPort;
+    protected $gmPort;
     protected $downLinkPort;
     protected $curlService;
 
@@ -204,6 +206,12 @@ class CoreService
         $url = '/api/decode/' . $thing['interface']['devEUI'];
         $response = $this->_send($url, $data, 'post', $project['container']['runner']['port']);
         return $response;
+    }
+
+    public function gatewayEvent($gateway, $timestamp, $limit)
+    {
+        $url = $url = $this->dm_url . '/api/gateway/' . $gateway . '?since=' . $timestamp . '&limit=' . $limit;
+        return $this->send($url, [], 'get');
     }
 
 

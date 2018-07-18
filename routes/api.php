@@ -124,24 +124,15 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
     });
 
     Route::group(['prefix' => 'packages', 'middleware' => ['auth.jwt']], function () {
-        Route::post('/', 'PackageController@create');
-        Route::get('/all', 'PackageController@all');
-        Route::delete('/{package}', 'PackageController@delete');
-        Route::patch('/{package}', 'PackageController@update');
-        Route::get('/{package}/activate', 'PackageController@activate');
-
         Route::get('/', 'PackageController@list');
         Route::get('/{package}', 'PackageController@get');
         Route::get('/{package}/invoice', 'PaymentController@createInvoice');
     });
-    Route::group(['prefix' => 'discount', 'middleware' => ['auth.jwt']], function () {
-        Route::post('/', 'DiscountController@create');
-        Route::get('/', 'DiscountController@all');
-        Route::delete('/{discount}', 'DiscountController@delete');
-    });
+
 
     Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt']], function () {
         Route::get('', 'PaymentController@list');
+        Route::get('/portals', 'PaymentController@portals');
     });
     Route::group(['prefix' => 'payment'], function () {
         Route::get('/{invoice}/pay', 'PaymentController@pay');
@@ -171,9 +162,26 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
         Route::get('/{codec}', 'CodecController@get');
     });
 
+
+    Route::group(['prefix' => 'packages', 'middleware' => ['auth.jwt','admin']], function () {
+        Route::post('/', 'PackageController@create');
+        Route::get('/', 'PackageController@all');
+        Route::delete('/{package}', 'PackageController@delete');
+        Route::patch('/{package}', 'PackageController@update');
+        Route::get('/{package}/activate', 'PackageController@activate');
+    });
+
+    Route::group(['prefix' => 'discount', 'middleware' => ['auth.jwt']], function () {
+        Route::post('/', 'DiscountController@create');
+        Route::get('/', 'DiscountController@all');
+        Route::delete('/{discount}', 'DiscountController@delete');
+    });
+
     Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt', 'admin']], function () {
         Route::get('/', 'PaymentController@list');
         Route::get('/overview', 'PaymentController@overview');
+        Route::get('/portals', 'PaymentController@portals');
+        Route::get('/portals/{paymentPortal}/active', 'PaymentController@activatePortal');
     });
 
     Route::group(['prefix' => 'permission', 'middleware' => ['auth.jwt', 'admin']], function () {

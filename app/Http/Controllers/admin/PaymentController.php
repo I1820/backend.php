@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Invoice;
+use App\PaymentPortal;
 use App\Repository\Helper\Response;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -35,5 +36,19 @@ class PaymentController extends Controller
             'last_week_transactions_sum' => $last_week_invoices->sum('price'),
         ];
         return Response::body(compact('overview'));
+    }
+
+    public function portals()
+    {
+        $portals = PaymentPortal::get();
+        return Response::body(compact('portals'));
+    }
+
+    public function activatePortal(PaymentPortal $paymentPortal, Request $request)
+    {
+        $active = $request->get('active') ? true : false;
+        $paymentPortal['active'] = $active;
+        $paymentPortal->save();
+        return Response::body(['success' => true]);
     }
 }
