@@ -136,6 +136,7 @@ class UserController extends Controller
                     'title' => $widget['title'],
                     'type' => $widget['type'],
                     'thing' => $thing,
+                    'alias' => $widget['alias'],
                     'data' => collect($this->coreService->thingData($thing, $since, $until))
                         ->filter(function ($data) use ($widget) {
                             $data = json_decode(json_encode($data), True);
