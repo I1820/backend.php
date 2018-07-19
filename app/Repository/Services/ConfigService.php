@@ -51,7 +51,7 @@ class ConfigService
         ])->map(function ($value) {
             return $value ?: 0;
         })->toArray();
-        if (!$widget['alias'])
+        if (!isset($widget['alias']) || !$widget['alias'])
             $widget['alias'] = $widget['key'];
         if ($data->get('id'))
             $config_widgets[$data->get('id')] = $widget;
