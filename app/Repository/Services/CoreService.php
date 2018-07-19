@@ -45,10 +45,10 @@ class CoreService
      * @return array
      * @throws GeneralException
      */
-    public function postProject($id)
+    public function createProject($id)
     {
         Log::debug("Core Send Project\t" . $id);
-        $url = '/api/project';
+        $url = '/api/projects';
         $data = ['name' => (string)$id];
         $response = $this->_send($url, $data, 'post', $this->pmPort);
         return $response;
@@ -64,10 +64,10 @@ class CoreService
     {
         if ($active) {
             Log::debug("Core Activate Thing\t" . $project['container']['name']);
-            $url = '/api/project/' . $project['container']['name'] . '/activate';
+            $url = '/api/projects/' . $project['container']['name'] . '/activate';
         } else {
             Log::debug("Core Deactivate Thing\t" . $project['container']['name']);
-            $url = '/api/project/' . $project['container']['name'] . '/activate';
+            $url = '/api/projects/' . $project['container']['name'] . '/deactivate';
         }
         $response = $this->_send($url, [], 'get', $this->pmPort);
         return $response;
@@ -82,7 +82,7 @@ class CoreService
     public function deleteProject($project_id)
     {
         Log::debug("Core Delete Project\t" . $project_id);
-        $url = '/api/project/' . $project_id;
+        $url = '/api/projects/' . $project_id;
         $response = $this->_send($url, [], 'delete', $this->pmPort);
         return $response;
     }
@@ -110,9 +110,10 @@ class CoreService
     public function postThing(Project $project, Thing $thing)
     {
         Log::debug("Core Send Thing\t" . $project['_id']);
-        $url = '/api/project/' . $project['container']['name'] . '/things';
+        $url = '/api/things';
         $data = [
             'name' => (string)$thing['interface']['devEUI'],
+            'project' => (string)$project['container']['name'],
         ];
         $response = $this->_send($url, $data, 'post', $this->pmPort);
         return $response;
@@ -175,8 +176,8 @@ class CoreService
     public function sendCodec(Project $project, Thing $thing, $codec)
     {
         Log::debug("Core Send Codec\t" . $project['_id']);
-        $url = '/api/codec';
-        $response = $this->_send($url, ['code' => $codec, 'id' => $thing['interface']['devEUI']], 'post', $project['container']['runner']['port']);
+        $url = '/api/runners/' . $project['container']['name'] . '/codec';
+        $response = $this->_send($url, ['code' => $codec, 'id' => $thing['interface']['devEUI']], 'post', $this->pmPort);
         return $response;
     }
 
@@ -189,8 +190,8 @@ class CoreService
      */
     public function encode(Project $project, Thing $thing, $data)
     {
-        $url = '/api/encode/' . $thing['interface']['devEUI'];
-        $response = $this->_send($url, $data, 'post', $project['container']['runner']['port']);
+        $url = '/api/runners/' . $project['container']['name'] . '/encode/' . $thing['interface']['devEUI'];
+        $response = $this->_send($url, $data, 'post', $this->pmPort);
         return $response;
     }
 
@@ -203,8 +204,8 @@ class CoreService
      */
     public function decode(Project $project, Thing $thing, $data)
     {
-        $url = '/api/decode/' . $thing['interface']['devEUI'];
-        $response = $this->_send($url, $data, 'post', $project['container']['runner']['port']);
+        $url = '/api/runners/' . $project['container']['name'] . '/decode/' . $thing['interface']['devEUI'];
+        $response = $this->_send($url, $data, 'post', $this->pmPort);
         return $response;
     }
 
@@ -291,8 +292,8 @@ class CoreService
     public function sendScenario(Project $project, Scenario $scenario)
     {
         Log::debug("Core Send Scenario\t" . $project['_id']);
-        $url = '/api/scenario';
-        $response = $this->_send($url, ['code' => $scenario->code, 'id' => $project['container']['name']], 'post', $project['container']['runner']['port']);
+        $url = '/api/runners/' . $project['container']['name'] . '/scenario';
+        $response = $this->_send($url, ['code' => $scenario->code, 'id' => $project['container']['name']], 'post', $this->pmPort);
         return $response;
     }
 
@@ -306,8 +307,8 @@ class CoreService
     public function lint(Project $project, $code)
     {
         Log::debug("Core Lint\t" . $project['_id']);
-        $url = '/api/lint';
-        $response = $this->_send($url, $code, 'post', $project['container']['runner']['port']);
+        $url = '/api/runners/' . $project['container']['name'] . '/lint';
+        $response = $this->_send($url, $code, 'post', $this->pmPort);
         return $response;
     }
 
@@ -332,7 +333,7 @@ class CoreService
     public function projectList()
     {
         Log::debug("Core Project List");
-        $url = '/api/project';
+        $url = '/api/projects';
         $response = $this->_send($url, [], 'get', $this->pmPort);
         return $response;
     }
@@ -346,10 +347,25 @@ class CoreService
     public function projectLogs($project_id, $limit)
     {
         //Log::debug("Core Project Log");
-        $url = '/api/project/' . $project_id . '/logs?limit=' . $limit;
+        $url = '/api/projects/' . $project_id . '/errors/project?limit=' . $limit;
         $response = $this->_send($url, [], 'get', $this->pmPort);
         return $response;
     }
+
+    /**
+     * @param $project_id
+     * @param $limit
+     * @return array
+     * @throws GeneralException
+     */
+    public function loraLogs($project_id, $limit)
+    {
+        //Log::debug("Core Project Log");
+        $url = '/api/projects/' . $project_id . '/errors/lora?limit=' . $limit;
+        $response = $this->_send($url, [], 'get', $this->pmPort);
+        return $response;
+    }
+
 
     /**
      * @param $mac
