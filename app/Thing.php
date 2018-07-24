@@ -85,11 +85,11 @@ class Thing extends Eloquent
         }
         $time = $this->lora_thing->lastSeenAt;
         $status = 'success';
-        if (Carbon::now()->subMinutes(2 * $this->period) > $time)
+        if (Carbon::now()->subMinutes(2 * $this->period)->gt(lora_time($time)))
             $status = 'warning';
-        if (Carbon::now()->subMinutes(3 * $this->period) > $time)
+        if (Carbon::now()->subMinutes(3 * $this->period)->gt(lora_time($time)))
             $status = 'danger';
-        if (Carbon::now()->subMinutes(4 * $this->period) > $time)
+        if (Carbon::now()->subMinutes(4 * $this->period)->gt(lora_time($time)))
             $status = 'secondary';
         return ['status' => $status, 'time' => $time ? (string)lora_time($time) : ''];
     }
