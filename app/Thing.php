@@ -84,13 +84,13 @@ class Thing extends Eloquent
             return "";
         }
         $time = $this->lora_thing->lastSeenAt;
-        $status = 'green';
+        $status = 'success';
         if (Carbon::now()->subMinutes(2 * $this->period) > $time)
-            $status = 'orange';
+            $status = 'warning';
         if (Carbon::now()->subMinutes(3 * $this->period) > $time)
-            $status = 'red';
+            $status = 'danger';
         if (Carbon::now()->subMinutes(4 * $this->period) > $time)
-            $status = 'gray';
+            $status = 'secondary';
         return ['status' => $status, 'time' => $time ? (string)lora_time($time) : ''];
     }
 
