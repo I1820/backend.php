@@ -3,6 +3,7 @@
 namespace app\Http\Middleware;
 
 use App\Exceptions\AuthException;
+use App\Repository\Services\LoggerService;
 use Closure;
 use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -12,6 +13,13 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthJwt
 {
+    protected $loggerService;
+
+    public function __construct(LoggerService $loggerService)
+    {
+        $this->loggerService = $loggerService;
+    }
+
     /**
      * Handle an incoming request.
      *
@@ -23,9 +31,7 @@ class AuthJwt
     public function handle($request, Closure $next)
     {
         $this->authenticate();
-        Log::notice('Request');
-        Log::debug($request->getRequestUri());
-        Log::debug(print_r($request->all(), true));
+        $this->loggerService->log($request);
         return $next($request);
     }
 
