@@ -132,6 +132,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
 
     Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt']], function () {
         Route::get('', 'PaymentController@list');
+        Route::get('/excel', 'PaymentController@excel');
         Route::get('/portals', 'PaymentController@portals');
     });
     Route::group(['prefix' => 'payment'], function () {
@@ -148,6 +149,7 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
 
     Route::group(['prefix' => 'users', 'middleware' => ['auth.jwt', 'admin']], function () {
         Route::get('/', 'UserController@list');
+        Route::get('/excel', 'UserController@excel');
         Route::get('/{user}', 'UserController@get');
         Route::get('/{user}/ban', 'UserController@ban');
         Route::post('/{user}/password', 'UserController@setPassword');

@@ -16,6 +16,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Excel;
 use MongoDB\BSON\UTCDateTime;
 use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -87,6 +88,54 @@ class UserService
         $package['start_date'] = new UTCDateTime(Carbon::now());
         $user['package'] = $package;
         $user->save();
+    }
+
+
+    public function toExcel($users)
+    {
+        $excel = resolve(Excel::class);
+        $res = [[
+            '#',
+            'نام کاربر',
+            'ایمیل',
+            'تعداد پروژه',
+            'تعداد اشیا',
+            'نوع کاربر',
+            'تاریخ ثبت نام',
+            'وضعیت',
+            'تلفن همراه',
+            'تلفن ثابت',
+        ]];
+        $res = array_merge($res, $users->map(function ($item, $key) {
+            return [
+                $key + 1,
+                $item['name'],
+                $item['email'],
+                $item['project_num'],
+                $item['node_num'],
+                $item['legal'] ? 'حقوقی' : 'حقیقی',
+                $item['created_at'],
+                $item['active'] ? 'فعال' : 'غیر فعال',
+                $item['mobile'] ?: '',
+                $item['phone'] ?: '',
+            ];
+        })->toArray());
+
+        return response(
+            $excel->create(
+                'invoices.xls',
+                function ($excel) use ($res) {
+                    $excel->sheet(
+                        'Invoices',
+                        function ($sheet) use ($res) {
+                            $sheet->fromArray($res, null, 'A1', false, false);
+                        }
+                    );
+                }
+            )->string('xls')
+        )
+            ->header('Content-Disposition', 'attachment; filename="things.xls"')
+            ->header('Content-Type', 'application/vnd.ms-excel; charset=UTF-8');
     }
 
 }

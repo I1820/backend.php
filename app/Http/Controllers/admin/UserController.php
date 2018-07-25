@@ -37,6 +37,19 @@ class UserController extends Controller
         return Response::body(compact('users'));
     }
 
+    public function excel(Request $request)
+    {
+        $users = User::skip(intval($request->get('offset')))
+            ->take(intval($request->get('limit')) ?: 10)
+            ->with('role')
+            ->get()->makeVisible(['_id', 'active','created_at']);
+        foreach ($users as $user){
+            $user['project_num'] = $user->projects()->count();
+            $user['node_num'] = $user->things()->count();
+        }
+        return $this->userService->toExcel($users);
+    }
+
     public function ban(User $user, Request $request)
     {
         $active = $request->get('active') ? true : false;

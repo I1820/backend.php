@@ -8,6 +8,7 @@ use App\Invoice;
 use App\Package;
 use App\PaymentPortal;
 use App\Repository\Helper\Response;
+use App\Repository\Services\Payment\PaymentService;
 use App\Repository\Services\Payment\ZarinPalService;
 use App\Repository\Services\UserService;
 use function GuzzleHttp\Promise\all;
@@ -19,12 +20,15 @@ class PaymentController extends Controller
 {
     protected $zarinPalService;
     protected $userService;
+    protected $paymentService;
 
     public function __construct(ZarinPalService $zarinPalService,
-                                UserService $userService)
+                                UserService $userService,
+                                PaymentService $paymentService)
     {
         $this->zarinPalService = $zarinPalService;
         $this->userService = $userService;
+        $this->paymentService = $paymentService;
     }
 
     public function createInvoice(Package $package, Request $request)
@@ -76,6 +80,12 @@ class PaymentController extends Controller
             $invoices = $invoices->take(intval($request->get('limit')) ?: 10);
         $invoices = $invoices->get();
         return Response::body(compact('invoices'));
+    }
+
+    public function excel()
+    {
+        $invoices = Auth::user()->invoices()->get();
+        return $this->paymentService->toExcel($invoices);
     }
 
     public function portals()
