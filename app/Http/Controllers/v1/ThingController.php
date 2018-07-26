@@ -114,7 +114,8 @@ class ThingController extends Controller
      */
     public function sampleData(Request $request)
     {
-        return $this->data($request, true);
+        $data = $this->data($request, true);
+        return Response::body(compact('data'));
     }
 
     /**
@@ -124,7 +125,21 @@ class ThingController extends Controller
      */
     public function mainData(Request $request)
     {
-        return $this->data($request, false);
+        $data = $this->data($request, false);
+        return Response::body(compact('data'));
+
+    }
+
+    /**
+     * @param Request $request
+     * @return ThingService|\Illuminate\Database\Eloquent\Model
+     * @throws GeneralException
+     */
+    public function excel(Request $request)
+    {
+        $data = $this->data($request, false);
+        return $this->thingService->dataToExcel(collect($data));
+
     }
 
     /**
@@ -263,7 +278,7 @@ class ThingController extends Controller
         }
         $data = $this->alias($data, $aliases);
 
-        return Response::body(compact('data'));
+        return $data;
     }
 
     private function prepareRow($row)

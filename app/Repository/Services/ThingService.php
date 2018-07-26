@@ -293,6 +293,49 @@ class ThingService
 
 
     /**
+     * @param $data
+     * @return $this|\Illuminate\Database\Eloquent\Model
+     */
+    public function dataToExcel($data)
+    {
+        $excel = resolve(Excel::class);
+        $res = [[
+            '#',
+            'تاریخ',
+            'شناسه شی',
+            'داده پارس شده',
+            'داده خام',
+        ]];
+        $res = array_merge($res, $data->map(function ($item, $key) {
+            return [
+                $key + 1,
+                $item->timestamp,
+                $item->thingid,
+                json_encode($item->data),
+                $item->raw
+            ];
+        })->toArray());
+
+        return response(
+            $excel->create(
+                'data.xls',
+                function ($excel) use ($res) {
+                    $excel->sheet(
+                        'data',
+                        function ($sheet) use ($res) {
+                            $sheet->fromArray($res, null, 'A1', false, false);
+                        }
+                    );
+                }
+            )->string('xls')
+        )
+            ->header('Content-Disposition', 'attachment; filename="things.xls"')
+            ->header('Content-Type', 'application/vnd.ms-excel; charset=UTF-8');
+    }
+
+
+
+    /**
      * @param $things
      * @return $this|\Illuminate\Database\Eloquent\Model
      */

@@ -92,6 +92,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
         Route::get('/{thing}', 'ThingController@get');
 
         Route::post('data', 'ThingController@mainData');
+        Route::post('data/excel', 'ThingController@excel');
         Route::post('data/sample', 'ThingController@sampleData');
 
         Route::patch('/{thing}', 'ThingController@update');
