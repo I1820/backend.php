@@ -9,7 +9,7 @@
 </head>
 
 <body style="font-family: Vazir, IRANSans, Tahoma, SansSerif;direction: rtl;text-align: right;">
-<h3 style="text-align: center;">{{'به سامانه اینترنت اشیا دانشگاه امیرکبیر خوش آمدید'}}</h3>
+<h3 style="text-align: center;">{{'به سامانه اینترنت اشیا پژوهشگاه فضایی خوش آمدید'}}</h3>
 <div>{{'برای فعال سازی حساب کاربری خود روی دکمه زیر کلیک کنید. در صورت کار نکردن دکمه لینک پایین صفحه را کپی کرده در مرورگر خود کپی کنید.'}}</div>
 <div style="text-align: center;margin-top: 20px;"><a style="background: #3498db linear-gradient(to bottom, #3498db, #2980b9);
         border-radius: 14px;
