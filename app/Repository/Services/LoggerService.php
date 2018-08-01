@@ -27,7 +27,7 @@ class LoggerService
     {
         $data = [
             'uri' => $request->path(),
-            'user' => $request->user()->_id,
+            'user' => $request->user()->email,
             'ips' => $request->ips(),
             'body' => $request->all(),
         ];
