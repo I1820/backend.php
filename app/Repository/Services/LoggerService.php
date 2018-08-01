@@ -11,6 +11,7 @@ namespace App\Repository\Services;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
@@ -27,10 +28,12 @@ class LoggerService
     {
         $data = [
             'uri' => $request->path(),
-            'user' => $request->user()->email,
+            'user_id' => $request->user()->_id,
+            'user_email' => $request->user()->email,
             'ips' => $request->ips(),
             'body' => $request->all(),
         ];
+        DB::collection('logs')->insert(array_merge($data, ['time' => Carbon::now()]));
         $orderLog = new Logger('Main');
         $orderLog->pushHandler(new StreamHandler(storage_path('logs/iot/' . $this->fileName)), Logger::INFO);
         $orderLog->info($request->method(), $data);
