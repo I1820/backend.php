@@ -441,7 +441,7 @@ class CoreService
         $url = $this->base_url . ':' . $port . $url;
 
         $response = $this->curlService->to($url)
-            ->withTimeout(30)
+            ->withTimeout(50)
             ->withData($data)
             ->withOption('SSL_VERIFYHOST', false)
             ->returnResponseObject()
