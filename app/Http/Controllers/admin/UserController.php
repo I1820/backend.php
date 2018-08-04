@@ -27,7 +27,7 @@ class UserController extends Controller
     public function list(Request $request)
     {
         $users = User::skip(intval($request->get('offset')))
-            ->take(intval($request->get('limit')) ?: 10)
+            //->take(intval($request->get('limit')) ?: 10)
             ->with('role')
             ->get()->makeVisible(['_id', 'active','created_at']);
         foreach ($users as $user){
@@ -40,7 +40,7 @@ class UserController extends Controller
     public function excel(Request $request)
     {
         $users = User::skip(intval($request->get('offset')))
-            ->take(intval($request->get('limit')) ?: 10)
+            //->take(intval($request->get('limit')) ?: 10)
             ->with('role')
             ->get()->makeVisible(['_id', 'active','created_at']);
         foreach ($users as $user){
