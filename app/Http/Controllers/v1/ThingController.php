@@ -66,18 +66,43 @@ class ThingController extends Controller
     }
 
     /**
+     * @param Request $request
      * @return array
      */
-    public function all()
+    public function all(Request $request)
     {
         $user = Auth::user();
         $things = $user->things()->with('project')->get();
+        if ($request->get('compress'))
+            $things->each->setAppends([]);
         $aliases = [];
         foreach ($user->projects()->get()->pluck('aliases') as $item)
             if ($item)
                 foreach ($item as $key => $alias)
                     $aliases[] = [$key => $alias];
         return Response::body(compact('things', 'aliases'));
+    }
+
+    public function list(Request $request)
+    {
+        $user = Auth::user();
+        $things = $user->things()->with('project');
+        try {
+            $data = ['sorted' => json_decode($request->get('sorted'), true) ?: [], 'filtered' => json_decode($request->get('filtered'), true) ?: []];
+        } catch (\Error $e) {
+            $data = ['sorted' => [], 'filtered' => []];
+        }
+        foreach ($data['filtered'] as $item)
+            $things->where($item['id'], 'like', '%' . $item['value'] . '%');
+        if (count($data['sorted']))
+            $things->orderBy($data['sorted'][0]['id'], $data['sorted'][0]['desc'] ? 'DESC' : 'ASC');
+
+        $pages = ceil($things->count() / (intval($request->get('limit')) ?: 10));
+        $things = $things->skip(intval($request->get('offset')))->take(intval($request->get('limit')) ?: 10)->get();
+        foreach ($things as $thing)
+            $thing->project->setAppends([]);
+
+        return Response::body(['things' => $things, 'pages' => $pages]);
     }
 
     /**

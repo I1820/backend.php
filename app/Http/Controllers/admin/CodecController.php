@@ -18,6 +18,10 @@ class CodecController extends Controller
     {
         $this->codecService = $codecService;
 
+        $this->middleware('can:update,codec')->only(['update']);
+        $this->middleware('can:delete,codec')->only(['delete']);
+        $this->middleware('can:create,App\Codec')->only(['create']);
+
     }
 
     /**

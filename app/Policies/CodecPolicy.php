@@ -37,7 +37,21 @@ class CodecPolicy
      */
     public function create(User $user)
     {
-        return $user['active'];
+        $permission = $user->role()->first()->perms()->where('slug', 'CREATE-CODEC')->first();
+        return $user['active'] && $permission;
+    }
+
+    /**
+     * Determine whether the user can Send codec.
+     *
+     * @param  \App\User  $user
+     * @return mixed
+     */
+    public function send(User $user)
+    {
+        dd('sajjad');
+        $permission = $user->role()->first()->perms()->where('slug', 'SEND-CODEC')->first();
+        return $user['active'] && $permission;
     }
 
     /**
@@ -49,7 +63,8 @@ class CodecPolicy
      */
     public function update(User $user, Codec $codec)
     {
-        return $this->isOwner($user,$codec);
+        $permission = $user->role()->first()->perms()->where('slug', 'UPDATE-CODEC')->first();
+        return $user['active'] && $permission;
     }
 
     /**
@@ -61,7 +76,8 @@ class CodecPolicy
      */
     public function delete(User $user, Codec $codec)
     {
-        return $this->isOwner($user,$codec);
+        $permission = $user->role()->first()->perms()->where('slug', 'DELETE-CODEC')->first();
+        return $user['active'] && $permission;
     }
 
     /**

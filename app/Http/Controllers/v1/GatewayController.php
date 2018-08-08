@@ -38,6 +38,7 @@ class GatewayController extends Controller
 
         $this->middleware('can:view,gateway')->only(['info']);
         $this->middleware('can:delete,gateway')->only(['delete']);
+        $this->middleware('can:update,gateway')->only(['update']);
         $this->middleware('can:create,App\Gateway')->only(['create']);
     }
 

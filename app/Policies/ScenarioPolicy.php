@@ -36,7 +36,8 @@ class ScenarioPolicy
      */
     public function create(User $user)
     {
-        return $user['active'];
+        $permission = $user->role()->first()->perms()->where('slug', 'CREATE-SCENARIO')->first();
+        return $user['active'] && $permission;
     }
 
     /**
@@ -48,7 +49,8 @@ class ScenarioPolicy
      */
     public function update(User $user, Scenario $scenario)
     {
-        return $this->isOwner($user,$scenario);
+        $permission = $user->role()->first()->perms()->where('slug', 'UPDATE-SCENARIO')->first();
+        return $user['active'] && $permission;
     }
 
     /**
@@ -60,7 +62,8 @@ class ScenarioPolicy
      */
     public function delete(User $user, Scenario $scenario)
     {
-        return $this->isOwner($user,$scenario);
+        $permission = $user->role()->first()->perms()->where('slug', '  DELETE-SCENARIO')->first();
+        return $user['active'] && $permission;
     }
 
     /**

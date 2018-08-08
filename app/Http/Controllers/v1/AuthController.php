@@ -67,8 +67,8 @@ class AuthController extends Controller
         $user = Auth::user();
         if (!$user->active)
             throw new AuthException(AuthException::M_USER_NOT_ACTIVE, AuthException::UNAUTHORIZED);
-
-        return Response::body(compact('user', 'token'));
+        $config = ['portainer_url' => env('PORTAINER_URL'), 'prometheus_url' => env('PROMETHEUS_URL')];
+        return Response::body(compact('user', 'token', 'config'));
     }
 
     /**

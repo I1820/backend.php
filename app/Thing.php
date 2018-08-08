@@ -28,7 +28,7 @@ class Thing extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'loc', 'description', 'period', 'interface', 'type', 'dev_eui', 'active', 'activation','keys'
+        'name', 'loc', 'description', 'period', 'interface', 'type', 'dev_eui', 'active', 'activation', 'keys'
     ];
 
     /**
@@ -85,12 +85,16 @@ class Thing extends Eloquent
         }
         $time = $this->lora_thing->lastSeenAt;
         $status = 'success';
-        if (Carbon::now()->subMinutes(2 * $this->period)->gt(lora_time($time)))
-            $status = 'warning';
-        if (Carbon::now()->subMinutes(3 * $this->period)->gt(lora_time($time)))
-            $status = 'danger';
-        if (Carbon::now()->subMinutes(4 * $this->period)->gt(lora_time($time)))
+        if (lora_time($time)) {
+            if (Carbon::now()->subMinutes(2 * $this->period)->gt(lora_time($time)))
+                $status = 'warning';
+            if (Carbon::now()->subMinutes(3 * $this->period)->gt(lora_time($time)))
+                $status = 'danger';
+            if (Carbon::now()->subMinutes(4 * $this->period)->gt(lora_time($time)))
+                $status = 'secondary';
+        } else
             $status = 'secondary';
+
         return ['status' => $status, 'time' => $time ? (string)lora_time($time) : ''];
     }
 

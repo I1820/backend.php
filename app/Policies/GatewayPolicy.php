@@ -26,7 +26,7 @@ class GatewayPolicy
      */
     public function view(User $user, Gateway $gateway)
     {
-        return $this->isOwner($user,$gateway);
+        return true;
     }
 
     /**
@@ -37,7 +37,8 @@ class GatewayPolicy
      */
     public function create(User $user)
     {
-        return $user['active'];
+        $permission = $user->role()->first()->perms()->where('slug', 'CREATE-GATEWAY')->first();
+        return $user['active'] && $permission;
     }
 
     /**
@@ -49,7 +50,8 @@ class GatewayPolicy
      */
     public function update(User $user, Gateway $gateway)
     {
-        return $this->isOwner($user,$gateway);
+        $permission = $user->role()->first()->perms()->where('slug', 'UPDATE-GATEWAY')->first();
+        return $user['active'] && $permission;
     }
 
     /**
@@ -61,7 +63,8 @@ class GatewayPolicy
      */
     public function delete(User $user, Gateway $gateway)
     {
-        return $this->isOwner($user, $gateway);
+        $permission = $user->role()->first()->perms()->where('slug', 'DELETE-GATEWAY')->first();
+        return $user['active'] && $permission;
     }
 
     /**

@@ -54,6 +54,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
         Route::get('/{project}/activate', 'ProjectController@activate');
 
         Route::get('/{project}/things', 'ProjectController@things');
+        Route::post('/{project}/things', 'ProjectController@things');
         Route::get('/{project}/things/export', 'ProjectController@exportThings');
         Route::post('/{project}/aliases', 'ProjectController@aliases');
 
@@ -86,6 +87,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
 
     Route::group(['prefix' => 'things', 'middleware' => ['auth.jwt']], function () {
         Route::get('/', 'ThingController@all');
+        Route::post('/list', 'ThingController@list');
         Route::post('/', 'ThingController@create');
         Route::post('/from-excel', 'ThingController@fromExcel');
         Route::post('/delete', 'ThingController@deleteMultiple');

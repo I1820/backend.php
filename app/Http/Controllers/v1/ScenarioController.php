@@ -23,11 +23,9 @@ class ScenarioController extends Controller
         $this->scenarioService = $scenarioService;
         $this->coreService = $coreService;
 
-        $this->middleware('can:view,project')->only(['list']);
-        $this->middleware('can:update,project')->only(['create', 'activate']);
+        $this->middleware('can:update,scenario')->only(['update', 'activate']);
         $this->middleware('can:delete,scenario')->only(['delete']);
-        $this->middleware('can:view,scenario')->only(['get']);
-        $this->middleware('can:update,scenario')->only(['update']);
+        $this->middleware('can:create,App\Scenario')->only(['create']);
     }
 
     /**

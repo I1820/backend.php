@@ -26,7 +26,7 @@ class CodecController extends Controller
 
         $this->middleware('can:update,project')->only(['create']);
         $this->middleware('can:view,project')->only(['list']);
-        $this->middleware('can:update,thing')->only(['send']);
+        $this->middleware('can:send,codec')->only(['send']);
         $this->middleware('can:view,thing')->only(['getThing']);
         $this->middleware('can:delete,codec')->only(['delete']);
         $this->middleware('can:view,codec')->only(['get']);

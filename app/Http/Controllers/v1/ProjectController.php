@@ -12,6 +12,7 @@ use App\Repository\Services\ThingService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Excel;
 
 class ProjectController extends Controller
@@ -89,12 +90,26 @@ class ProjectController extends Controller
 
     /**
      * @param Project $project
+     * @param Request $request
      * @return array
      */
-    public function things(Project $project)
+    public function things(Project $project, Request $request)
     {
-        $things = $project->things()->with('profile')->get();
-        return Response::body(compact('things'));
+        $things = $project->things()->with('profile');
+        try {
+            $data = ['sorted' => json_decode($request->get('sorted'), true), 'filtered' => json_decode($request->get('filtered'), true)];
+        } catch (\Error $e) {
+            $data = ['sorted' => [], 'filtered' => []];
+        }
+        foreach ($data['filtered'] as $item)
+            $things->where($item['id'], 'like', '%' . $item['value'] . '%');
+        if (count($data['sorted']))
+            $things->orderBy($data['sorted'][0]['id'], $data['sorted'][0]['desc'] ? 'DESC' : 'ASC');
+
+        $pages = ceil($things->count() / (intval($request->get('limit')) ?: 10));
+        $things = $things->skip(intval($request->get('offset')))->take(intval($request->get('limit')) ?: 10)->get();
+
+        return Response::body(['things' => $things, 'pages' => $pages]);
     }
 
     /**
@@ -113,10 +128,12 @@ class ProjectController extends Controller
      * @param Project $project
      * @return array
      */
-    public function get(Project $project)
+    public function get(Project $project, Request $request)
     {
         $project->load(['things', 'scenarios']);
         $project['scenarios']->forget('code');
+        if ($request->get('compress'))
+            $project->things->each->setAppends([]);
         $project['scenarios'] = $project['scenarios']->map(function ($item, $key) {
             unset($item['code']);
             return $item;
@@ -186,7 +203,7 @@ class ProjectController extends Controller
     public function log(Request $request, Project $project)
     {
         $limit = intval($request->get('limit')) ?: 10;
-        if($request->get('type')  == 'lora')
+        if ($request->get('type') == 'lora')
             $logs = $this->coreService->loraLogs($project['_id'], $limit);
         else
             $logs = $this->coreService->projectLogs($project['_id'], $limit);
