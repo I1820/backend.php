@@ -119,7 +119,7 @@ class ProjectController extends Controller
      */
     public function exportThings(Project $project, Excel $excel)
     {
-        $things = $project->things()->with('profile')->get();
+        $things = $project->things()->with(['profile', 'project'])->get();
         return $this->thingService->toExcel($things);
     }
 

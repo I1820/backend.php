@@ -13,6 +13,7 @@ use App\Gateway;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Excel;
 
 class GatewayService
 {
@@ -70,6 +71,51 @@ class GatewayService
         ]);
 
         return $gateway;
+    }
+
+    /**
+     * @param $gateways
+     * @return $this|\Illuminate\Database\Eloquent\Model
+     */
+    public function toExcel($gateways)
+    {
+        $excel = resolve(Excel::class);
+        $res = [[
+            '#',
+            'name',
+            'mac',
+            'altitude',
+            'description',
+            'lat',
+            'long',
+        ]];
+        $res = array_merge($res, $gateways->map(function ($item, $key) {
+            return [
+                $key + 1,
+                $item['name'],
+                $item['mac'],
+                $item['altitude'],
+                $item['description'],
+                $item['loc']['coordinates'][0],
+                $item['loc']['coordinates'][1],
+            ];
+        })->toArray());
+
+        return response(
+            $excel->create(
+                'gateways.xls',
+                function ($excel) use ($res) {
+                    $excel->sheet(
+                        'Gateways',
+                        function ($sheet) use ($res) {
+                            $sheet->fromArray($res, null, 'A1', false, false);
+                        }
+                    );
+                }
+            )->string('xls')
+        )
+            ->header('Content-Disposition', 'attachment; filename="gateways.xls"')
+            ->header('Content-Type', 'application/vnd.ms-excel; charset=UTF-8');
     }
 
 

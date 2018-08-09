@@ -50,9 +50,10 @@ class CoreService
     {
         Log::debug("Core Send Project\t" . $id);
         $url = '/api/projects';
-        $data = ['name' => (string)$id, [
+        $data = [
+            'name' => (string)$id,
             'envs' => Auth::user()->only(['email', 'name', '_id'])
-        ]];
+        ];
         $response = $this->_send($url, $data, 'post', $this->pmPort);
         return $response;
     }

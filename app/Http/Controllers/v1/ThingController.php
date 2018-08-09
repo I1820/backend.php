@@ -160,10 +160,21 @@ class ThingController extends Controller
      * @return ThingService|\Illuminate\Database\Eloquent\Model
      * @throws GeneralException
      */
-    public function excel(Request $request)
+    public function dataToExcel(Request $request)
     {
         $data = $this->data($request, false);
         return $this->thingService->dataToExcel(collect($data));
+
+    }
+
+    /**
+     * @param Request $request
+     * @return ThingService|\Illuminate\Database\Eloquent\Model
+     */
+    public function exportExcel(Request $request)
+    {
+        $things = Auth::user()->things()->with(['profile', 'project'])->get();
+        return $this->thingService->toExcel($things);
 
     }
 

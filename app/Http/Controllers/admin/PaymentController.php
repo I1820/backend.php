@@ -5,12 +5,20 @@ namespace App\Http\Controllers\admin;
 use App\Invoice;
 use App\PaymentPortal;
 use App\Repository\Helper\Response;
+use App\Repository\Services\Payment\PaymentService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class PaymentController extends Controller
 {
+    protected $paymentService;
+
+    public function __construct(PaymentService $paymentService)
+    {
+        $this->paymentService = $paymentService;
+    }
+
     public function list(Request $request)
     {
         $invoices = Invoice::skip(intval($request->get('offset')))
@@ -24,6 +32,15 @@ class PaymentController extends Controller
             'total_income' => $invoices->sum('price')
         ];
         return Response::body(compact('overview', 'invoices'));
+    }
+
+    public function exportToExcel(Request $request)
+    {
+        $invoices = Invoice::skip(intval($request->get('offset')))
+            ->take(intval($request->get('limit')) ?: 10)
+            ->with('user')
+            ->get();
+        return $this->paymentService->toExcel($invoices);
     }
 
     public function overview()

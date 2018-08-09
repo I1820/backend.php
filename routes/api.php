@@ -90,11 +90,12 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
         Route::post('/list', 'ThingController@list');
         Route::post('/', 'ThingController@create');
         Route::post('/from-excel', 'ThingController@fromExcel');
+        Route::get('/to-excel', 'ThingController@exportExcel');
         Route::post('/delete', 'ThingController@deleteMultiple');
         Route::get('/{thing}', 'ThingController@get');
 
         Route::post('data', 'ThingController@mainData');
-        Route::post('data/excel', 'ThingController@excel');
+        Route::post('data/excel', 'ThingController@dataToExcel');
         Route::post('data/sample', 'ThingController@sampleData');
 
         Route::patch('/{thing}', 'ThingController@update');
@@ -120,6 +121,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
     Route::group(['prefix' => 'gateway', 'middleware' => ['auth.jwt']], function () {
         Route::post('/', 'GatewayController@create');
         Route::get('/', 'GatewayController@list');
+        Route::get('/to-excel', 'GatewayController@exportToExcel');
         Route::delete('/{gateway}', 'GatewayController@delete');
         Route::get('/{gateway}', 'GatewayController@info');
         Route::put('/{gateway}', 'GatewayController@update');
@@ -184,6 +186,7 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
 
     Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt', 'admin']], function () {
         Route::get('/', 'PaymentController@list');
+        Route::get('/to-excel', 'PaymentController@exportToExcel');
         Route::get('/overview', 'PaymentController@overview');
         Route::get('/portals', 'PaymentController@portals');
         Route::get('/portals/{paymentPortal}/active', 'PaymentController@activatePortal');

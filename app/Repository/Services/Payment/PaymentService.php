@@ -27,6 +27,7 @@ class PaymentService
             'درگاه',
             'وضعیت',
             'تخفیف',
+            'کاربر',
         ]];
         $res = array_merge($res, $invoices->map(function ($item, $key) {
             return [
@@ -39,6 +40,8 @@ class PaymentService
                 $item['package']['price'],
                 'زرین پال',
                 $item['status'] ? 'موفق' : 'ناموفق',
+                $item['discount'],
+                $item['user']['email']
             ];
         })->toArray());
 

@@ -84,7 +84,7 @@ class PaymentController extends Controller
 
     public function excel()
     {
-        $invoices = Auth::user()->invoices()->get();
+        $invoices = Auth::user()->invoices()->with('user')->get();
         return $this->paymentService->toExcel($invoices);
     }
 

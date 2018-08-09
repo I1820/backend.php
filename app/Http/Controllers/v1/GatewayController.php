@@ -153,6 +153,17 @@ class GatewayController extends Controller
         return Response::body(compact('gateways'));
     }
 
+
+    /**
+     * @return ThingService|\Illuminate\Database\Eloquent\Model
+     */
+    public function exportToExcel()
+    {
+        $gateways = Auth::user()->gateways()->get();
+        return $this->gatewayService->toExcel($gateways);
+    }
+
+
     /**
      * @param Gateway $gateway
      * @return array
