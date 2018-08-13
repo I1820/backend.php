@@ -49,7 +49,6 @@ class CodecPolicy
      */
     public function send(User $user)
     {
-        dd('sajjad');
         $permission = $user->role()->first()->perms()->where('slug', 'SEND-CODEC')->first();
         return $user['active'] && $permission;
     }

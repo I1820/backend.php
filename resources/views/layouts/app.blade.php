@@ -26,7 +26,7 @@
             <div class="container">
                 <div>
                     <a style="float: right;" class="navbar-brand">
-                        {{ 'سامانه اینترنت اشیا دانشگاه امیرکبیر' }}
+                        {{ 'سامانه اینترنت اشیا پژوهشکده فضایی' }}
                     </a>
                 </div>
                 <div class="collapse navbar-collapse" id="app-navbar-collapse">
