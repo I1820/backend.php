@@ -5,6 +5,7 @@ namespace App\Http\Controllers\v1;
 use App\Exceptions\GeneralException;
 use App\Http\Controllers\Controller;
 use App\Project;
+use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
 use App\Thing;
 use Illuminate\Http\Request;
@@ -37,6 +38,7 @@ class DownLinkController extends Controller
             $request->get('data')
             , $request->get('fport') ?: 2
             , $request->get('confirmed') ? true : false);
+        return Response::body(['success' => true]);
 
     }
 }
