@@ -90,6 +90,7 @@ class LanService
 
         $response = $this->curlService->to($url)
             ->withHeader('Accept: application/json')
+            ->withHeader('Authorization: ' . env('CORE_SECRET'))
             ->withData($data)
             ->withOption('SSL_VERIFYHOST', false)
             ->returnResponseObject()
