@@ -35,16 +35,19 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+/*
+
         //AuthValidation::register($request);
 
 
-        #$this->userService->validateRegisterUser($request);
+        $this->userService->validateRegisterUser($request);
 
-        #$user = $this->userService->insertUser($request);
+        $user = $this->userService->insertUser($request);
         # generate token
         # $token = JWTAuth::fromUser($user);
 
-        #Mail::to($user['email'])->send(new EmailVerification($user));
+        Mail::to($user['email'])->send(new EmailVerification($user));
+*/
 
         return Response::body(['message' => 'ایمیل فعال سازی برای شما فرستاده شد']);
     }
