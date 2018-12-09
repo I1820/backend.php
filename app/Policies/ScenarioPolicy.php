@@ -62,7 +62,7 @@ class ScenarioPolicy
      */
     public function delete(User $user, Scenario $scenario)
     {
-        $permission = $user->role()->first()->perms()->where('slug', '  DELETE-SCENARIO')->first();
+        $permission = $user->role()->first()->perms()->where('slug', 'DELETE-SCENARIO')->first();
         return $user['active'] && $permission;
     }
 
