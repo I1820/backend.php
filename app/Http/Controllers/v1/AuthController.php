@@ -35,7 +35,7 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-/*
+
 
         //AuthValidation::register($request);
 
@@ -47,7 +47,6 @@ class AuthController extends Controller
         # $token = JWTAuth::fromUser($user);
 
         Mail::to($user['email'])->send(new EmailVerification($user));
-*/
 
         return Response::body(['message' => 'ایمیل فعال سازی برای شما فرستاده شد']);
     }
