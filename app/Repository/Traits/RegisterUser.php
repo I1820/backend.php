@@ -64,7 +64,7 @@ trait RegisterUser
         $validator = Validator::make($request->all(), [
             'name' => 'string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])$/',
+            'password' => 'required|string|min:6|confirmed|regex:/^(?=.[0-9])(?=.[!@#$%^&])[a-zA-Z0-9!@#$%^&]{7,15}$/',
         ], $messages);
         
         if ($validator->fails())
