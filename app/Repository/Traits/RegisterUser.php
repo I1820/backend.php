@@ -19,7 +19,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use MongoDB\BSON\UTCDateTime;
-use DateTime;
 
 
 trait RegisterUser
@@ -42,8 +41,7 @@ trait RegisterUser
             'password' => bcrypt($request->get('password')),
             'package' => $package,
             'role_id' => $role['_id'],
-            'last_login_IP'=>request()->ip(),
-            'last_login_time'=> new DateTime
+            'last_login_IP'=>request()->ip()
         ]);
 
         return $user;
