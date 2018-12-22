@@ -39,7 +39,9 @@ trait RegisterUser
             'email' => $request->get('email'),
             'password' => bcrypt($request->get('password')),
             'package' => $package,
-            'role_id' => $role['_id']
+            'role_id' => $role['_id'],
+            'last_login_IP'=>request()->ip(),
+            'last_login_time'=> new DateTime
         ]);
 
         return $user;
