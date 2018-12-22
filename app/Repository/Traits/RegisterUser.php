@@ -53,6 +53,7 @@ trait RegisterUser
     public function validateRegisterUser(Request $request)
     {
         $messages = [
+            'email.required' => 'لطفا ایمیل را وارد کنید',
             'email.email' => 'لطفا ایمیل را درست وارد کنید',
             'email.unique' => 'این ایمیل قبلا ثبت شده است',
             'password.required' => 'لطفا رمزعبور را وارد کنید',
@@ -62,7 +63,7 @@ trait RegisterUser
 
         $validator = Validator::make($request->all(), [
             'name' => 'string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])$/',
         ], $messages);
         
