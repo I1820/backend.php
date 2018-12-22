@@ -58,7 +58,7 @@ trait RegisterUser
             'email.unique' => 'این ایمیل قبلا ثبت شده است',
             'password.required' => 'لطفا رمزعبور را وارد کنید',
             'password.min' => 'رمز عبور حداقل باید ۶ کارکتر باشد',
-            'password.regex'=>'رمز عبور باید شامل حداقل یک حرف بزرگ، یک حرف کوچک و یک کاراکتر خاص باشد'
+            'password.regex'=>'رمز عبور باید شامل حداقل یک عدد،یک حرف بزرگ، یک حرف کوچک و یک کاراکتر خاص باشد'
         ];
 
         $validator = Validator::make($request->all(), [
