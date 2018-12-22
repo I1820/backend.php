@@ -23,7 +23,7 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'other_info', 'active', 'legal', 'mobile', 'package','role_id'
+        'name', 'email', 'password', 'other_info', 'active', 'legal', 'mobile', 'package','role_id','last_login_IP'
     ];
 
     /**
@@ -32,7 +32,7 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token', 'active', '_id', 'updated_at', 'created_at', 'files', 'email_token','last_login_IP'
+        'password', 'remember_token', 'active', '_id', 'updated_at', 'created_at', 'files', 'email_token'
     ];
 
     public function projects()
