@@ -57,7 +57,6 @@ trait RegisterUser
             'email.email' => 'لطفا ایمیل را درست وارد کنید',
             'email.unique' => 'این ایمیل قبلا ثبت شده است',
             'password.required' => 'لطفا رمزعبور را وارد کنید',
-            'password.confirmed' => 'رمز عبور و تکرار آن باید یکسان باشند',
             'password.min' => 'رمز عبور حداقل باید ۶ کارکتر باشد',
             'password.regex'=>'رمز عبور باید شامل حداقل یک حرف بزرگ، یک حرف کوچک و یک کاراکتر خاص باشد'
         ];
@@ -65,7 +64,7 @@ trait RegisterUser
         $validator = Validator::make($request->all(), [
             'name' => 'string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/',
+            'password' => 'required|string|min:6|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/',
         ], $messages);
         
         if ($validator->fails())
