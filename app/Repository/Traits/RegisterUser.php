@@ -53,7 +53,6 @@ trait RegisterUser
     public function validateRegisterUser(Request $request)
     {
         $messages = [
-            'email.required' => 'XXلطفا ایمیل را وارد کنید',
             'email.email' => 'لطفا ایمیل را درست وارد کنید',
             'email.unique' => 'این ایمیل قبلا ثبت شده است',
             'password.required' => 'لطفا رمزعبور را وارد کنید',
