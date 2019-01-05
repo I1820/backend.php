@@ -66,19 +66,27 @@ class UserController extends Controller
      */
     public function changePassword(Request $request)
     {
-        $new_password = $request->get('new_password');
-        $messages = [
-            'new_password.required' => 'لطفا رمزعبور را وارد کنید',
-            'new_password.min' => 'رمز عبور باید حداقل ۶ حرف باشد شامل حداقل یک عدد،یک حرف بزرگ، یک حرف کوچک و یک کاراکتر خاص باشد',
-            'new_password.regex'=>'رمز عبور باید حداقل ۶ حرف باشد شامل حداقل یک عدد،یک حرف بزرگ، یک حرف کوچک و یک کاراکتر خاص باشد'
-        ];
-        $validator = Validator::make($request->all(), [
-            'new_password' => 'required|string|min:6|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/',
-        ], $messages);
+        // $new_password = $request->get('new_password');
+        // $messages = [
+        //     'new_password.required' => 'لطفا رمزعبور را وارد کنید',
+        //     'new_password.min' => 'رمز عبور باید حداقل ۶ حرف باشد شامل حداقل یک عدد،یک حرف بزرگ، یک حرف کوچک و یک کاراکتر خاص باشد',
+        //     'new_password.regex'=>'رمز عبور باید حداقل ۶ حرف باشد شامل حداقل یک عدد،یک حرف بزرگ، یک حرف کوچک و یک کاراکتر خاص باشد'
+        // ];
+        // $validator = Validator::make($request->all(), [
+        //     'new_password' => 'required|string|min:6|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/',
+        // ], $messages);
         
-        if ($validator->fails())
-            throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
+        // if ($validator->fails())
+        //     throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
 
+        // $this->userService->changePassword($request);
+        // return Response::body(['success' => true]);
+
+        /******* */
+
+        $new_password = $request->get('new_password');
+        if (strlen($new_password) < 6)
+            throw new GeneralException('رمز عبور باید حداقل ۶ کاراکتر باشد.', GeneralException::VALIDATION_ERROR);
         $this->userService->changePassword($request);
         return Response::body(['success' => true]);
     }

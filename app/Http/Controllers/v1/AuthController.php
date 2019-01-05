@@ -68,8 +68,6 @@ class AuthController extends Controller
         
         $token = $this->userService->generateToken($request);
         $user = Auth::user();
-      #  user()->update(['last_login_IP' => request()->ip() ]) ;
-       # user()->update(['last_login_time' => new DateTime() ]) ;
         $user['last_login_IP']= request()->ip();
         $user['last_login_time']= new DateTime();
         $user->save();
