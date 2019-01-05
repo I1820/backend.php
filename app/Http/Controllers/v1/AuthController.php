@@ -64,9 +64,11 @@ class AuthController extends Controller
         if ($validator->fails()) {
             throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
         }
-
+        
         $token = $this->userService->generateToken($request);
         $user = Auth::user();
+        $user['last_login_IP']=request()->ip();
+        $user['last_login_time']=new DateTime();
         if (!$user->active)
             throw new AuthException(AuthException::M_USER_NOT_ACTIVE, AuthException::UNAUTHORIZED);
         $config = ['portainer_url' => env('PORTAINER_URL'), 'prometheus_url' => env('PROMETHEUS_URL')];
