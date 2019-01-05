@@ -68,10 +68,11 @@ class AuthController extends Controller
         
         $token = $this->userService->generateToken($request);
         $user = Auth::user();
-        $user()->update(['last_login_IP' => request()->ip() ]) ;
-        $user()->update(['last_login_time' => new DateTime() ]) ;
+      #  user()->update(['last_login_IP' => request()->ip() ]) ;
+       # user()->update(['last_login_time' => new DateTime() ]) ;
         $user['last_login_IP']= request()->ip();
         $user['last_login_time']= new DateTime();
+        $user->save();
         if (!$user->active)
             throw new AuthException(AuthException::M_USER_NOT_ACTIVE, AuthException::UNAUTHORIZED);
         $config = ['portainer_url' => env('PORTAINER_URL'), 'prometheus_url' => env('PROMETHEUS_URL')];
