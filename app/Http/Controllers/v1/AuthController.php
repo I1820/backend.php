@@ -18,7 +18,7 @@ use DateTime;
 
 class AuthController extends Controller
 {
-    use AuthenticatesUsers;
+    use AuthenticatesUsers,ThrottlesLogins;
     private $userService;
 
     /**
