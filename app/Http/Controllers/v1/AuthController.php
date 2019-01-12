@@ -61,10 +61,10 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        $this->incrementLoginAttempts($request);
         $request->merge($request->json()->all());
         $validator = $this->loginValidator($request);
         if ($validator->fails()) {
-            $this->incrementLoginAttempts($request);
             if ($this->hasTooManyLoginAttempts($request)) {
                 $this->fireLockoutEvent($request);
     
@@ -72,6 +72,7 @@ class AuthController extends Controller
             }
             throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
         }
+        $this->clearLoginAttempts($request);
         $token = $this->userService->generateToken($request);
         $user = Auth::user();
         $user['last_login_IP']= request()->ip();
