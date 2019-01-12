@@ -15,10 +15,10 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use DateTime;
-use Illuminate\Foundation\Auth\ThrottlesLogins;
 
 class AuthController extends Controller
 {
+    use AuthenticatesUsers;
     private $userService;
 
     /**
@@ -61,10 +61,10 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $this->incrementLoginAttempts($request);
         $request->merge($request->json()->all());
         $validator = $this->loginValidator($request);
         if ($validator->fails()) {
+            $this->incrementLoginAttempts($request);
             if ($this->hasTooManyLoginAttempts($request)) {
                 $this->fireLockoutEvent($request);
     
