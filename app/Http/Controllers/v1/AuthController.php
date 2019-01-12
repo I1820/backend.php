@@ -15,10 +15,10 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use DateTime;
+use Illuminate\Foundation\Auth\ThrottlesLogins;
 
 class AuthController extends Controller
 {
-    use Illuminate\Foundation\Auth\ThrottlesLogins;
     private $userService;
 
     /**
