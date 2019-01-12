@@ -25,6 +25,10 @@ class LoginController extends Controller
      *
      * @var string
      */
+
+    protected $maxAttempts= 2;
+    protected $decayMinutes= 10;
+
     protected $redirectTo = '/home';
 
     /**
