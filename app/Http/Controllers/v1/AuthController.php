@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use DateTime;
+use ThrottlesLogins;
 
 class AuthController extends Controller
 {
@@ -63,9 +64,14 @@ class AuthController extends Controller
         $request->merge($request->json()->all());
         $validator = $this->loginValidator($request);
         if ($validator->fails()) {
+            $this->incrementLoginAttempts($request);
+            if ($this->hasTooManyLoginAttempts($request)) {
+                $this->fireLockoutEvent($request);
+    
+                return $this->sendLockoutResponse($request);
+            }
             throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
         }
-        
         $token = $this->userService->generateToken($request);
         $user = Auth::user();
         $user['last_login_IP']= request()->ip();
