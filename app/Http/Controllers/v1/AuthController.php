@@ -20,6 +20,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class AuthController extends Controller
 {
+    use AuthenticatesUsers;
     private $userService;
 
     /**
@@ -68,7 +69,6 @@ class AuthController extends Controller
             $this->incrementLoginAttempts($request);
             if ($this->hasTooManyLoginAttempts($request)) {
                 $this->fireLockoutEvent($request);
-    
                 return $this->sendLockoutResponse($request);
             }
             throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
