@@ -70,8 +70,8 @@ class AuthController extends Controller
             if ($this->hasTooManyLoginAttempts($request)) {
                 $this->fireLockoutEvent($request);
                 return $this->sendLockoutResponse($request);
-            }else{
-            throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);}
+            }
+            throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
         }
         $this->clearLoginAttempts($request);
         $token = $this->userService->generateToken($request);
