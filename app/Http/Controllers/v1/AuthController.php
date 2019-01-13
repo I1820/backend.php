@@ -67,10 +67,10 @@ class AuthController extends Controller
         $validator = $this->loginValidator($request);
         if ($validator->fails()) {
             $this->incrementLoginAttempts($request);
-            if ($this->hasTooManyLoginAttempts($request)) {
+         //   if ($this->hasTooManyLoginAttempts($request)) {
                 $this->fireLockoutEvent($request);
                 return $this->sendLockoutResponse($request);
-            }
+        //    }
             throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
         }
         $this->clearLoginAttempts($request);
