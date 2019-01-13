@@ -21,7 +21,6 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 class AuthController extends Controller
 {
     use AuthenticatesUsers;
-    use ThrottlesLogins;
     private $userService;
 
     /**
