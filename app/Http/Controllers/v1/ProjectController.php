@@ -101,8 +101,12 @@ class ProjectController extends Controller
         } catch (\Error $e) {
             $data = ['sorted' => [], 'filtered' => []];
         }
+        if(is_array($data['filtered'])){
         foreach ($data['filtered'] as $item)
             $things->where($item['id'], 'like', '%' . $item['value'] . '%');
+        }else{
+            return Response::body(['error message' => 'array is empty']);
+        }
         if (count($data['sorted']))
             $things->orderBy($data['sorted'][0]['id'], $data['sorted'][0]['desc'] ? 'DESC' : 'ASC');
 
