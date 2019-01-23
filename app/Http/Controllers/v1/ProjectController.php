@@ -95,7 +95,7 @@ class ProjectController extends Controller
      */
     public function things(Project $project, Request $request)
     {
-        $things = $project->things()->with('profile');
+        $things = $project->things();
         try {
             $data = ['sorted' => json_decode($request->get('sorted'), true), 'filtered' => json_decode($request->get('filtered'), true)];
         } catch (\Error $e) {
