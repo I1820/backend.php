@@ -1,0 +1,3 @@
+{"_id":{"$oid":"5ac73bc622642e035ce784dd"},"name":"طلایی","node_num":100,"project_num":10,"time":90,"price":180000,"is_active":true}
+{"_id":{"$oid":"5ac73bc622642e035ce784de"},"name":"نقره‌ای","node_num":50,"project_num":5,"time":45,"price":"90000","is_active":true}
+{"_id":{"$oid":"5ac73bc622642e035ce784df"},"name":"شروع","node_num":"2","project_num":1,"time":30,"price":"25000","is_active":false,"default":true}

@@ -1,0 +1,6 @@
+{"_id":{"$oid":"5a78c0125521845d6e3f47a2"},"slug":"CREATE-PROJECT","name":"ساخت پروژه"}
+{"_id":{"$oid":"5a78c0125521845d6e3f47a4"},"slug":"EDIT-PROJECT","name":"ویرایش پروژه"}
+{"_id":{"$oid":"5a78c0125521845d6e3f47a9"},"slug":"CREATE-THING","name":"ساخت شی"}
+{"_id":{"$oid":"5a78c0125521845d6e3f47ae"},"slug":"EDIT-THING","name":"ویرایش شی"}
+{"_id":{"$oid":"5b2cdbe4adf51b3f24f316ce"},"slug":"DELETE-THING","name":"حذف شی"}
+{"_id":{"$oid":"5b2cdbfbadf51b3f24f316cf"},"slug":"DELETE-PROJECT","name":"حذف پروژه"}
