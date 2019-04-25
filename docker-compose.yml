@@ -10,13 +10,13 @@ services:
     container_name: app
     restart: unless-stopped
     tty: true
-    env_file: .env
     environment:
       SERVICE_NAME: app
       SERVICE_TAGS: dev
     working_dir: /var/www
     volumes:
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./.env:/var/www/.env
     networks:
       - app-network
 
