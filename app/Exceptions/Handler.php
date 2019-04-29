@@ -57,6 +57,7 @@ class Handler extends ExceptionHandler
         } else { # other exceptions
             $response = $this->otherExceptions($request, $exception);
         }
+
         return $response;
     }
 
@@ -80,10 +81,10 @@ class Handler extends ExceptionHandler
      */
     private function otherExceptions($request, Exception $exception)
     {
-        if (env('APP_DEBUG')) { # debug true
+        if (env('APP_DEBUG') == 'true') { # debug true
             $response = parent::render($request, $exception);
         } else { # debug false
-            $response = response()->json(Response::body('server error', 500));
+            $response = response()->json(Response::body($exception->getMessage(), 500));
         }
 
         return $response;
