@@ -476,16 +476,21 @@ class CoreService
         */
 
         if ($new_response->status == 0) {
-            throw new GeneralException($new_response->error, 0);
+            throw new GeneralException('Core service connection error', 500);
         }
         if ($new_response->status == 200) {
             return $new_response->content ?: [];
         }
-        throw new GeneralException(
-            $new_response->content->error ?: '',
-            $new_response->status
-        );
-
+        if ($new_response->status != 200) {
+            if ($new_response->content) {
+                throw new GeneralException(
+                    $new_response->content->error ?: 'Unkown Core service error',
+                    $new_response->status
+                );
+            } else {
+                throw new GeneralException('Core service connection error', $new_response->status);
+            }
+        }
     }
 
     public function fake()
