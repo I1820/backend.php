@@ -28,7 +28,9 @@ class LoraService
 
     public function __construct(CurlService $curlService)
     {
-        $this->token = Storage::get('jwt.token');
+        if (Storage::exists('jwt.token')) {
+            $this->token = Storage::get('jwt.token');
+        }
         $this->base_url = config('iot.lora.serverBaseUrl');
         $this->organization_id = config('iot.lora.organizationID');
         $this->networkServerID = config('iot.lora.networkServerID');
