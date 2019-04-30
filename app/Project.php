@@ -47,12 +47,10 @@ class Project extends Eloquent
         return $this->hasMany(Codec::class);
     }
 
-
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-
 
     public function getOwnerAttribute()
     {
@@ -75,5 +73,4 @@ class Project extends Eloquent
         $scenario['is_active'] = true;
         $scenario->save();
     }
-
 }
