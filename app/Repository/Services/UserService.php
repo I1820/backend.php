@@ -25,9 +25,6 @@ class UserService
     use RegisterUser;
     use UpdateUser;
 
-
-    const GRAVATAR_BASE_URL = 'https://www.gravatar.com/avatar/';
-
     /**
      * @param Request $request
      * @return string
