@@ -13,8 +13,8 @@
         "kavenegar/php": "^1.2",
         "laravel/framework": "^5.8",
         "laravel/tinker": "~1.0",
+        "tymon/jwt-auth": "^1.0.0-rc.4",
         "saeedpooyanfar/zarinpal": "^3.0",
-        "tymon/jwt-auth": "^0.5.12",
         "maatwebsite/excel": "^2.1"
     },
     "require-dev": {
