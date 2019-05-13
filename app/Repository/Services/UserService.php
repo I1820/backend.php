@@ -33,9 +33,9 @@ class UserService
      * @return string
      * @throws AuthException
      */
-    public function generateToken(Request $request): string
+    public function generateAccessToken(Request $request): string
     {
-        # verify user with db and generate token
+        // verify user with db and generate access token
         $credentials = $request->only('email', 'password');
         $token = auth()->attempt($credentials);
 
@@ -45,6 +45,22 @@ class UserService
 
         return $token;
     }
+
+    /**
+     * @param Request $request
+     * @return string
+     */
+    public function generateRefreshToken(string $sub): string
+    {
+        $token = auth()->setTTL(7200)->tokenById($sub); // token is valid for 5 days!
+
+        if (!$token) {
+            throw new AuthException(AuthException::M_INVALID_CREDENTIALS, AuthException::UNAUTHORIZED);
+        }
+
+        return $token;
+    }
+
 
     public function activateImpersonate(User $user)
     {
@@ -74,7 +90,7 @@ class UserService
     public function refreshToken(): string
     {
         try {
-            return JWTAuth::refresh(JWTAuth::getToken());
+            return auth()->refresh();
         } catch (TokenBlacklistedException $exception) {
             throw new GeneralException(GeneralException::M_UNKNOWN, 701);
         }
