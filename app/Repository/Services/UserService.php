@@ -87,10 +87,10 @@ class UserService
      * @return string
      * @throws GeneralException
      */
-    public function refreshToken(): string
+    public function refreshToken(string $sub): string
     {
         try {
-            return auth()->refresh();
+            return auth()->tokenById($sub);
         } catch (TokenBlacklistedException $exception) {
             throw new GeneralException(GeneralException::M_UNKNOWN, 701);
         }

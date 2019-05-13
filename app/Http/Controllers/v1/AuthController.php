@@ -84,7 +84,7 @@ class AuthController extends Controller
     public function refresh(Request $request)
     {
         $user = auth()->user();
-        $token = $this->userService->refreshToken();
+        $token = $this->userService->refreshToken($user->getKey());
         return Response::body(['token' => $token, 'user' => $user]);
     }
 
