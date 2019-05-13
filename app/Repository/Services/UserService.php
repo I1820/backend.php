@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Excel;
 use MongoDB\BSON\UTCDateTime;
 use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserService
 {
@@ -38,7 +37,7 @@ class UserService
     {
         # verify user with db and generate token
         $credentials = $request->only('email', 'password');
-        $token = JWTAuth::attempt($credentials);
+        $token = auth()->attempt($credentials);
 
         if (!$token) {
             throw new AuthException(AuthException::M_INVALID_CREDENTIALS, AuthException::UNAUTHORIZED);
