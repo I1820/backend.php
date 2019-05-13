@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'ISRC'),
+    'name' => env('APP_NAME', 'I1820'),
 
     /*
     |--------------------------------------------------------------------------
@@ -167,7 +167,6 @@ return [
         /*
          * Package Service Providers...
          */
-        // added by saman
         Ixudra\Curl\CurlServiceProvider::class,
 
         /*
@@ -179,9 +178,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
-        //added by Sajjad
         Jenssegers\Mongodb\MongodbServiceProvider::class,
-        Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
+        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         Anhskohbo\NoCaptcha\NoCaptchaServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Zarinpal\ZarinpalServiceProvider::class,
@@ -237,7 +235,6 @@ return [
         'NoCaptcha' => Anhskohbo\NoCaptcha\Facades\NoCaptcha::class,
 
 
-        // added by saman
         'Curl' => Ixudra\Curl\Facades\Curl::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
 
