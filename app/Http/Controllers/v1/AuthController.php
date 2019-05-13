@@ -63,28 +63,28 @@ class AuthController extends Controller
             throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
         }
 
-        $token = $this->userService->generateToken($request);
-        $user = Auth::user();
+        $access_token = $this->userService->generateAccessToken($request);
+
+        // check user activation status
+        $user = auth()->user();
         if (!$user->active)
             throw new AuthException(AuthException::M_USER_NOT_ACTIVE, AuthException::UNAUTHORIZED);
+
+        $refresh_token = $this->userService->generateRefreshToken($user->getKey());
+
         $config = ['portainer_url' => env('PORTAINER_URL'), 'prometheus_url' => env('PROMETHEUS_URL')];
-        return Response::body(compact('user', 'token', 'config'));
+        return Response::body(compact('user', 'access_token', 'refresh_token', 'config'));
     }
 
     /**
+     * refresh API
      * @param Request $request
      * @return array
      */
     public function refresh(Request $request)
     {
-
-        try {
-            $token = $this->userService->refreshToken();
-            $user = User::where('_id', JWTAuth::getPayload($token)->toArray()['sub'])->first();
-        } catch (\Exception $e) {
-            return Response::body($e->getMessage(), $e->getCode());
-        }
-        $request->headers->set('authorization', 'Bearer ' . $token);
+        $user = auth()->user();
+        $token = $this->userService->refreshToken();
         return Response::body(['token' => $token, 'user' => $user]);
     }
 
