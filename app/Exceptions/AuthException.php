@@ -17,6 +17,8 @@ class AuthException extends IOTException
 
     const M_USER_NOT_ACTIVE = 'حساب شما فعال نیست';
     const M_INVALID_CREDENTIALS = 'اطلاعات وارد شده درست نیست';
+    const M_TOKEN_EXPIRED = 'توکن شما منقضی شده است';
+
     /**
      * AuthException constructor.
      * @param string $message
