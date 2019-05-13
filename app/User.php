@@ -10,8 +10,9 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Eloquent implements AuthenticatableContract, AuthorizableContract
+class User extends Eloquent implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
     use Authorizable;
     use Authenticatable;
@@ -82,4 +83,23 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
         return (isset($this['is_admin']) && $this['is_admin']);
     }
 
+        /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 }
