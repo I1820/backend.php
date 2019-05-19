@@ -53,7 +53,7 @@ class ProjectService
 
     /**
      * @param Request $request
-     * @return void
+     * @return Project
      * @throws GeneralException
      * @throws LoraException
      */

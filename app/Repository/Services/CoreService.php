@@ -429,6 +429,7 @@ class CoreService
 
 
     /**
+     * General send function for core services that handles errors
      * @param $url
      * @param $data
      * @param string $method
@@ -484,7 +485,7 @@ class CoreService
         if ($new_response->status != 200) {
             if ($new_response->content) {
                 throw new GeneralException(
-                    $new_response->content->error ?: 'Unkown Core service error',
+                    $new_response->content->error ?: 'Unknown Core service error',
                     $new_response->status
                 );
             } else {

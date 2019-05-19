@@ -78,10 +78,10 @@ class AuthController extends Controller
 
     /**
      * refresh API
-     * @param Request $request
      * @return array
+     * @throws GeneralException
      */
-    public function refresh(Request $request)
+    public function refresh()
     {
         $user = auth()->user();
         $token = $this->userService->refreshToken($user->getKey());

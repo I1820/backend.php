@@ -44,8 +44,9 @@ class UserService
     }
 
     /**
-     * @param Request $request
+     * @param string $sub is a refresh token subject
      * @return string
+     * @throws AuthException
      */
     public function generateRefreshToken(string $sub): string
     {
