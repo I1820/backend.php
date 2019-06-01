@@ -32,6 +32,7 @@ You have the php environment so let's run this shit!
 ```bash
 php artisan key:generate
 php artisan config:cache
+php artisan jwt:secret
 
 php artisan serve --host=0.0.0.0 --port=7070
 ```
