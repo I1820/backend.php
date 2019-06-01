@@ -80,7 +80,7 @@ class UserController extends Controller
     public function profile()
     {
         $user = Auth::user();
-        return Response::body(['user' => $user, 'token' => JWTAuth::refresh()]);
+        return Response::body(['user' => $user]);
     }
 
     /**
