@@ -11,6 +11,7 @@ First of all you must install the php.
 ```bash
 sudo apt install curl php-cli php-mbstring git unzip
 sudo apt install php-fpm php-pear php-dev
+sudo apt install php-curl
 ```
 
 Then you must install the php composer for php package management.
