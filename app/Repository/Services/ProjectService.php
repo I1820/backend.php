@@ -60,21 +60,17 @@ class ProjectService
     public function insertProject(Request $request)
     {
         $id = new ObjectId();
-        $container = $this->coreService->createProject($id); // create project with `pm`
+        $application_id = $this->loraService->postApp($request->get('description'), $id);
+        $container = $this->coreService->createProject($id);
         $project = Project::create([
             '_id' => $id,
             'name' => $request->get('name'),
             'description' => $request->get('description'),
             'active' => true,
             'container' => $container,
+            'application_id' => $application_id
         ]);
         return $project;
-    }
-
-    public function enableLoraOnProject(Request $request, Project $project)
-    {
-        $project->application_id = $this->loraService->postApp($request->get('description'), $project->_id);
-        $project->save();
     }
 
     /**
