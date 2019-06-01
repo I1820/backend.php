@@ -27,6 +27,15 @@ Almost Done! Install the mongodb extension for php with the following command.
 sudo pecl install mongodb
 ```
 
+You have the php environment so let's run this shit!
+
+```bash
+php artisan key:generate
+php artisan config:cache
+
+php artisan serve --host=0.0.0.0 --port=7070
+```
+
 ## Installation (with Docker)
 Let's up and run this piece of shit on Docker.
 
