@@ -453,7 +453,7 @@ class CoreService
             ->returnResponseObject()
             ->asJsonRequest()
             ->asJsonResponse()
-            ->withTimeout('5');
+            ->withTimeout('60');
         $new_response = null;
         switch ($method) {
             case 'get':
