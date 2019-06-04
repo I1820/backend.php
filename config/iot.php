@@ -16,8 +16,8 @@ return [
     'core' => [
         'serverBaseUrl' => env('CORE_BASE_URL', '172.23.132.50'),
         'pmPort' => '8080',
-        'dmPort' => '1372',
-        'downLinkPort' => '1373',
+        'dmPort' => '1373',
+        'downLinkPort' => '1372',
         'gmPort' => '1374'
     ],
     'lan' => [

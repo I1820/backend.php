@@ -275,7 +275,7 @@ class CoreService
     public function thingsMainData($ids, $since, $until, $limit, $offset)
     {
         Log::debug("Core Things Data");
-        $url = '/api/things';
+        $url = '/api/queries/fetch';
         $data = ['since' => (int)$since, 'thing_ids' => $ids];
         if ($limit) {
             $data['limit'] = (int)$limit;
