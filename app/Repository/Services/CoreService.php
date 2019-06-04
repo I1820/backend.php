@@ -144,7 +144,7 @@ class CoreService
     public function getThingLastParsed(Thing $thing)
     {
         Log::debug("Core Get Thing\t" . $thing['dev_eui']);
-        $url = '/api/things/' . $thing['dev_eui'] . '/p';
+        $url = '/api/queries/things/' . $thing['dev_eui'] . '/parsed';
         $response = $this->_send($url, [], 'get', $this->dmPort);
         return $response;
     }
@@ -231,7 +231,7 @@ class CoreService
     public function thingData(Thing $thing, $since, $until, $limit = 0)
     {
         Log::debug("Core Thing Data");
-        $url = '/api/things/' . $thing['interface']['devEUI'];
+        $url = '/api/queries/things/' . $thing['interface']['devEUI'] . '/fetch';
         $data = ['since' => (int)$since];
         if ($until)
             $data['until'] = (int)$until;
