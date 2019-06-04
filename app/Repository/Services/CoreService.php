@@ -317,20 +317,6 @@ class CoreService
     }
 
     /**
-     * @param $mac
-     * @return array
-     * @throws GeneralException
-     */
-    public function enableGateway($mac)
-    {
-        Log::debug("Core Enable Gateway\t" . $mac);
-        $url = '/api/gateway/' . $mac . '/enable';
-        $response = $this->_send($url, [], 'get', $this->dmPort);
-        return $response;
-    }
-
-
-    /**
      * @return array
      * @throws GeneralException
      */
