@@ -66,7 +66,7 @@ class GatewayService
             'mac' => $request->get('mac'),
             'loc' => [
                 'type' => 'Point',
-                'coordinates' => [$request->get('latitude'), $request->get('longitude')]
+                'coordinates' => [$request->get('longitude'), $request->get('latitude')]
             ],
         ]);
 

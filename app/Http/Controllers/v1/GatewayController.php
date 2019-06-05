@@ -84,9 +84,8 @@ class GatewayController extends Controller
         $gateway['altitude'] = intval($data['altitude']);
         $gateway['loc'] = [
             'type' => 'Point',
-            'coordinates' => [$request->get('latitude'), $request->get('longitude')]
+            'coordinates' => [$request->get('longitude'), $request->get('latitude')]
         ];
-        $this->coreService->enableGateway($gateway['mac']);
         $gateway->save();
         $gateway->load_last_seen();
         return Response::body(compact('gateway'));
