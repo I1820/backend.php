@@ -1,6 +1,6 @@
 {
-    "name": "loraform/backend",
-    "description": "The LoraForm Glue",
+    "name": "i1820/backend",
+    "description": "The Glue",
     "keywords": ["iot-platform", "lora", "backend"],
     "license": "GPLv3",
     "type": "project",
