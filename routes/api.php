@@ -202,7 +202,6 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
         Route::patch('/role/{role}', 'PermissionController@updateRole');
         Route::get('/admin/{user}', 'PermissionController@admin');
     });
-    Route::post('/logs', 'AdminController@logs')->middleware(['auth.jwt', 'admin']);
 });
 
 
