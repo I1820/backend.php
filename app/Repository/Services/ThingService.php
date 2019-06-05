@@ -269,7 +269,7 @@ class ThingService
         if ($request->get('lat') && $request->get('long'))
             $thing->loc = [
                 'type' => 'Point',
-                'coordinates' => [$request->get('lat'), $request->get('long')]
+                'coordinates' => [$request->get('long'), $request->get('lat')]
             ];
         if ($thing['type'] == 'lora')
             $this->loraService->updateDevice($lora_data, $thing['dev_eui']);

@@ -39,7 +39,7 @@ class LanService
             'name',
             'devEUI'
         ]);
-        $response = $this->send($url, $data, 'post');
+        $response = $this->_send($url, $data, 'post');
         return $response;
     }
 
@@ -47,10 +47,7 @@ class LanService
     {
         Log::debug("LAN Update Device:\t" . $dev_eui);
         $url = $this->base_url . '/api/devices/' . $dev_eui;
-        $data = $data->only([
-            'name',
-        ]);
-        $response = $this->send($url, $data, 'put');
+        $response = $this->_send($url, $data, 'put');
         return $response;
     }
 
@@ -58,7 +55,7 @@ class LanService
     {
         Log::debug("LAN Delete Device:\t" . $dev_eui);
         $url = $this->base_url . '/api/devices/' . $dev_eui;
-        $response = $this->send($url, [], 'delete');
+        $response = $this->_send($url, [], 'delete');
         return $response;
     }
 
@@ -67,7 +64,7 @@ class LanService
         Log::debug("LAN Get Key:\t" . $thing['dev_eui']);
         $url = $this->base_url . '/api/devices/' . $thing['dev_eui'] . '/refresh';
 
-        $response = $this->send($url, [], 'get');
+        $response = $this->_send($url, [], 'get');
         return $response;
     }
 
@@ -76,22 +73,19 @@ class LanService
      * @param $url
      * @param $data
      * @param string $method
-     * @return array|object
+     * @return array
      * @throws GeneralException
      */
-    private function send($url, $data, $method)
+    private function _send($url, $data, $method)
     {
         if (env('LAN_TEST') == 1) {
             return $this->fake();
         }
 
         $response = $this->curlService->to($url)
-            ->withHeader('Accept: application/json')
             ->withData($data)
-            ->withOption('SSL_VERIFYHOST', false)
             ->returnResponseObject()
-            ->asJsonRequest()
-            ->asJsonResponse()
+            ->asJson(true)
             ->withTimeout('5');
         $new_response = null;
         switch ($method) {
@@ -104,6 +98,9 @@ class LanService
             case 'delete':
                 $new_response = $response->delete();
                 break;
+            case 'put':
+                $new_response = $response->put();
+                break;
             default:
                 $new_response = $response->get();
                 break;
@@ -115,15 +112,21 @@ class LanService
         Log::debug('-----------------------------------------------------');
         */
         if ($new_response->status == 0) {
-            throw new GeneralException($new_response->error, 0);
+            throw new GeneralException('LAN service connection error', 500);
         }
         if ($new_response->status == 200) {
-            return $new_response->content ?: [];
+            return collect($new_response->content) ?: [];
         }
-        $error = property_exists($new_response->content, 'error') ? $new_response->content->error :
-            (property_exists($new_response->content, 'description') ? $new_response->content->description : 'خطای نامشخص');
-        throw new GeneralException($error, $new_response->status);
-
+        if ($new_response->status != 200) {
+            if ($new_response->content) {
+                throw new GeneralException(
+                    $new_response->content->message ?: 'Unknown LAN service error',
+                    $new_response->status
+                );
+            } else {
+                throw new GeneralException('LAN service connection error', $new_response->status);
+            }
+        }
     }
 
     public function fake()

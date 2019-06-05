@@ -471,7 +471,7 @@ class CoreService
         if ($new_response->status != 200) {
             if ($new_response->content) {
                 throw new GeneralException(
-                    $new_response->content->error ?: 'Unknown Core service error',
+                    $new_response->content->message ?: 'Unknown Core service error',
                     $new_response->status
                 );
             } else {
