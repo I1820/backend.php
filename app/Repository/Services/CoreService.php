@@ -215,8 +215,9 @@ class CoreService
 
     public function gatewayEvent($gateway, $timestamp, $limit)
     {
-        $url = $url = $this->dm_url . '/api/gateway/' . $gateway . '?since=' . $timestamp . '&limit=' . $limit;
-        return $this->send($url, [], 'get');
+        $url = '/api/gateway/' . $gateway . '?since=' . $timestamp . '&limit=' . $limit;
+        $response = $this->_send($url, [], 'get', $this->dmPort);
+        return $response;
     }
 
 
@@ -433,7 +434,6 @@ class CoreService
 
         $response = $this->curlService->to($url)
             ->withTimeout(100)
-            ->withHeader('Authorization: ' . env('CORE_SECRET'))
             ->withData($data)
             ->withOption('SSL_VERIFYHOST', false)
             ->returnResponseObject()

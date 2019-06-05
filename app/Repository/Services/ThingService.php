@@ -72,10 +72,6 @@ class ThingService
         if ($request->get('type') == 'lora') {
             $rules['thing_profile_slug'] = 'required';
             $messages['thing_profile_slug.required'] = 'لطفا شناسه پروفایل شی را وارد کنید';
-        } else {
-            $rules['ip'] = 'required|ip';
-            $messages['ip.required'] = 'لطفا شناسه IP شی را وارد کنید';
-            $messages['ip.ip'] = 'لطفا شناسه IP شی را درست وارد کنید';
         }
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -189,7 +185,7 @@ class ThingService
             'keys' => $lora ? [] : ['JWT' => $device['token']],
             'loc' => [
                 'type' => 'Point',
-                'coordinates' => [$request->get('lat'), $request->get('long')]
+                'coordinates' => [$request->get('long'), $request->get('lat')]
             ],
         ]);
         if ($lora)
@@ -251,13 +247,6 @@ class ThingService
             $lora_data['name'] = (string)$request->get('name');
             $lan_data['name'] = (string)$request->get('name');
         }
-        if ($request->get('ip')) {
-            $interface = $thing['interface'];
-            $interface['ip'] = $request->get('ip');
-            $thing['interface'] = $interface;
-            $lan_data['ip'] = (string)$request->get('ip');
-        }
-
 
         $thing->description = $request->get('description') ?: '';
         $lora_data['description'] = (string)$request->get('description');
@@ -285,7 +274,7 @@ class ThingService
         if ($thing['type'] == 'lora')
             $this->loraService->updateDevice($lora_data, $thing['dev_eui']);
         if ($thing['type'] == 'lan')
-            $this->lanService->updateDevice(collect($lan_data), $thing['dev_eui']);
+            $this->lanService->updateDevice($lan_data, $thing['dev_eui']);
         $thing->save();
 
         return $thing;

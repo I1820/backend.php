@@ -10,7 +10,6 @@ namespace App\Repository\Services;
 
 
 use App\Exceptions\GeneralException;
-use App\Exceptions\LoraException;
 use App\Thing;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -32,29 +31,27 @@ class LanService
      * @return string
      * @throws GeneralException
      */
-    public function postDevice(Collection $data)
+    public function postDevice($data)
     {
         Log::debug("LAN Send Device:\t" . $data['devEUI']);
         $url = $this->base_url . '/api/devices';
         $data = $data->only([
             'name',
-            'devEUI',
-            'ip'
+            'devEUI'
         ]);
         $response = $this->send($url, $data, 'post');
-        return collect(json_decode(json_encode($response), true));
+        return $response;
     }
 
-    public function updateDevice(Collection $data, $dev_eui)
+    public function updateDevice($data, $dev_eui)
     {
         Log::debug("LAN Update Device:\t" . $dev_eui);
         $url = $this->base_url . '/api/devices/' . $dev_eui;
         $data = $data->only([
             'name',
-            'ip'
         ]);
         $response = $this->send($url, $data, 'put');
-        return collect(json_decode(json_encode($response), true));
+        return $response;
     }
 
     public function deleteDevice($dev_eui)
@@ -62,7 +59,7 @@ class LanService
         Log::debug("LAN Delete Device:\t" . $dev_eui);
         $url = $this->base_url . '/api/devices/' . $dev_eui;
         $response = $this->send($url, [], 'delete');
-        return collect(json_decode(json_encode($response), true));
+        return $response;
     }
 
     public function getKey(Thing $thing)
@@ -71,7 +68,7 @@ class LanService
         $url = $this->base_url . '/api/devices/' . $thing['dev_eui'] . '/refresh';
 
         $response = $this->send($url, [], 'get');
-        return collect(json_decode(json_encode($response), true));
+        return $response;
     }
 
 
@@ -90,7 +87,6 @@ class LanService
 
         $response = $this->curlService->to($url)
             ->withHeader('Accept: application/json')
-            ->withHeader('Authorization: ' . env('CORE_SECRET'))
             ->withData($data)
             ->withOption('SSL_VERIFYHOST', false)
             ->returnResponseObject()
