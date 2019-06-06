@@ -5,9 +5,7 @@ steps:
 - name: install
   image: composer
   commands:
-  - pecl install mongodb
-  - echo "extension=mongodb.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
-  - composer install
+  - composer install --ignore-platform-reqs --no-scripts
 
 - name: test
   image: php:7
