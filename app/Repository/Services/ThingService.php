@@ -183,6 +183,7 @@ class ThingService
             'type' => $lora ? 'lora' : 'lan',
             'activation' => $lora ? ($thingProfile['data']['deviceProfile']['supportsJoin'] ? 'OTAA' : 'ABP') : 'JWT',
             'keys' => $lora ? [] : ['JWT' => $device['token']],
+            'model' => $request->get('model') ?: 'generic',
             'loc' => [
                 'type' => 'Point',
                 'coordinates' => [$request->get('long'), $request->get('lat')]
@@ -254,6 +255,9 @@ class ThingService
 
         if ($request->get('period'))
             $thing->period = $request->get('period');
+
+        if ($request->get('model'))
+            $thing->period = $request->get('model');
 
         if ($request->get('thing_profile_slug')) {
             $profile = ThingProfile::where('thing_profile_slug', (int)$request->get('thing_profile_slug'))->first();

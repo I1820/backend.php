@@ -117,6 +117,7 @@ class CoreService
         $url = '/api/things';
         $data = [
             'name' => (string)$thing['interface']['devEUI'],
+            'model' => (string)$thing['model'],
             'project' => (string)$project['container']['name'],
         ];
         $response = $this->_send($url, $data, 'post', $this->pmPort);
