@@ -1,4 +1,5 @@
 # Platform Backend
+[![Drone (cloud)](https://img.shields.io/drone/build/I1820/sjd-backend.svg?style=flat-square)](https://cloud.drone.io/I1820/sjd-backend)
 
 ## Introduction
 Every microservice architecture must have a glue and its our glue for I1820 Platform.
