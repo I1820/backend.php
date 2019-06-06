@@ -3,7 +3,6 @@
 namespace App;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property mixed name
@@ -47,17 +46,17 @@ class Project extends Eloquent
         return $this->hasMany(Codec::class);
     }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
     public function getOwnerAttribute()
     {
         $user = $this->user()->first();
         if ($user)
             return $user;
         return null;
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function activeScenario(Scenario $scenario)

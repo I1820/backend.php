@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\admin;
 
 use App\Exceptions\GeneralException;
+use App\Http\Controllers\Controller;
 use App\Repository\Helper\Response;
 use App\Repository\Services\UserService;
-use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Request;
 
@@ -29,8 +29,8 @@ class UserController extends Controller
         $users = User::skip(intval($request->get('offset')))
             //->take(intval($request->get('limit')) ?: 10)
             ->with('role')
-            ->get()->makeVisible(['_id', 'active','created_at']);
-        foreach ($users as $user){
+            ->get()->makeVisible(['_id', 'active', 'created_at']);
+        foreach ($users as $user) {
             $user['project_num'] = $user->projects()->count();
             $user['node_num'] = $user->things()->count();
         }
@@ -42,8 +42,8 @@ class UserController extends Controller
         $users = User::skip(intval($request->get('offset')))
             //->take(intval($request->get('limit')) ?: 10)
             ->with('role')
-            ->get()->makeVisible(['_id', 'active','created_at']);
-        foreach ($users as $user){
+            ->get()->makeVisible(['_id', 'active', 'created_at']);
+        foreach ($users as $user) {
             $user['project_num'] = $user->projects()->count();
             $user['node_num'] = $user->things()->count();
         }

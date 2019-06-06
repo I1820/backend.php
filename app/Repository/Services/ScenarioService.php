@@ -12,11 +12,10 @@ namespace App\Repository\Services;
 use App\Exceptions\GeneralException;
 use App\Project;
 use App\Scenario;
-use App\Thing;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 
 class ScenarioService
 {
@@ -67,7 +66,7 @@ class ScenarioService
     /**
      * @param Request $request
      * @param Scenario $scenario
-     * @return $this|\Illuminate\Database\Eloquent\Model
+     * @return $this|Model
      */
     public function updateScenario(Request $request, Scenario $scenario)
     {

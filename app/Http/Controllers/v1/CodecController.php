@@ -4,14 +4,14 @@ namespace App\Http\Controllers\v1;
 
 use App\Codec;
 use App\Exceptions\GeneralException;
+use App\Http\Controllers\Controller;
 use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CodecService;
 use App\Repository\Services\CoreService;
 use App\Thing;
+use Exception;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 
 class CodecController extends Controller
 {
@@ -116,7 +116,7 @@ class CodecController extends Controller
      * @param Project $project
      * @param Codec $codec
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete(Project $project, Codec $codec)
     {
@@ -128,7 +128,7 @@ class CodecController extends Controller
      * @param Project $project
      * @param Codec $codec
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function get(Project $project, Codec $codec)
     {

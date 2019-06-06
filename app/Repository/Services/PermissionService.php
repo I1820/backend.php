@@ -10,7 +10,6 @@ namespace App\Repository\Services;
 
 use App\Permission;
 use App\Role;
-use App\User;
 use Illuminate\Support\Facades\DB;
 
 class PermissionService
@@ -44,7 +43,7 @@ class PermissionService
     public function getRole($id)
     {
         $role = Role::wehre('_id', $id)->first();
-        if($role)
+        if ($role)
             $role['permissions'] = Permission::whereIn('_id', $role['permissions'])->get();
         else return false;
         return $role;

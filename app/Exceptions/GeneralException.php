@@ -8,8 +8,6 @@
 
 namespace App\Exceptions;
 
-use Exception;
-
 class GeneralException extends IOTException
 {
 
@@ -19,7 +17,6 @@ class GeneralException extends IOTException
     const ACCESS_DENIED = 703;
     const NOT_FOUND = 704;
     const VALIDATION_ERROR = 707;
-
 
 
     const M_UNKNOWN = 'خطای نامشخص';

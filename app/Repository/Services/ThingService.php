@@ -14,6 +14,7 @@ use App\Exceptions\LoraException;
 use App\Project;
 use App\Thing;
 use App\ThingProfile;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -45,7 +46,7 @@ class ThingService
      * @return void
      * @throws GeneralException
      */
-    public function validateCreateThing($request)
+    public function validateCreateThing(Collection $request)
     {
         $messages = [
             'name.required' => 'لطفا نام شی را وارد کنید',
@@ -81,7 +82,6 @@ class ThingService
             throw new  GeneralException('این DEV EUI قبلا ثبت شده است.', GeneralException::VALIDATION_ERROR);
     }
 
-
     /**
      * @param Request $request
      * @return void
@@ -105,6 +105,65 @@ class ThingService
             throw new  GeneralException('لطفا فایل با فرمت اکسل انتخاب کنید', GeneralException::VALIDATION_ERROR);
     }
 
+    /**
+     * @param $request
+     * @param Project $project
+     * @param ThingProfile $thingProfile
+     * @return Thing
+     * @throws GeneralException
+     * @throws LoraException
+     */
+    public function insertThing(Collection $request, Project $project = null, ThingProfile $thingProfile = null)
+    {
+        $lora = $request->get('type') == 'lora';
+        if (!$thingProfile && $lora)
+            throw new GeneralException('پروفایل شی یافت نشد', 700);
+        if (!$project)
+            throw new GeneralException('پروژه یافت نشد', 700);
+
+        if ($lora)
+            $device = $this->loraService->postDevice(
+                $request,
+                $project['application_id'],
+                $thingProfile['device_profile_id']
+            );
+        else
+            $device = $this->lanService->postDevice($request);
+
+        $thing = Thing::create([
+            'name' => $request->get('name'),
+            'description' => $request->get('description') ?: '',
+            'period' => $request->get('period'),
+            'dev_eui' => $request->get('devEUI'),
+            'active' => true,
+            'interface' => $device->toArray(),
+            'type' => $lora ? 'lora' : 'lan',
+            'activation' => $lora ? ($thingProfile['data']['deviceProfile']['supportsJoin'] ? 'OTAA' : 'ABP') : 'JWT',
+            'keys' => $lora ? [] : ['JWT' => $device['token']],
+            'model' => $request->get('model') ?: 'generic',
+            'loc' => [
+                'type' => 'Point',
+                'coordinates' => [$request->get('long'), $request->get('lat')]
+            ],
+        ]);
+        if ($lora)
+            $thing->profile()->associate($thingProfile);
+        return $thing;
+    }
+
+    public function ABPKeys($request, Thing $thing)
+    {
+        $this->validateKeys($request, 'ABP');
+        $data['devAddr'] = (string)$request->get('devAddr');
+        $data['nwkSKey'] = (string)$request->get('nwkSKey');
+        $data['appSKey'] = (string)$request->get('appSKey');
+        $data['fCntUp'] = intval($request->get('fCntUp', 0));
+        $data['fCntDown'] = intval($request->get('fCntDown', 0));
+        $data['skipFCntCheck'] = $request->get('skipFCntCheck') === 'true' ? true : false;
+        $data['devEUI'] = $thing['interface']['devEUI'];
+        $this->loraService->activateDevice($data);
+        return $data;
+    }
 
     /**
      * @param Request $request
@@ -147,68 +206,6 @@ class ThingService
             throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
     }
 
-
-    /**
-     * @param $request
-     * @param Project $project
-     * @param ThingProfile $thingProfile
-     * @return void
-     * @throws GeneralException
-     * @throws LoraException
-     */
-    public function insertThing($request, Project $project = null, ThingProfile $thingProfile = null)
-    {
-        $lora = $request->get('type') == 'lora';
-        if (!$thingProfile && $lora)
-            throw new GeneralException('پروفایل شی یافت نشد', 700);
-        if (!$project)
-            throw new GeneralException('پروژه یافت نشد', 700);
-
-        if ($lora)
-            $device = $this->loraService->postDevice(
-                $request,
-                $project['application_id'],
-                $thingProfile['device_profile_id']
-            );
-        else
-            $device = $this->lanService->postDevice($request);
-
-        $thing = Thing::create([
-            'name' => $request->get('name'),
-            'description' => $request->get('description') ?: '',
-            'period' => $request->get('period'),
-            'dev_eui' => $request->get('devEUI'),
-            'active' => true,
-            'interface' => $device->toArray(),
-            'type' => $lora ? 'lora' : 'lan',
-            'activation' => $lora ? ($thingProfile['data']['deviceProfile']['supportsJoin'] ? 'OTAA' : 'ABP') : 'JWT',
-            'keys' => $lora ? [] : ['JWT' => $device['token']],
-            'model' => $request->get('model') ?: 'generic',
-            'loc' => [
-                'type' => 'Point',
-                'coordinates' => [$request->get('long'), $request->get('lat')]
-            ],
-        ]);
-        if ($lora)
-            $thing->profile()->associate($thingProfile);
-        return $thing;
-    }
-
-
-    public function ABPKeys($request, Thing $thing)
-    {
-        $this->validateKeys($request, 'ABP');
-        $data['devAddr'] = (string)$request->get('devAddr');
-        $data['nwkSKey'] = (string)$request->get('nwkSKey');
-        $data['appSKey'] = (string)$request->get('appSKey');
-        $data['fCntUp'] = intval($request->get('fCntUp', 0));
-        $data['fCntDown'] = intval($request->get('fCntDown', 0));
-        $data['skipFCntCheck'] = $request->get('skipFCntCheck') === 'true' ? true : false;
-        $data['devEUI'] = $thing['interface']['devEUI'];
-        $this->loraService->activateDevice($data);
-        return $data;
-    }
-
     public function OTAAKeys($request, Thing $thing)
     {
         $this->validateKeys($request, 'OTAA');
@@ -236,7 +233,7 @@ class ThingService
     /**
      * @param Collection $request
      * @param Thing $thing
-     * @return $this|\Illuminate\Database\Eloquent\Model
+     * @return $this|Model
      * @throws LoraException
      */
     public function updateThing(Collection $request, Thing $thing)
@@ -287,7 +284,7 @@ class ThingService
 
     /**
      * @param $data
-     * @return $this|\Illuminate\Database\Eloquent\Model
+     * @return $this|Model
      */
     public function dataToExcel($data)
     {
@@ -327,10 +324,9 @@ class ThingService
     }
 
 
-
     /**
      * @param $things
-     * @return $this|\Illuminate\Database\Eloquent\Model
+     * @return $this|Model
      */
     public function toExcel($things)
     {

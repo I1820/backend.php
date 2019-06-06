@@ -4,7 +4,6 @@ namespace App\Http\Controllers\v1;
 
 use App\Exceptions\GeneralException;
 use App\Http\Controllers\Controller;
-use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
 use App\Thing;

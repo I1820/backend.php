@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Repository\Services\CoreService;
-use Illuminate\Http\Request;
 
 class LogController extends Controller
 {
@@ -20,7 +19,8 @@ class LogController extends Controller
         return view('containers', ['containers' => $containers]);
     }
 
-    public function containerLog($id){
+    public function containerLog($id)
+    {
         $logs = $this->coreService->projectLogs($id);
         return view('containers-logs', ['logs' => $logs]);
     }

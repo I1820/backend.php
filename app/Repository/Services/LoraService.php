@@ -11,10 +11,12 @@ namespace App\Repository\Services;
 
 use App\Exceptions\GeneralException;
 use App\Exceptions\LoraException;
-use App\Thing;
+use Exception;
+use Illuminate\Config\Repository;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Ixudra\Curl\Builder;
 use Ixudra\Curl\CurlService;
 
 class LoraService
@@ -63,6 +65,82 @@ class LoraService
         return $data;
     }
 
+    private function send($url, $data, $method = 'get', $accept = 200)
+    {
+        if (env('LORA_TEST'))
+            return (object)[
+                'status' => 200,
+                'content' => [
+                    'key' => 'value'
+                ],
+                'id' => 'SajjadRahnamaId',
+                'lastSeenAt' => ''
+            ];
+
+        $response = $this->curlService->to($url)
+            ->withData($data)
+            ->withOption('SSL_VERIFYHOST', false)
+            ->withHeader('Authorization: ' . $this->token)
+            ->returnResponseObject();
+        $new_response = $this->sendMethods($method, $response);
+        /*
+        Log::debug('-----------------------------------------------------');
+        Log::debug(print_r($data, true));
+        Log::debug(print_r($new_response, true));
+        Log::debug('-----------------------------------------------------');
+        */
+        if ($new_response->status == 401 | $new_response->status == 403) {
+            $this->authenticate();
+            $response = $response->withHeader('Authorization: ' . $this->token);
+            $new_response = $this->sendMethods($method, $response);
+        }
+        if ($new_response->status == 0) {
+            throw new LoraException($new_response->error, 0);
+        }
+        if ($new_response->status == 200 || $new_response->status == $accept)
+            return $new_response->content;
+        throw new LoraException($new_response->content->error, $new_response->content->code);
+    }
+
+    /**
+     * @param $method string
+     * @param $response Builder
+     * @return mixed
+     */
+    private function sendMethods($method, $response)
+    {
+
+        switch ($method) {
+            case 'get':
+                $new_response = $response->asJsonResponse()->get();
+                break;
+            case 'post':
+                $new_response = $response->asJson()->post();
+                break;
+            case 'put':
+                $new_response = $response->asJson()->put();
+                break;
+            case 'delete':
+                $new_response = $response->asJsonResponse()->delete();
+                break;
+            default:
+                $new_response = $response->asJsonResponse()->get();
+                break;
+        }
+        return $new_response;
+    }
+
+    private function authenticate()
+    {
+        $response = $this->curlService->to($this->base_url . '/api/internal/login')
+            ->withData(['username' => 'admin', 'password' => 'admin'])
+            ->asJson()
+            ->withOption('SSL_VERIFYHOST', false)
+            ->post();;
+        $this->token = $response->jwt;
+        Storage::put('jwt.token', $this->token);
+    }
+
     /**
      * @param $data
      * @return object
@@ -74,7 +152,6 @@ class LoraService
         $url = $this->base_url . '/api/device-profiles';
         return $this->send($url, $data, 'post');
     }
-
 
     /**
      * @param $deviceProfileId
@@ -167,13 +244,13 @@ class LoraService
         $url = $url = $this->base_url . '/api/devices/' . $data['devEUI'] . '/keys';
         try {
             return $this->send($url, $data, 'post');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->send($url, $data, 'put');
         }
     }
 
     /**
-     * @return \Illuminate\Config\Repository|mixed
+     * @return Repository|mixed
      */
     public function getOrganizationId()
     {
@@ -181,7 +258,7 @@ class LoraService
     }
 
     /**
-     * @return \Illuminate\Config\Repository|mixed
+     * @return Repository|mixed
      */
     public function getNetworkServerID()
     {
@@ -256,83 +333,6 @@ class LoraService
         Log::debug("Lora Get Device Activation\t" . $dev_eui);
         $url = $url = $this->base_url . '/api/devices/' . $dev_eui . '/activation';
         return $this->send($url, [], 'get');
-    }
-
-    private function send($url, $data, $method = 'get', $accept = 200)
-    {
-        if (env('LORA_TEST'))
-            return (object)[
-                'status' => 200,
-                'content' => [
-                    'key' => 'value'
-                ],
-                'id' => 'SajjadRahnamaId',
-                'lastSeenAt' => ''
-            ];
-
-        $response = $this->curlService->to($url)
-            ->withData($data)
-            ->withOption('SSL_VERIFYHOST', false)
-            ->withHeader('Authorization: ' . $this->token)
-            ->returnResponseObject();
-        $new_response = $this->sendMethods($method, $response);
-        /*
-        Log::debug('-----------------------------------------------------');
-        Log::debug(print_r($data, true));
-        Log::debug(print_r($new_response, true));
-        Log::debug('-----------------------------------------------------');
-        */
-        if ($new_response->status == 401 | $new_response->status == 403) {
-            $this->authenticate();
-            $response = $response->withHeader('Authorization: ' . $this->token);
-            $new_response = $this->sendMethods($method, $response);
-        }
-        if ($new_response->status == 0) {
-            throw new LoraException($new_response->error, 0);
-        }
-        if ($new_response->status == 200 || $new_response->status == $accept)
-            return $new_response->content;
-        throw new LoraException($new_response->content->error, $new_response->content->code);
-    }
-
-    private function authenticate()
-    {
-        $response = $this->curlService->to($this->base_url . '/api/internal/login')
-            ->withData(['username' => 'admin', 'password' => 'admin'])
-            ->asJson()
-            ->withOption('SSL_VERIFYHOST', false)
-            ->post();;
-        $this->token = $response->jwt;
-        Storage::put('jwt.token', $this->token);
-    }
-
-
-    /**
-     * @param $method string
-     * @param $response \Ixudra\Curl\Builder
-     * @return mixed
-     */
-    private function sendMethods($method, $response)
-    {
-
-        switch ($method) {
-            case 'get':
-                $new_response = $response->asJsonResponse()->get();
-                break;
-            case 'post':
-                $new_response = $response->asJson()->post();
-                break;
-            case 'put':
-                $new_response = $response->asJson()->put();
-                break;
-            case 'delete':
-                $new_response = $response->asJsonResponse()->delete();
-                break;
-            default:
-                $new_response = $response->asJsonResponse()->get();
-                break;
-        }
-        return $new_response;
     }
 
 

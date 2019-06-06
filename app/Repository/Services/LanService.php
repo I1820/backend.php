@@ -28,10 +28,10 @@ class LanService
 
     /**
      * @param Collection $data
-     * @return string
+     * @return Collection
      * @throws GeneralException
      */
-    public function postDevice($data)
+    public function postDevice(Collection $data)
     {
         Log::debug("LAN Send Device:\t" . $data['devEUI']);
         $url = $this->base_url . '/api/devices';
@@ -43,37 +43,11 @@ class LanService
         return $response;
     }
 
-    public function updateDevice($data, $dev_eui)
-    {
-        Log::debug("LAN Update Device:\t" . $dev_eui);
-        $url = $this->base_url . '/api/devices/' . $dev_eui;
-        $response = $this->_send($url, $data, 'put');
-        return $response;
-    }
-
-    public function deleteDevice($dev_eui)
-    {
-        Log::debug("LAN Delete Device:\t" . $dev_eui);
-        $url = $this->base_url . '/api/devices/' . $dev_eui;
-        $response = $this->_send($url, [], 'delete');
-        return $response;
-    }
-
-    public function getKey(Thing $thing)
-    {
-        Log::debug("LAN Get Key:\t" . $thing['dev_eui']);
-        $url = $this->base_url . '/api/devices/' . $thing['dev_eui'] . '/refresh';
-
-        $response = $this->_send($url, [], 'get');
-        return $response;
-    }
-
-
     /**
      * @param $url
      * @param $data
      * @param string $method
-     * @return array
+     * @return Collection
      * @throws GeneralException
      */
     private function _send($url, $data, $method)
@@ -131,11 +105,33 @@ class LanService
 
     public function fake()
     {
-        return (object)[
-            'status' => 200,
-            'content' => [
-                'key' => 'value'
-            ]
-        ];
+        return collect([
+            'key' => 'value'
+        ]);
+    }
+
+    public function updateDevice($data, $dev_eui)
+    {
+        Log::debug("LAN Update Device:\t" . $dev_eui);
+        $url = $this->base_url . '/api/devices/' . $dev_eui;
+        $response = $this->_send($url, $data, 'put');
+        return $response;
+    }
+
+    public function deleteDevice($dev_eui)
+    {
+        Log::debug("LAN Delete Device:\t" . $dev_eui);
+        $url = $this->base_url . '/api/devices/' . $dev_eui;
+        $response = $this->_send($url, [], 'delete');
+        return $response;
+    }
+
+    public function getKey(Thing $thing)
+    {
+        Log::debug("LAN Get Key:\t" . $thing['dev_eui']);
+        $url = $this->base_url . '/api/devices/' . $thing['dev_eui'] . '/refresh';
+
+        $response = $this->_send($url, [], 'get');
+        return $response;
     }
 }

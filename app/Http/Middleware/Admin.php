@@ -2,9 +2,9 @@
 
 namespace app\Http\Middleware;
 
-use App\Exceptions\AuthException;
 use App\Exceptions\GeneralException;
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class Admin
@@ -12,8 +12,8 @@ class Admin
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Closure $next
+     * @param Request $request
+     * @param Closure $next
      * @return mixed
      * @throws GeneralException
      */

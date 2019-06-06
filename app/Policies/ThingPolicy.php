@@ -4,8 +4,8 @@ namespace App\Policies;
 
 use App\Exceptions\GeneralException;
 use App\Project;
-use App\User;
 use App\Thing;
+use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Http\Request;
 
@@ -29,8 +29,8 @@ class ThingPolicy
     /**
      * Determine whether the user can view the thing.
      *
-     * @param  \App\User $user
-     * @param  \App\Thing $thing
+     * @param User $user
+     * @param Thing $thing
      * @return mixed
      */
     public function view(User $user, Thing $thing)
@@ -39,9 +39,21 @@ class ThingPolicy
     }
 
     /**
+     * Determine whether the user is the owner of the thing.
+     *
+     * @param User $user
+     * @param Thing $thing
+     * @return mixed
+     */
+    private function isOwner(User $user, Thing $thing)
+    {
+        return $thing['owner']['_id'] == $user['id'];
+    }
+
+    /**
      * Determine whether the user can create things.
      *
-     * @param  \App\User $user
+     * @param User $user
      * @return mixed
      * @throws GeneralException
      */
@@ -58,8 +70,8 @@ class ThingPolicy
     /**
      * Determine whether the user can update the thing.
      *
-     * @param  \App\User $user
-     * @param  \App\Thing $thing
+     * @param User $user
+     * @param Thing $thing
      * @return mixed
      */
     public function update(User $user, Thing $thing)
@@ -71,26 +83,13 @@ class ThingPolicy
     /**
      * Determine whether the user can delete the thing.
      *
-     * @param  \App\User $user
-     * @param  \App\Thing $thing
+     * @param User $user
+     * @param Thing $thing
      * @return mixed
      */
     public function delete(User $user, Thing $thing)
     {
         $permission = $user->role()->first()->perms()->where('slug', 'DELETE-THING')->first();
         return $this->isOwner($user, $thing) && $permission;
-    }
-
-
-    /**
-     * Determine whether the user is the owner of the thing.
-     *
-     * @param  \App\User $user
-     * @param Thing $thing
-     * @return mixed
-     */
-    private function isOwner(User $user, Thing $thing)
-    {
-        return $thing['owner']['_id'] == $user['id'];
     }
 }

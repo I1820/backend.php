@@ -2,15 +2,13 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
 class ThingData extends Eloquent
 {
+    const CREATED_AT = 'timestamp';
     protected $connection = 'mongodb_data';
     protected $collection = 'things_data';
-    const CREATED_AT = 'timestamp';
-
     /**
      * The attributes that should be hidden for arrays.
      *

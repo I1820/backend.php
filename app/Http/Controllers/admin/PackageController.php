@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\admin;
 
 use App\Exceptions\GeneralException;
+use App\Http\Controllers\Controller;
 use App\Package;
 use App\Repository\Helper\Response;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
 class PackageController extends Controller

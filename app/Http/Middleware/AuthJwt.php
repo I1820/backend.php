@@ -4,7 +4,7 @@ namespace app\Http\Middleware;
 
 use App\Exceptions\AuthException;
 use Closure;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
@@ -21,8 +21,8 @@ class AuthJwt
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Closure $next
+     * @param Request $request
+     * @param Closure $next
      * @return mixed
      * @throws AuthException
      */

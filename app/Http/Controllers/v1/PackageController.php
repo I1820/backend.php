@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\v1;
 
-use App\Exceptions\GeneralException;
+use App\Http\Controllers\Controller;
 use App\Package;
 use App\Repository\Helper\Response;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
 
 class PackageController extends Controller
 {
@@ -44,7 +42,6 @@ class PackageController extends Controller
     {
         return Response::body(compact('package'));
     }
-
 
 
 }

@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\v1;
 
 use App\Exceptions\GeneralException;
+use App\Exceptions\LoraException;
+use App\Http\Controllers\Controller;
 use App\Repository\Helper\Counter;
 use App\Repository\Helper\Response;
 use App\Repository\Services\LoraService;
 use App\Repository\Services\ThingService;
 use App\ThingProfile;
-use App\Exceptions\LoraException;
+use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -61,51 +63,6 @@ class ThingProfileController extends Controller
         return Response::body(compact('thing_profile'));
     }
 
-    /**
-     * @return array
-     */
-    public function all()
-    {
-        $thing_profiles = Auth::user()->thingProfiles()->get();
-        return Response::body(compact('thing_profiles'));
-    }
-
-
-    /**
-     * @param ThingProfile $thing_profile
-     * @return array
-     */
-    public function get(ThingProfile $thing_profile)
-    {
-        $res = $thing_profile->toArray();
-        $res['parameters'] = $thing_profile['data']['deviceProfile'];
-        return Response::body(['thing_profile' => $res]);
-    }
-
-    /**
-     * @param ThingProfile $thing_profile
-     * @return array
-     * @throws LoraException
-     * @throws \Exception
-     */
-    public function delete(ThingProfile $thing_profile)
-    {
-        $this->loraService->deleteDeviceProfile($thing_profile['device_profile_id']);
-        $thing_profile->delete();
-        return Response::body(['success' => 'true']);
-    }
-
-    /**
-     * @param ThingProfile $thing_profile
-     * @return ThingService|\Illuminate\Database\Eloquent\Model
-     */
-    public function thingsExcel(ThingProfile $thing_profile)
-    {
-        $things = $thing_profile->things()->get();
-        return $this->thingService->toExcel($things);
-    }
-
-
     private function prepareDeviceProfileData(Collection $data)
     {
         try {
@@ -138,11 +95,54 @@ class ThingProfileController extends Controller
                 'networkServerID' => $this->loraService->getNetworkServerID(),
                 'organizationID' => $this->loraService->getOrganizationId()
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new LoraException('Device Profile Data Invalid', 700);
         }
 
         return $res;
+    }
+
+    /**
+     * @return array
+     */
+    public function all()
+    {
+        $thing_profiles = Auth::user()->thingProfiles()->get();
+        return Response::body(compact('thing_profiles'));
+    }
+
+    /**
+     * @param ThingProfile $thing_profile
+     * @return array
+     */
+    public function get(ThingProfile $thing_profile)
+    {
+        $res = $thing_profile->toArray();
+        $res['parameters'] = $thing_profile['data']['deviceProfile'];
+        return Response::body(['thing_profile' => $res]);
+    }
+
+    /**
+     * @param ThingProfile $thing_profile
+     * @return array
+     * @throws LoraException
+     * @throws Exception
+     */
+    public function delete(ThingProfile $thing_profile)
+    {
+        $this->loraService->deleteDeviceProfile($thing_profile['device_profile_id']);
+        $thing_profile->delete();
+        return Response::body(['success' => 'true']);
+    }
+
+    /**
+     * @param ThingProfile $thing_profile
+     * @return ThingService|Model
+     */
+    public function thingsExcel(ThingProfile $thing_profile)
+    {
+        $things = $thing_profile->things()->get();
+        return $this->thingService->toExcel($things);
     }
 
 }

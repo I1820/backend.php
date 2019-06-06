@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\admin;
 
 use App\Exceptions\GeneralException;
+use App\Http\Controllers\Controller;
 use App\Permission;
 use App\Repository\Helper\Response;
 use App\Repository\Services\PermissionService;
 use App\Role;
 use App\User;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class PermissionController extends Controller
 {

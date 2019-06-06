@@ -3,16 +3,19 @@
 namespace App\Http\Controllers\v1;
 
 use App\Exceptions\GeneralException;
+use App\Exceptions\LoraException;
+use App\Http\Controllers\Controller;
 use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
 use App\Repository\Services\LoraService;
 use App\Repository\Services\ProjectService;
 use App\Repository\Services\ThingService;
+use Error;
+use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Excel;
 
 class ProjectController extends Controller
@@ -50,7 +53,7 @@ class ProjectController extends Controller
      * @param Request $request
      * @return array
      * @throws GeneralException
-     * @throws \App\Exceptions\LoraException
+     * @throws LoraException
      */
     public function create(Request $request)
     {
@@ -66,7 +69,7 @@ class ProjectController extends Controller
      * @param Project $project
      * @return array
      * @throws GeneralException
-     * @throws \Exception
+     * @throws Exception
      */
     public function stop(Project $project)
     {
@@ -98,7 +101,7 @@ class ProjectController extends Controller
         $things = $project->things()->with('profile');
         try {
             $data = ['sorted' => json_decode($request->get('sorted'), true), 'filtered' => json_decode($request->get('filtered'), true)];
-        } catch (\Error $e) {
+        } catch (Error $e) {
             $data = ['sorted' => [], 'filtered' => []];
         }
         foreach ($data['filtered'] as $item)
@@ -115,7 +118,7 @@ class ProjectController extends Controller
     /**
      * @param Project $project
      * @param Excel $excel
-     * @return ThingService|\Illuminate\Database\Eloquent\Model
+     * @return ThingService|Model
      */
     public function exportThings(Project $project, Excel $excel)
     {

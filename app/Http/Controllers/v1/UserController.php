@@ -3,21 +3,19 @@
 namespace App\Http\Controllers\v1;
 
 use App\Exceptions\GeneralException;
+use App\Http\Controllers\Controller;
 use App\Repository\Helper\Response;
 use App\Repository\Services\ConfigService;
 use App\Repository\Services\CoreService;
 use App\Repository\Services\FileService;
 use App\Repository\Services\UserService;
-use App\Http\Controllers\Controller;
 use App\Thing;
 use Carbon\Carbon;
+use Error;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Psy\Exception\FatalErrorException;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 
 class UserController extends Controller
@@ -62,7 +60,7 @@ class UserController extends Controller
     /**
      * @param Request $request
      * @return array
-     * @throws \App\Exceptions\GeneralException
+     * @throws GeneralException
      */
     public function changePassword(Request $request)
     {
@@ -146,9 +144,9 @@ class UserController extends Controller
                             $data = json_decode(json_encode($data), True);
                             return ['timestamp' => $data['timestamp'], 'value' => $data['data'][$widget['key']]];
                         })->values()];
-            } catch (\Error $e) {
+            } catch (Error $e) {
                 return [];
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return [];
             }
         });

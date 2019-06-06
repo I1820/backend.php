@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\v1;
 
+use App\Exceptions\GeneralException;
+use App\Http\Controllers\Controller;
 use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
 use App\Repository\Services\ScenarioService;
 use App\Scenario;
+use Exception;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Exceptions\GeneralException;
-use Illuminate\Support\Facades\Auth;
 
 class ScenarioController extends Controller
 {
@@ -95,7 +95,7 @@ class ScenarioController extends Controller
      * @param Scenario $scenario
      * @return array
      * @throws GeneralException
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete(Project $project, Scenario $scenario)
     {

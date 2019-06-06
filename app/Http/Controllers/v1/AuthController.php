@@ -9,8 +9,8 @@ use App\Mail\EmailVerification;
 use App\Repository\Helper\Response;
 use App\Repository\Services\UserService;
 use App\User;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -76,6 +76,21 @@ class AuthController extends Controller
         return Response::body(compact('user', 'access_token', 'refresh_token', 'config'));
     }
 
+    public function loginValidator($request)
+    {
+        $captcha = env('CAPTCHA_ENABLE', 0);
+        $data = $request->only(['email', 'password', 'g-recaptcha-response']);
+        return Validator::make($data, [
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+            'g-recaptcha-response' => $captcha ? 'required|captcha' : ''
+        ]);
+    }
+
+    /*
+     * @return Validator
+     */
+
     /**
      * refresh API
      * @return array
@@ -88,20 +103,6 @@ class AuthController extends Controller
         return Response::body(['token' => $token, 'user' => $user]);
     }
 
-    /*
-     * @return Validator
-     */
-    public function loginValidator($request)
-    {
-        $captcha = env('CAPTCHA_ENABLE', 0);
-        $data = $request->only(['email', 'password', 'g-recaptcha-response']);
-        return Validator::make($data, [
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-            'g-recaptcha-response' => $captcha ? 'required|captcha' : ''
-        ]);
-    }
-
     /**
      * @param Request $request
      * @return array
@@ -111,7 +112,7 @@ class AuthController extends Controller
         try {
             $token = JWTAuth::getToken();
             JWTAuth::invalidate($token);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
         }
         $message = "با موفقیت خارج شدید";
         return Response::body($message);

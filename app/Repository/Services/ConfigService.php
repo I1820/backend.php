@@ -8,17 +8,11 @@
 
 namespace App\Repository\Services;
 
-use App\Exceptions\AuthException;
 use App\Exceptions\GeneralException;
-use App\Repository\Traits\RegisterUser;
-use App\Repository\Traits\UpdateUser;
 use App\UserConfig;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ConfigService
 {
@@ -63,22 +57,6 @@ class ConfigService
 
     }
 
-    /**
-     * @param Collection $data
-     * @return string
-     */
-    public function deleteWidgetChart(Collection $data)
-    {
-        $config = Auth::user()->config()->first();
-        if (!$config)
-            $config = UserConfig::create(['user_id' => Auth::user()['_id']]);
-        $config_widgets = isset($config['widgets']) ? $config['widgets'] : [];
-        unset($config_widgets[$data->get('id')]);
-        $config['widgets'] = $config_widgets;
-        $config->save();
-
-    }
-
     public function validateWidgetChart($data)
     {
         $messages = [
@@ -97,6 +75,22 @@ class ConfigService
 
         if ($validator->fails())
             throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
+    }
+
+    /**
+     * @param Collection $data
+     * @return string
+     */
+    public function deleteWidgetChart(Collection $data)
+    {
+        $config = Auth::user()->config()->first();
+        if (!$config)
+            $config = UserConfig::create(['user_id' => Auth::user()['_id']]);
+        $config_widgets = isset($config['widgets']) ? $config['widgets'] : [];
+        unset($config_widgets[$data->get('id')]);
+        $config['widgets'] = $config_widgets;
+        $config->save();
+
     }
 
 }

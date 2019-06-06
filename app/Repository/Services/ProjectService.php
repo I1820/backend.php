@@ -9,13 +9,12 @@
 namespace App\Repository\Services;
 
 
-use App\Codec;
 use App\Exceptions\GeneralException;
 use App\Exceptions\LoraException;
 use App\Project;
 use App\Thing;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use MongoDB\BSON\ObjectId;
 
@@ -98,7 +97,7 @@ class ProjectService
     /**
      * @param Request $request
      * @param Project $project
-     * @return $this|\Illuminate\Database\Eloquent\Model
+     * @return $this|Model
      */
     public function updateProject(Request $request, Project $project)
     {
@@ -116,7 +115,7 @@ class ProjectService
      * @param Project $project
      * @param Thing $thing
      * @param $codec
-     * @throws \App\Exceptions\GeneralException
+     * @throws GeneralException
      */
     public function addThing(Project $project, Thing $thing, $codec)
     {

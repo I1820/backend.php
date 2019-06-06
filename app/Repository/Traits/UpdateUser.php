@@ -9,7 +9,7 @@
 namespace App\Repository\Traits;
 
 use App\Exceptions\GeneralException;
-use App\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -20,7 +20,7 @@ trait UpdateUser
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return Authenticatable|null
      */
     public function updateUser(Request $request)
     {
@@ -31,76 +31,6 @@ trait UpdateUser
             return $this->updateRealUser($request);
         }
     }
-
-    public function changePassword(Request $request)
-    {
-        $user = Auth::user();
-        if ($request->get('new_password') && Hash::check($request->get('password'), $user['password']))
-            $user['password'] = Hash::make($request->get('new_password'));
-        else
-            throw new GeneralException('اطلاعات را درست وارد کنید', GeneralException::VALIDATION_ERROR);
-        $user->save();
-        return $user;
-    }
-
-    public function validateUpdateUser(Request $request)
-    {
-        if ($request->has('legal') && $request->get('legal') == 1) {
-            $this->validateUpdateLegal($request);
-        } else {
-            $this->validateUpdateReal($request);
-        }
-
-    }
-
-    private function validateUpdateReal(Request $request)
-    {
-        $messages = [
-            'name.filled' => 'لطفا نام را وارد کنید',
-            'password.filled' => 'لطفا رمزعبور را وارد کنید',
-            'password.min' => 'رمز عبور حداقل باید ۶ کارکتر باشد',
-            'other_info.filled' => 'لطفا سایر اطلاعات را درست وارد کنید',
-        ];
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'filled|string|max:255',
-            'password' => 'filled|string|min:6',
-            'other_info' => 'json',
-        ], $messages);
-
-        if ($validator->fails())
-            throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
-    }
-
-    private function validateUpdateLegal(Request $request)
-    {
-        $data = collect(json_decode($request->get('legal_info'), true));
-        $messages = [
-            'org_interface_name.filled' => 'لطفا نام رابط سازمان را وارد کنید',
-            'org_interface_last_name.filled' => 'لطفا نام خانوادگی رابط سازمان را وارد کنید',
-            'org_interface_phone.filled' => 'لطفا شماره تلفن ثابت رابط سازمان را وارد کنید',
-            'org_interface_mobile.filled' => 'لطفا شماره موبایل شخصی را وارد کنید',
-            'type.filled' => 'لطفا نوع حقوقی را وارد کنید',
-            'org_name.filled' => 'لطفا نام سازمان را وارد کنید',
-            'reg_number.filled' => 'لطفا شماره ثبت را وارد کنید',
-            'ec_code.filled' => 'لطفا کد اقتصادی را وارد کنید',
-        ];
-
-        $validator = Validator::make($data->all(), [
-            'org_interface_name' => 'filled',
-            'org_interface_last_name' => 'filled',
-            'org_interface_phone' => 'filled',
-            'org_interface_mobile' => 'filled',
-            'type' => 'filled',
-            'org_name' => 'filled',
-            'reg_number' => 'filled',
-            'ec_code' => 'filled',
-        ], $messages);
-
-        if ($validator->fails())
-            throw new UserException($validator->errors()->first(), UserException::C_UE);
-    }
-
 
     private function updateRealUser(Request $request)
     {
@@ -160,6 +90,75 @@ trait UpdateUser
         $user->save();
 
         return $user;
+    }
+
+    public function changePassword(Request $request)
+    {
+        $user = Auth::user();
+        if ($request->get('new_password') && Hash::check($request->get('password'), $user['password']))
+            $user['password'] = Hash::make($request->get('new_password'));
+        else
+            throw new GeneralException('اطلاعات را درست وارد کنید', GeneralException::VALIDATION_ERROR);
+        $user->save();
+        return $user;
+    }
+
+    public function validateUpdateUser(Request $request)
+    {
+        if ($request->has('legal') && $request->get('legal') == 1) {
+            $this->validateUpdateLegal($request);
+        } else {
+            $this->validateUpdateReal($request);
+        }
+
+    }
+
+    private function validateUpdateLegal(Request $request)
+    {
+        $data = collect(json_decode($request->get('legal_info'), true));
+        $messages = [
+            'org_interface_name.filled' => 'لطفا نام رابط سازمان را وارد کنید',
+            'org_interface_last_name.filled' => 'لطفا نام خانوادگی رابط سازمان را وارد کنید',
+            'org_interface_phone.filled' => 'لطفا شماره تلفن ثابت رابط سازمان را وارد کنید',
+            'org_interface_mobile.filled' => 'لطفا شماره موبایل شخصی را وارد کنید',
+            'type.filled' => 'لطفا نوع حقوقی را وارد کنید',
+            'org_name.filled' => 'لطفا نام سازمان را وارد کنید',
+            'reg_number.filled' => 'لطفا شماره ثبت را وارد کنید',
+            'ec_code.filled' => 'لطفا کد اقتصادی را وارد کنید',
+        ];
+
+        $validator = Validator::make($data->all(), [
+            'org_interface_name' => 'filled',
+            'org_interface_last_name' => 'filled',
+            'org_interface_phone' => 'filled',
+            'org_interface_mobile' => 'filled',
+            'type' => 'filled',
+            'org_name' => 'filled',
+            'reg_number' => 'filled',
+            'ec_code' => 'filled',
+        ], $messages);
+
+        if ($validator->fails())
+            throw new UserException($validator->errors()->first(), UserException::C_UE);
+    }
+
+    private function validateUpdateReal(Request $request)
+    {
+        $messages = [
+            'name.filled' => 'لطفا نام را وارد کنید',
+            'password.filled' => 'لطفا رمزعبور را وارد کنید',
+            'password.min' => 'رمز عبور حداقل باید ۶ کارکتر باشد',
+            'other_info.filled' => 'لطفا سایر اطلاعات را درست وارد کنید',
+        ];
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'filled|string|max:255',
+            'password' => 'filled|string|min:6',
+            'other_info' => 'json',
+        ], $messages);
+
+        if ($validator->fails())
+            throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
     }
 
 

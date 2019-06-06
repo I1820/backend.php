@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\User;
 use App\Gateway;
+use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class GatewayPolicy
@@ -20,8 +20,8 @@ class GatewayPolicy
     /**
      * Determine whether the user can view the gateway.
      *
-     * @param  \App\User $user
-     * @param  \App\Gateway $gateway
+     * @param User $user
+     * @param Gateway $gateway
      * @return mixed
      */
     public function view(User $user, Gateway $gateway)
@@ -32,7 +32,7 @@ class GatewayPolicy
     /**
      * Determine whether the user can create gateways.
      *
-     * @param  \App\User $user
+     * @param User $user
      * @return mixed
      */
     public function create(User $user)
@@ -44,8 +44,8 @@ class GatewayPolicy
     /**
      * Determine whether the user can update the gateway.
      *
-     * @param  \App\User $user
-     * @param  \App\Gateway $gateway
+     * @param User $user
+     * @param Gateway $gateway
      * @return mixed
      */
     public function update(User $user, Gateway $gateway)
@@ -57,8 +57,8 @@ class GatewayPolicy
     /**
      * Determine whether the user can delete the gateway.
      *
-     * @param  \App\User $user
-     * @param  \App\Gateway $gateway
+     * @param User $user
+     * @param Gateway $gateway
      * @return mixed
      */
     public function delete(User $user, Gateway $gateway)
@@ -70,7 +70,7 @@ class GatewayPolicy
     /**
      * Determine whether the user is the owner of the gateway.
      *
-     * @param  \App\User $user
+     * @param User $user
      * @param Gateway $gateway
      * @return mixed
      */

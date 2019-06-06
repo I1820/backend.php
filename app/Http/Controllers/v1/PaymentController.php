@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\Discount;
 use App\Exceptions\GeneralException;
+use App\Http\Controllers\Controller;
 use App\Invoice;
 use App\Package;
 use App\PaymentPortal;
@@ -11,9 +12,7 @@ use App\Repository\Helper\Response;
 use App\Repository\Services\Payment\PaymentService;
 use App\Repository\Services\Payment\ZarinPalService;
 use App\Repository\Services\UserService;
-use function GuzzleHttp\Promise\all;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
@@ -42,11 +41,6 @@ class PaymentController extends Controller
 
     }
 
-    public function pay(Invoice $invoice)
-    {
-        return $this->zarinPalService->pay($invoice);
-    }
-
     private function discount($code)
     {
         if (!$code)
@@ -59,6 +53,11 @@ class PaymentController extends Controller
         $discount->expired = true;
         $discount->save();
         return $discount->value;
+    }
+
+    public function pay(Invoice $invoice)
+    {
+        return $this->zarinPalService->pay($invoice);
     }
 
     public function callback(Invoice $invoice, Request $request)

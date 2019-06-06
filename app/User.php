@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Jenssegers\Mongodb\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 
@@ -18,7 +19,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'other_info', 'active', 'legal', 'mobile', 'package','role_id'
+        'name', 'email', 'password', 'other_info', 'active', 'legal', 'mobile', 'package', 'role_id'
     ];
 
     /**
@@ -77,7 +78,7 @@ class User extends Authenticatable implements JWTSubject
         return (isset($this['is_admin']) && $this['is_admin']);
     }
 
-        /**
+    /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
      * @return mixed

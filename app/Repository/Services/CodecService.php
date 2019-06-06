@@ -12,11 +12,9 @@ namespace App\Repository\Services;
 use App\Codec;
 use App\Exceptions\GeneralException;
 use App\Project;
-use App\Thing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 
 class CodecService
 {

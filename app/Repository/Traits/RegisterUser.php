@@ -10,13 +10,11 @@ namespace App\Repository\Traits;
 
 use App\Exceptions\GeneralException;
 use App\Package;
-use App\Permission;
-use App\Repository\Helper\MobileFactory;
 use App\Role;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use MongoDB\BSON\UTCDateTime;
 
@@ -25,7 +23,7 @@ trait RegisterUser
 
     /**
      * @param Request $request
-     * @return $this|\Illuminate\Database\Eloquent\Model
+     * @return $this|Model
      */
     public function insertUser(Request $request)
     {

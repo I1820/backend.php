@@ -8,8 +8,6 @@
 
 namespace App\Exceptions;
 
-use Exception;
-
 class LoraException extends IOTException
 {
     /**

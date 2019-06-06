@@ -9,7 +9,7 @@
 namespace App\Repository\Helper;
 
 
-
+use Exception;
 use Kavenegar\KavenegarApi;
 
 class MobileFactory
@@ -17,16 +17,16 @@ class MobileFactory
 
     public static function sendWelcome($mobile)
     {
-        try{
+        try {
             $kavenegar = new KavenegarApi(env('KAVENEGAR_API_KEY'));
-            $kavenegar->Send('',$mobile,'به سامانه اینترنت اشیای دانشگاه امیرکبیر خوش آمدید', null, null);
+            $kavenegar->Send('', $mobile, 'به سامانه اینترنت اشیای دانشگاه امیرکبیر خوش آمدید', null, null);
             return [
                 'success' => 0,
                 'message' => ''
             ];
-        }catch (\Exception $e){}
+        } catch (Exception $e) {
+        }
     }
-
 
 
 }

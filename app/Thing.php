@@ -2,11 +2,10 @@
 
 namespace App;
 
-use App\Repository\Services\LoraService;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property mixed loc
@@ -40,17 +39,10 @@ class Thing extends Eloquent
         'updated_at', 'created_at', 'user_id', 'id', 'project_id', 'profile_id', 'codec', 'permissions'
     ];
 
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
     public function project()
     {
         return $this->belongsTo(Project::class);
     }
-
 
     public function profile()
     {
@@ -72,6 +64,11 @@ class Thing extends Eloquent
         return null;
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function getLastSeenAtAttribute($value)
     {
         try {
@@ -79,7 +76,7 @@ class Thing extends Eloquent
                 $loraService = resolve('App\Repository\Services\LoraService');
                 $this->lora_thing = $loraService->getDevice($this->dev_eui);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Lora Get Thing\t" . $this['dev_eui']);
             return "";
         }
@@ -107,7 +104,7 @@ class Thing extends Eloquent
             }
             return $this->last_parsed ?
                 $this->last_parsed : 0;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Core Get Thing\t" . $this['dev_eui']);
             return "";
         }
@@ -123,7 +120,7 @@ class Thing extends Eloquent
                 $this->lora_activation = $loraService->getActivation($this->dev_eui);
             }
             return array_merge(json_decode(json_encode($this->lora_activation, true)), $this->attributes['keys']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return isset($this->attributes['keys']) ? $this->attributes['keys'] : [];
         }
 

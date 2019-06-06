@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\v1;
 
 use App\Exceptions\GeneralException;
+use App\Http\Controllers\Controller;
 use App\Mail\ResetPassword;
 use App\Repository\Helper\Response;
 use App\ResetPasswordToken;
 use App\User;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 

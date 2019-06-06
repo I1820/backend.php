@@ -4,7 +4,6 @@ namespace App;
 
 use Illuminate\Support\Facades\DB;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\Model;
 
 class Role extends Eloquent
 {
@@ -40,7 +39,7 @@ class Role extends Eloquent
 
     public function users()
     {
-        return $this->hasMany(User::class,'role_id');
+        return $this->hasMany(User::class, 'role_id');
     }
 
 }

@@ -12,8 +12,6 @@ namespace App\Repository\Services;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class FileService
 {

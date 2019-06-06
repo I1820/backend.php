@@ -4,18 +4,20 @@ namespace App\Http\Controllers\v1;
 
 use App\Exceptions\GeneralException;
 use App\Exceptions\LoraException;
+use App\Http\Controllers\Controller;
 use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
 use App\Repository\Services\LanService;
 use App\Repository\Services\LoraService;
-use App\Repository\Services\PermissionService;
-use App\ThingProfile;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Repository\Services\ThingService;
 use App\Thing;
+use App\ThingProfile;
+use Carbon\Carbon;
+use Error;
+use Exception;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -65,6 +67,21 @@ class ThingController extends Controller
         return Response::body(compact('thing'));
     }
 
+    private function createThing(Collection $data, Project $project)
+    {
+        $user = Auth::user();
+        $this->thingService->validateCreateThing($data);
+        if ($data->get('type') == 'lora')
+            $thing_profile = ThingProfile::where('thing_profile_slug', (int)$data->get('thing_profile_slug'))->first();
+        else
+            $thing_profile = null;
+        $thing = $this->thingService->insertThing($data, $project, $thing_profile);
+
+        $user->things()->save($thing);
+        $this->thingService->addToProject($project, $thing);
+        return $thing;
+    }
+
     /**
      * @param Request $request
      * @return array
@@ -89,7 +106,7 @@ class ThingController extends Controller
         $things = $user->things()->with('project');
         try {
             $data = ['sorted' => json_decode($request->get('sorted'), true) ?: [], 'filtered' => json_decode($request->get('filtered'), true) ?: []];
-        } catch (\Error $e) {
+        } catch (Error $e) {
             $data = ['sorted' => [], 'filtered' => []];
         }
         foreach ($data['filtered'] as $item)
@@ -145,6 +162,54 @@ class ThingController extends Controller
 
     /**
      * @param Request $request
+     * @param bool $sample
+     * @return array
+     * @throws GeneralException
+     */
+    private function data(Request $request, $sample = false)
+    {
+        $project = Project::where('_id', $request->get('project_id'))->first();
+        $aliases = isset($project['aliases']) ? $project['aliases'] : null;
+        if ($request->get('window')) {
+            $since = Carbon::now()->subMinute((int)$request->get('window'))->getTimestamp();
+            $until = Carbon::now()->getTimestamp();
+        } else {
+            $since = $request->get('since') ?: 0;
+            $until = $request->get('until') ?: Carbon::now()->getTimestamp();
+        }
+        $thing_ids = json_decode($request->get('thing_ids'), true)['ids'] ?: [];
+        $thing_ids = $project->things()->whereIn('_id', $thing_ids)->get()->pluck('dev_eui');
+        if ($sample) {
+            $cluster_number = (int)($request->get('cn')) ?: 50;
+            $data = $this->coreService->thingsSampleData($thing_ids, $since, $until, $cluster_number);
+        } else {
+            $limit = (int)($request->get('limit')) ?: 0;
+            $offset = (int)($request->get('offset')) ?: 0;
+            $data = $this->coreService->thingsMainData($thing_ids, $since, $until, $limit, $offset);
+        }
+        $data = $this->alias($data, $aliases);
+
+        return $data;
+    }
+
+    private function alias($data, $aliases)
+    {
+        if ($aliases)
+            foreach ($data as $d) {
+                $res = [];
+                foreach ($d->data as $key => $item) {
+                    if (isset($aliases[$key]))
+                        $res[$aliases[$key]] = $item;
+                    else
+                        $res[$key] = $item;
+                }
+                $d->data = $res;
+            }
+        return $data;
+    }
+
+    /**
+     * @param Request $request
      * @return array
      * @throws GeneralException
      */
@@ -157,7 +222,7 @@ class ThingController extends Controller
 
     /**
      * @param Request $request
-     * @return ThingService|\Illuminate\Database\Eloquent\Model
+     * @return ThingService|Model
      * @throws GeneralException
      */
     public function dataToExcel(Request $request)
@@ -169,7 +234,7 @@ class ThingController extends Controller
 
     /**
      * @param Request $request
-     * @return ThingService|\Illuminate\Database\Eloquent\Model
+     * @return ThingService|Model
      */
     public function exportExcel(Request $request)
     {
@@ -218,7 +283,7 @@ class ThingController extends Controller
                             $res[$data['devEUI']] = 'پیدا نشد';
                     } else
                         $res[$data['devEUI']] = 'خطای عملیات';
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $res[$data['devEUI']] = $e->getMessage();
                 }
             }
@@ -228,11 +293,33 @@ class ThingController extends Controller
         return Response::body(compact('res'));
     }
 
+    private function prepareRow($row)
+    {
+        $row = $row->toArray();
+        $row['type'] = 'lora';
+        $row['factoryPresetFreqs'] = isset($row['factoryPresetFreqs']) ? [$row['factoryPresetFreqs']] : [];
+        return collect($row);
+
+    }
+
+    private function sendKeys(Thing $thing, Collection $data)
+    {
+        if ($thing['activation'] == 'OTAA')
+            $keys = $this->thingService->OTAAKeys($data, $thing);
+        elseif ($thing['activation'] == 'ABP')
+            $keys = $this->thingService->ABPKeys($data, $thing);
+        else
+            $keys = $this->thingService->JWTKey($thing);
+        $thing['keys'] = $keys;
+        $thing->save();
+        return $keys;
+    }
+
     /**
      * @param Thing $thing
      * @return array
-     * @throws \App\Exceptions\LoraException
-     * @throws \Exception
+     * @throws LoraException
+     * @throws Exception
      */
     public function delete(Thing $thing)
     {
@@ -282,93 +369,6 @@ class ThingController extends Controller
         $keys = $this->sendKeys($thing, collect($request->all()));
         return Response::body(['keys' => $keys]);
 
-    }
-
-
-    /**
-     * @param Request $request
-     * @param bool $sample
-     * @return array
-     * @throws GeneralException
-     */
-    private function data(Request $request, $sample = false)
-    {
-        $project = Project::where('_id', $request->get('project_id'))->first();
-        $aliases = isset($project['aliases']) ? $project['aliases'] : null;
-        if ($request->get('window')) {
-            $since = Carbon::now()->subMinute((int)$request->get('window'))->getTimestamp();
-            $until = Carbon::now()->getTimestamp();
-        } else {
-            $since = $request->get('since') ?: 0;
-            $until = $request->get('until') ?: Carbon::now()->getTimestamp();
-        }
-        $thing_ids = json_decode($request->get('thing_ids'), true)['ids'] ?: [];
-        $thing_ids = $project->things()->whereIn('_id', $thing_ids)->get()->pluck('dev_eui');
-        if ($sample) {
-            $cluster_number = (int)($request->get('cn')) ?: 50;
-            $data = $this->coreService->thingsSampleData($thing_ids, $since, $until, $cluster_number);
-        } else {
-            $limit = (int)($request->get('limit')) ?: 0;
-            $offset = (int)($request->get('offset')) ?: 0;
-            $data = $this->coreService->thingsMainData($thing_ids, $since, $until, $limit, $offset);
-        }
-        $data = $this->alias($data, $aliases);
-
-        return $data;
-    }
-
-    private function prepareRow($row)
-    {
-        $row = $row->toArray();
-        $row['type'] = 'lora';
-        $row['factoryPresetFreqs'] = isset($row['factoryPresetFreqs']) ? [$row['factoryPresetFreqs']] : [];
-        return collect($row);
-
-    }
-
-    private function alias($data, $aliases)
-    {
-        if ($aliases)
-            foreach ($data as $d) {
-                $res = [];
-                foreach ($d->data as $key => $item) {
-                    if (isset($aliases[$key]))
-                        $res[$aliases[$key]] = $item;
-                    else
-                        $res[$key] = $item;
-                }
-                $d->data = $res;
-            }
-        return $data;
-    }
-
-    private function createThing(Collection $data, Project $project)
-    {
-        $user = Auth::user();
-        $this->thingService->validateCreateThing($data);
-        if ($data->get('type') == 'lora')
-            $thing_profile = ThingProfile::where('thing_profile_slug', (int)$data->get('thing_profile_slug'))->first();
-        else
-            $thing_profile = null;
-        $thing = $this->thingService->insertThing($data, $project, $thing_profile);
-
-        $user->things()->save($thing);
-        $this->thingService->addToProject($project, $thing);
-        return $thing;
-    }
-
-
-    private function sendKeys(Thing $thing, Collection $data)
-    {
-        if ($thing['activation'] == 'OTAA')
-            $keys = $this->thingService->OTAAKeys($data, $thing);
-        elseif ($thing['activation'] == 'ABP')
-            $keys = $this->thingService->ABPKeys($data, $thing);
-        else
-            $keys = $this->thingService->JWTKey($thing);
-        $thing['keys'] = $keys;
-        $thing->save();
-        return $keys;
     }
 
 }

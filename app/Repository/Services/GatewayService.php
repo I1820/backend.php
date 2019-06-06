@@ -10,6 +10,7 @@ namespace App\Repository\Services;
 
 use App\Exceptions\GeneralException;
 use App\Gateway;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -75,7 +76,7 @@ class GatewayService
 
     /**
      * @param $gateways
-     * @return $this|\Illuminate\Database\Eloquent\Model
+     * @return $this|Model
      */
     public function toExcel($gateways)
     {

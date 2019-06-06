@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\User;
 use App\Codec;
+use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CodecPolicy
@@ -20,19 +20,31 @@ class CodecPolicy
     /**
      * Determine whether the user can view the codec.
      *
-     * @param  \App\User  $user
-     * @param  \App\Codec  $codec
+     * @param User $user
+     * @param Codec $codec
      * @return mixed
      */
     public function view(User $user, Codec $codec)
     {
-        return $this->isOwner($user,$codec);
+        return $this->isOwner($user, $codec);
+    }
+
+    /**
+     * Determine whether the user is the owner of the codec.
+     *
+     * @param User $user
+     * @param Codec $codec
+     * @return mixed
+     */
+    private function isOwner(User $user, Codec $codec)
+    {
+        return $user['_id'] == $codec['user_id'];
     }
 
     /**
      * Determine whether the user can create codecs.
      *
-     * @param  \App\User  $user
+     * @param User $user
      * @return mixed
      */
     public function create(User $user)
@@ -44,7 +56,7 @@ class CodecPolicy
     /**
      * Determine whether the user can Send codec.
      *
-     * @param  \App\User  $user
+     * @param User $user
      * @return mixed
      */
     public function send(User $user)
@@ -56,8 +68,8 @@ class CodecPolicy
     /**
      * Determine whether the user can update the codec.
      *
-     * @param  \App\User  $user
-     * @param  \App\Codec  $codec
+     * @param User $user
+     * @param Codec $codec
      * @return mixed
      */
     public function update(User $user, Codec $codec)
@@ -69,25 +81,13 @@ class CodecPolicy
     /**
      * Determine whether the user can delete the codec.
      *
-     * @param  \App\User  $user
-     * @param  \App\Codec  $codec
+     * @param User $user
+     * @param Codec $codec
      * @return mixed
      */
     public function delete(User $user, Codec $codec)
     {
         $permission = $user->role()->first()->perms()->where('slug', 'DELETE-CODEC')->first();
         return $user['active'] && $permission;
-    }
-
-    /**
-     * Determine whether the user is the owner of the codec.
-     *
-     * @param  \App\User $user
-     * @param Codec $codec
-     * @return mixed
-     */
-    private function isOwner(User $user, Codec $codec)
-    {
-        return $user['_id'] == $codec['user_id'];
     }
 }

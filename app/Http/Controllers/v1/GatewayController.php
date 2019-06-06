@@ -5,14 +5,15 @@ namespace App\Http\Controllers\v1;
 use App\Exceptions\GeneralException;
 use App\Exceptions\LoraException;
 use App\Gateway;
+use App\Http\Controllers\Controller;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
 use App\Repository\Services\GatewayService;
 use App\Repository\Services\LoraService;
 use Carbon\Carbon;
-use function GuzzleHttp\Psr7\str;
+use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use MongoDB\BSON\ObjectId;
 
@@ -153,7 +154,7 @@ class GatewayController extends Controller
 
 
     /**
-     * @return ThingService|\Illuminate\Database\Eloquent\Model
+     * @return ThingService|Model
      */
     public function exportToExcel()
     {
@@ -166,7 +167,7 @@ class GatewayController extends Controller
      * @param Gateway $gateway
      * @return array
      * @throws LoraException
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete(Gateway $gateway)
     {
