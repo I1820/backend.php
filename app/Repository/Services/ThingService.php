@@ -254,7 +254,7 @@ class ThingService
             $thing->period = $request->get('period');
 
         if ($request->get('model'))
-            $thing->period = $request->get('model');
+            $thing->model = $request->get('model');
 
         if ($request->get('thing_profile_slug')) {
             $profile = ThingProfile::where('thing_profile_slug', (int)$request->get('thing_profile_slug'))->first();
