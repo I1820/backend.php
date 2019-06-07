@@ -8,7 +8,7 @@
 
 namespace App\Exceptions;
 
-class AuthException extends IOTException
+class AuthException extends IoTException
 {
     # Exception Codes list
     const UNAUTHORIZED = 701;

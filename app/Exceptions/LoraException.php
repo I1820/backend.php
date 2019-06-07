@@ -8,7 +8,7 @@
 
 namespace App\Exceptions;
 
-class LoraException extends IOTException
+class LoraException extends IoTException
 {
     /**
      * UserException constructor.

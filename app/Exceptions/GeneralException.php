@@ -8,7 +8,7 @@
 
 namespace App\Exceptions;
 
-class GeneralException extends IOTException
+class GeneralException extends IoTException
 {
 
     # Exception Codes list
@@ -23,7 +23,7 @@ class GeneralException extends IOTException
     const M_ACCESS_DENIED = 'دسترسی انجام این عملیات را ندارید';
 
     /**
-     * UserException constructor.
+     * GeneralException constructor.
      * @param string $message
      * @param int $code
      */

@@ -10,6 +10,6 @@ namespace App\Exceptions;
 
 use Exception;
 
-class IOTException extends Exception
+class IoTException extends Exception
 {
 }
