@@ -14,6 +14,12 @@ return [
         ),
     ],
     'core' => [
+        'gm' => [
+            'url'  => env('CORE_GM_URL', '127.0.0.1:1374')
+        ],
+        'tm' => [
+            'url'=> env('CORE_TM_URL', '127.0.0.1:1995')
+        ],
         'serverBaseUrl' => env('CORE_BASE_URL', '172.23.132.50'),
         'pmPort' => '8080',
         'dmPort' => '1373',
@@ -23,6 +29,4 @@ return [
     'lan' => [
         'serverBaseUrl' => env('LAN_BASE_URL', '172.23.132.50:9000'),
     ],
-
-
 ];
