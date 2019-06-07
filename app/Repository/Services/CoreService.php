@@ -9,8 +9,11 @@
 namespace App\Repository\Services;
 
 
+use App\Exceptions\CoreException;
 use App\Exceptions\GeneralException;
 use App\Project;
+use App\Repository\Services\Core\GMCoreService;
+use App\Repository\Services\Core\TMCoreService;
 use App\Scenario;
 use App\Thing;
 use Illuminate\Support\Facades\Auth;
@@ -23,18 +26,22 @@ class CoreService
     protected $port;
     protected $dmPort;
     protected $pmPort;
-    protected $gmPort;
     protected $downLinkPort;
     protected $curlService;
 
-    public function __construct(CurlService $curlService)
+    protected $tmService;
+    protected $gmService;
+
+    public function __construct(CurlService $curlService, TMCoreService $tmService, GMCoreService $gmService)
     {
         $this->base_url = config('iot.core.serverBaseUrl');
         $this->pmPort = config('iot.core.pmPort');
         $this->dmPort = config('iot.core.dmPort');
         $this->downLinkPort = config('iot.core.downLinkPort');
-        $this->gmPort = config('iot.core.gmPort');
         $this->curlService = $curlService;
+
+        $this->tmService = $tmService;
+        $this->gmService = $gmService;
     }
 
     /**
@@ -165,48 +172,37 @@ class CoreService
     }
 
     /**
-     * @param $devEUI
+     * @param string $devEUI
      * @return array
-     * @throws GeneralException
+     * @throws CoreException
      */
-    public function deleteThing($devEUI)
+    public function deleteThing(string $devEUI)
     {
-        Log::debug("Core Delete Thing\t" . $devEUI);
-        $url = '/api/things/' . $devEUI;
-        $response = $this->_send($url, [], 'delete', $this->pmPort);
-        return $response;
+        return $this->tmService->delete($devEUI);
     }
 
     /**
      * @param Project $project
      * @param Thing $thing
      * @return array
-     * @throws GeneralException
+     * @throws CoreException
      */
     public function postThing(Project $project, Thing $thing)
     {
-        Log::debug("Core Send Thing\t" . $project['_id']);
-        $url = '/api/things';
-        $data = [
-            'name' => (string)$thing['interface']['devEUI'],
-            'model' => (string)$thing['model'],
-            'project' => (string)$project['container']['name'],
-        ];
-        $response = $this->_send($url, $data, 'post', $this->pmPort);
-        return $response;
+        return $this->tmService->create(
+            (string)$project['container']['name'],
+            $thing
+        );
     }
 
     /**
      * @param Thing $thing
      * @return array
-     * @throws GeneralException
+     * @throws CoreException
      */
     public function getThing(Thing $thing)
     {
-        Log::debug("Core Get Thing\t" . $thing['dev_eui']);
-        $url = '/api/things/' . $thing['dev_eui'];
-        $response = $this->_send($url, [], 'get', $this->pmPort);
-        return $response;
+        return $this->tmService->show($thing['dev_eui']);
     }
 
     /**
@@ -226,19 +222,11 @@ class CoreService
      * @param Thing $thing
      * @param bool $active
      * @return array
-     * @throws GeneralException
+     * @throws CoreException
      */
     public function activateThing(Thing $thing, $active = true)
     {
-        if ($active) {
-            Log::debug("Core Activate Thing\t" . $thing['dev_eui']);
-            $url = '/api/things/' . $thing['dev_eui'] . '/activate';
-        } else {
-            Log::debug("Core Deactivate Thing\t" . $thing['dev_eui']);
-            $url = '/api/things/' . $thing['dev_eui'] . '/deactivate';
-        }
-        $response = $this->_send($url, [], 'get', $this->pmPort);
-        return $response;
+        return $this->tmService->activation($thing['dev_eui'], $active);
     }
 
     /**
@@ -443,19 +431,11 @@ class CoreService
      * @param $netskey
      * @param $phyPayload
      * @return array
-     * @throws GeneralException
+     * @throws CoreException
      */
     public function decryptPhyPayload($appskey, $netskey, $phyPayload)
     {
-        Log::debug("Core Decrypt PhyPayload");
-        $url = '/api/decrypt';
-        $data = [
-            'appskey' => $appskey,
-            'netskey' => $netskey,
-            'phy_payload' => $phyPayload,
-        ];
-        $response = $this->_send($url, $data, 'post', $this->gmPort);
-        return $response;
+        return $this->gmService->decrypt($appskey, $netskey, $phyPayload);
     }
 
     /**
