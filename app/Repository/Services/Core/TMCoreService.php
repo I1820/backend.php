@@ -28,8 +28,8 @@ class TMCoreService extends AbstractCoreService
             'name' => (string)$thing['interface']['devEUI'],
             'model' => (string)$thing['model'],
             'location' => [
-                'lat' => $thing['loc']['coordinates'][1],
-                'long' => $thing['loc']['coordinates'][0],
+                'lat' => floatval($thing['loc']['coordinates'][1]),
+                'long' => floatval($thing['loc']['coordinates'][0]),
             ]
         ];
         $path = '/api/projects/' . $project_id . '/things';
