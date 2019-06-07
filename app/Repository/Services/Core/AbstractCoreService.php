@@ -45,16 +45,16 @@ abstract class AbstractCoreService
             ->withTimeout('60');
         $new_response = null;
         switch ($method) {
-            case 'post':
+            case 'POST':
                 $new_response = $response->post();
                 break;
-            case 'delete':
+            case 'DELETE':
                 $new_response = $response->delete();
                 break;
-            case 'put':
+            case 'PUT':
                 $new_response = $response->put();
                 break;
-            case 'get':
+            case 'GET':
             default:
                 $new_response = $response->get();
                 break;
@@ -69,7 +69,7 @@ abstract class AbstractCoreService
         if ($new_response->status != 200) {
             if ($new_response->content) {
                 throw new CoreException(
-                    $new_response->content->message ?: CoreException::M_UNKNOWN,
+                    array_key_exists('message', $new_response->content) ? $new_response->content['message'] : CoreException::M_UNKNOWN,
                     $new_response->status
                 );
             } else {
