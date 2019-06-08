@@ -80,14 +80,12 @@ class ProjectService
     public function validateUpdateProject(Request $request)
     {
         $messages = [
-            'name.filled' => 'لطفا نام پروژه را وارد کنید',
             'name.unique' => 'این پرژوه قبلا وجود دارد',
-            'description.filled' => 'لطفا توضیحات را درست وارد کنید',
         ];
 
         $validator = Validator::make($request->all(), [
-            'name' => 'filled|string|max:255|unique:projects',
-            'description' => 'filled|string',
+            'name' => 'string|max:255|unique:projects',
+            'description' => 'string',
         ], $messages);
 
         if ($validator->fails())
