@@ -173,6 +173,11 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
+        /* project name must be unique so remove it from the request if its equal with current project */
+        if ($request->get('name') == $project->name) {
+            $request->merge(['name' => '']);
+        }
+
         $this->projectService->validateUpdateProject($request);
 
         $project = $this->projectService->updateProject($request, $project);
