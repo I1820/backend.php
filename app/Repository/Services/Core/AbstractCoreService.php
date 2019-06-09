@@ -42,7 +42,7 @@ abstract class AbstractCoreService
             ->returnResponseObject()
             ->asJsonRequest()
             ->asJsonResponse(true)
-            ->withTimeout('60');
+            ->withTimeout(60);
         $new_response = null;
         switch ($method) {
             case 'POST':
