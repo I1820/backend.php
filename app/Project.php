@@ -5,10 +5,10 @@ namespace App;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
 /**
- * @property string name
- * @property string description
- * @property bool active
- * @property string _id
+ * @property string $name
+ * @property string $description
+ * @property bool $active
+ * @property string $_id
  */
 class Project extends Eloquent
 {

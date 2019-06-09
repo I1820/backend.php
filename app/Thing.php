@@ -9,16 +9,16 @@ use Illuminate\Support\Facades\Log;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
 /**
- * @property array loc
- * @property integer period
- * @property string description
- * @property string name
- * @property array interface
- * @property string dev_eui
- * @property string model
- * @property string type
- * @property boolean active
- * @property string activation
+ * @property array $loc
+ * @property integer $period
+ * @property string $description
+ * @property string $name
+ * @property array $interface
+ * @property string $dev_eui
+ * @property string $model
+ * @property string $type
+ * @property boolean $active
+ * @property string $activation
  */
 class Thing extends Eloquent
 {
