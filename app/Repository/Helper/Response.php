@@ -11,7 +11,7 @@ namespace App\Repository\Helper;
 class Response
 {
     /**
-     * @param array $result
+     * @param array|string $result
      * @param int $code
      * @return array
      */
