@@ -11,15 +11,15 @@ namespace App\Repository\Helper;
 class Response
 {
     /**
-     * @param string $message
+     * @param array $result
      * @param int $code
      * @return array
      */
-    public static function body($message = '', int $code = 200): array
+    public static function body($result = [], int $code = 200): array
     {
         return [
             'code' => $code,
-            'result' => $message
+            'result' => $result
         ];
     }
 }
