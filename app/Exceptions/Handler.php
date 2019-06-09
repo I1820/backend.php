@@ -55,7 +55,7 @@ class Handler extends ExceptionHandler
         if ($exception instanceof AuthorizationException)
             $response = response(Response::body(GeneralException::M_ACCESS_DENIED, GeneralException::ACCESS_DENIED), 403);
         else if ($exception instanceof IoTException) { # IOT exceptions
-            $response = $this->CustomException($exception);
+            $response = $this->customException($exception);
         } else { # other exceptions
             $response = $this->otherExceptions($request, $exception);
         }
@@ -65,9 +65,9 @@ class Handler extends ExceptionHandler
 
     /**
      * @param Exception $e
-     * @return array
+     * @return Response
      */
-    private function CustomException(Exception $e)
+    private function customException(Exception $e)
     {
         if ($e->getCode() == 701)
             $code = 401;
