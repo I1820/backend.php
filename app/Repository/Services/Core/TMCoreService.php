@@ -25,11 +25,11 @@ class TMCoreService extends AbstractCoreService
      */
     public function create(string $project_id, Thing $thing) {
         $data = [
-            'name' => (string)$thing['interface']['devEUI'],
-            'model' => (string)$thing['model'],
+            'name' => $thing->dev_eui,
+            'model' => $thing->model,
             'location' => [
-                'lat' => floatval($thing['loc']['coordinates'][1]),
-                'long' => floatval($thing['loc']['coordinates'][0]),
+                'lat' => floatval($thing->loc['coordinates'][1]),
+                'long' => floatval($thing->loc['coordinates'][0]),
             ]
         ];
         $path = '/api/projects/' . $project_id . '/things';
