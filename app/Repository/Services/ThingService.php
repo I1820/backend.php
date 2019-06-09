@@ -9,9 +9,11 @@
 namespace App\Repository\Services;
 
 
+use App\Exceptions\CoreException;
 use App\Exceptions\GeneralException;
 use App\Exceptions\LoraException;
 use App\Project;
+use App\Repository\Services\Core\TMCoreService;
 use App\Thing;
 use App\ThingProfile;
 use Illuminate\Database\Eloquent\Model;
@@ -24,21 +26,21 @@ use Maatwebsite\Excel\Excel;
 class ThingService
 {
     protected $loraService;
-    protected $coreService;
     protected $projectService;
     protected $lanService;
+    protected $tmService;
 
     public function __construct(
         LoraService $loraService,
-        CoreService $coreService,
         LanService $lanService,
-        ProjectService $projectService
+        ProjectService $projectService,
+        TMCoreService $tmService
     )
     {
         $this->loraService = $loraService;
-        $this->coreService = $coreService;
         $this->lanService = $lanService;
         $this->projectService = $projectService;
+        $this->tmService = $tmService;
     }
 
     /**
@@ -151,7 +153,7 @@ class ThingService
         return $thing;
     }
 
-    public function ABPKeys($request, Thing $thing)
+    public function ABPKeys(Request $request, Thing $thing)
     {
         $this->validateKeys($request, 'ABP');
         $data['devAddr'] = (string)$request->get('devAddr');
@@ -206,7 +208,7 @@ class ThingService
             throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
     }
 
-    public function OTAAKeys($request, Thing $thing)
+    public function OTAAKeys(Request $request, Thing $thing)
     {
         $this->validateKeys($request, 'OTAA');
         $key = $request->get('appKey');
@@ -222,13 +224,34 @@ class ThingService
         return ['JWT' => $result['token']];
     }
 
-    public function activate(Thing $thing, $active)
+    /**
+     * @param Thing $thing
+     * @param bool $active
+     * @throws CoreException
+     */
+    public function activate(Thing $thing, bool $active)
     {
-        $this->coreService->activateThing($thing, $active);
+        $this->tmService->activation($thing->dev_eui, $active);
         $thing->active = $active;
         $thing->save();
     }
 
+
+    /**
+     * @param Thing $thing
+     * @return void
+     * @throws LoraException
+     * @throws CoreException
+     * @throws \Exception
+     */
+    public function delete(Thing $thing) {
+        if ($thing['type'] == 'lora')
+            $this->loraService->deleteDevice($thing['interface']['devEUI']);
+        if ($thing['type'] == 'lan')
+            $this->lanService->deleteDevice($thing['dev_eui']);
+        $this->tmService->delete($thing->dev_eui);
+        $thing->delete();
+    }
 
     /**
      * @param Collection $request
@@ -398,13 +421,13 @@ class ThingService
     /**
      * @param Project $project
      * @param Thing $thing
-     * @throws GeneralException
+     * @throws CoreException
      */
     public function addToProject(Project $project, Thing $thing)
     {
         $thing->project()->associate($project);
         $thing->save();
-        $this->coreService->postThing($project, $thing);
+        $this->tmService->create($project->_id, $thing);
     }
 
 }

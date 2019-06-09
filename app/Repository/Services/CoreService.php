@@ -9,11 +9,8 @@
 namespace App\Repository\Services;
 
 
-use App\Exceptions\CoreException;
 use App\Exceptions\GeneralException;
 use App\Project;
-use App\Repository\Services\Core\GMCoreService;
-use App\Repository\Services\Core\TMCoreService;
 use App\Scenario;
 use App\Thing;
 use Illuminate\Support\Facades\Auth;
@@ -29,19 +26,13 @@ class CoreService
     protected $downLinkPort;
     protected $curlService;
 
-    protected $tmService;
-    protected $gmService;
-
-    public function __construct(CurlService $curlService, TMCoreService $tmService, GMCoreService $gmService)
+    public function __construct(CurlService $curlService)
     {
         $this->base_url = config('iot.core.serverBaseUrl');
         $this->pmPort = config('iot.core.pmPort');
         $this->dmPort = config('iot.core.dmPort');
         $this->downLinkPort = config('iot.core.downLinkPort');
         $this->curlService = $curlService;
-
-        $this->tmService = $tmService;
-        $this->gmService = $gmService;
     }
 
     /**
@@ -172,40 +163,6 @@ class CoreService
     }
 
     /**
-     * @param string $devEUI
-     * @return array
-     * @throws CoreException
-     */
-    public function deleteThing(string $devEUI)
-    {
-        return $this->tmService->delete($devEUI);
-    }
-
-    /**
-     * @param Project $project
-     * @param Thing $thing
-     * @return array
-     * @throws CoreException
-     */
-    public function postThing(Project $project, Thing $thing)
-    {
-        return $this->tmService->create(
-            (string)$project['container']['name'],
-            $thing
-        );
-    }
-
-    /**
-     * @param Thing $thing
-     * @return array
-     * @throws CoreException
-     */
-    public function getThing(Thing $thing)
-    {
-        return $this->tmService->show($thing['dev_eui']);
-    }
-
-    /**
      * @param Thing $thing
      * @return array
      * @throws GeneralException
@@ -216,17 +173,6 @@ class CoreService
         $url = '/api/queries/things/' . $thing['dev_eui'] . '/parsed';
         $response = $this->_send($url, [], 'get', $this->dmPort);
         return $response;
-    }
-
-    /**
-     * @param Thing $thing
-     * @param bool $active
-     * @return array
-     * @throws CoreException
-     */
-    public function activateThing(Thing $thing, $active = true)
-    {
-        return $this->tmService->activation($thing['dev_eui'], $active);
     }
 
     /**
@@ -424,18 +370,6 @@ class CoreService
         $url = '/api/gateway/' . $mac;
         $response = $this->_send($url, ['since' => $since], 'get', $this->dmPort);
         return $response;
-    }
-
-    /**
-     * @param $appskey
-     * @param $netskey
-     * @param $phyPayload
-     * @return array
-     * @throws CoreException
-     */
-    public function decryptPhyPayload($appskey, $netskey, $phyPayload)
-    {
-        return $this->gmService->decrypt($appskey, $netskey, $phyPayload);
     }
 
     /**

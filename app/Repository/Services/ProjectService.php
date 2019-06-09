@@ -111,19 +111,6 @@ class ProjectService
 
     /**
      * @param Project $project
-     * @param Thing $thing
-     * @param $codec
-     * @throws GeneralException
-     */
-    public function addThing(Project $project, Thing $thing, $codec)
-    {
-        $this->coreService->postThing($project, $thing);
-        if ($codec)
-            $this->coreService->sendCodec($project, $thing, $codec->code);
-    }
-
-    /**
-     * @param Project $project
      * @param array $aliases
      * @throws GeneralException
      */

@@ -2,27 +2,29 @@
 
 namespace App\Http\Controllers\v1;
 
+use App\Exceptions\CoreException;
 use App\Exceptions\GeneralException;
 use App\Http\Controllers\Controller;
 use App\Repository\Helper\Response;
-use App\Repository\Services\CoreService;
+use App\Repository\Services\Core\GMCoreService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class OtherController extends Controller
 {
-    protected $coreService;
+    protected $gmService;
 
-    /**
-     * OtherController constructor.
-     * @param CoreService $coreService
-     */
-    public function __construct(CoreService $coreService)
+    public function __construct(GMCoreService $gmService)
     {
-        $this->coreService = $coreService;
+        $this->gmService = $gmService;
     }
 
-
+    /**
+     * @param Request $request
+     * @return array
+     * @throws GeneralException
+     * @throws CoreException
+     */
     public function decryptPhyPayload(Request $request)
     {
         $messages = [
@@ -39,7 +41,8 @@ class OtherController extends Controller
 
         if ($validator->fails())
             throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
+
         $data = $request->only(['appskey', 'netskey', 'phyPayload']);
-        return Response::body($this->coreService->decryptPhyPayload($data['appskey'], $data['netskey'], $data['phyPayload']));
+        return Response::body($this->gmService->decrypt($data['appskey'], $data['netskey'], $data['phyPayload']));
     }
 }

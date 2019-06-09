@@ -323,12 +323,7 @@ class ThingController extends Controller
      */
     public function delete(Thing $thing)
     {
-        if ($thing['type'] == 'lora')
-            $this->loraService->deleteDevice($thing['interface']['devEUI']);
-        if ($thing['type'] == 'lan')
-            $this->lanService->deleteDevice($thing['dev_eui']);
-        $this->coreService->deleteThing($thing['dev_eui']);
-        $thing->delete();
+        $this->thingService->delete($thing);
         return Response::body(['success' => 'true']);
     }
 
