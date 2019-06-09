@@ -8,10 +8,15 @@ use Illuminate\Support\Facades\Log;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
 /**
- * @property mixed loc
- * @property mixed period
- * @property mixed description
- * @property mixed name
+ * @property array loc
+ * @property integer period
+ * @property string description
+ * @property string name
+ * @property array interface
+ * @property string dev_eui
+ * @property string model
+ * @property string type
+ * @property boolean active
  */
 class Thing extends Eloquent
 {
