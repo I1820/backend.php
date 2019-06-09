@@ -65,8 +65,7 @@ abstract class AbstractCoreService
         }
         if ($new_response->status == 200) {
             return $new_response->content ?: [];
-        }
-        if ($new_response->status != 200) {
+        } else {
             if ($new_response->content) {
                 throw new CoreException(
                     array_key_exists('message', $new_response->content) ? $new_response->content['message'] : CoreException::M_UNKNOWN,
