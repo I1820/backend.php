@@ -3,6 +3,7 @@
 namespace App;
 
 use Carbon\Carbon;
+use DateTime;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
@@ -17,6 +18,7 @@ use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
  * @property string model
  * @property string type
  * @property boolean active
+ * @property string activation
  */
 class Thing extends Eloquent
 {
@@ -85,19 +87,21 @@ class Thing extends Eloquent
             Log::error("Lora Get Thing\t" . $this['dev_eui']);
             return "";
         }
-        $time = $this->lora_thing->lastSeenAt;
+        try {
+            $time = new DateTime($this->lora_thing->lastSeenAt);
+        } catch (Exception $e) {
+            $status = 'secondary';
+            return ['status' => $status, 'time' => ''];
+        }
         $status = 'success';
-        if (lora_time($time)) {
-            if (Carbon::now()->subMinutes(2 * $this->period)->gt(lora_time($time)))
-                $status = 'warning';
-            if (Carbon::now()->subMinutes(3 * $this->period)->gt(lora_time($time)))
-                $status = 'danger';
-            if (Carbon::now()->subMinutes(4 * $this->period)->gt(lora_time($time)))
-                $status = 'secondary';
-        } else
+        if (Carbon::now()->subMinutes(2 * $this->period)->gt($time))
+            $status = 'warning';
+        if (Carbon::now()->subMinutes(3 * $this->period)->gt($time))
+            $status = 'danger';
+        if (Carbon::now()->subMinutes(4 * $this->period)->gt($time))
             $status = 'secondary';
 
-        return ['status' => $status, 'time' => $time ? (string)lora_time($time) : ''];
+        return ['status' => $status, 'time' => $time->format(Carbon::RFC3339)];
     }
 
     public function getLastParsedAtAttribute($value)
