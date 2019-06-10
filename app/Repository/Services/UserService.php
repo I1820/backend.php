@@ -71,7 +71,7 @@ class UserService
     public function activateImpersonate(string $userID)
     {
         $main_user_claims = auth()->payload();
-        if ($main_user_claims->hasKey('impersonate_id')) {
+        if ($main_user_claims['impersonate_id']) {
             throw new GeneralException('حالت سوم شخص فعال است', 400);
         } else {
             $main_user = Auth::user()['_id'];
@@ -88,7 +88,7 @@ class UserService
     public function deactivateImpersonate()
     {
         $main_user_claims = auth()->payload();
-        if ($main_user_claims->hasKey('impersonate_id')) {
+        if ($main_user_claims['impersonate_id']) {
             $main_user = User::where('_id', $main_user_claims['impersonate_id'])->first();
         } else {
             throw new GeneralException('حالت سوم شخص فعال است', 400);
@@ -96,7 +96,7 @@ class UserService
         $main_user['impersonated'] = false;
         return [
             'user' => $main_user,
-            'access_token' => $this->generateAccessTokenByID($main_user['_id']),
+            'access_token' => $this->generateAccessTokenByID($main_user['_id'], ['impersonate_id' => null]),
             'refresh_token' => $this->generateRefreshToken($main_user['_id']),
         ];
     }
