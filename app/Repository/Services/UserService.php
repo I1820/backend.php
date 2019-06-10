@@ -67,7 +67,7 @@ class UserService
         if (!$main_user)
             $main_user = Auth::user();
         $token = auth()->claims(['impersonate_id' => $main_user['_id']])->tokenById($user->_id);
-        return ['user' => $user, 'token' => $token];
+        return ['user' => $user, 'access_token' => $token];
     }
 
     public function deactivateImpersonate()
@@ -77,7 +77,7 @@ class UserService
         if (!$main_user)
             $main_user = Auth::user();
         $main_user['impersonated'] = false;
-        return ['user' => $main_user, 'token' => JWTAuth::fromUser($main_user)];
+        return ['user' => $main_user, 'access_token' => auth()->tokenById($main_user->_id)];
     }
 
 
