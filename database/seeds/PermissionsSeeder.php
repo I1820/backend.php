@@ -26,13 +26,19 @@ class PermissionsSeeder extends Seeder
             "slug" => "EDIT-THING", "name" => "ویرایش شی"
         ]);
         DB::collection('permissions')->insert([
-            "slug" => "EDIT-THING", "name" => "ویرایش شی"
-        ]);
-        DB::collection('permissions')->insert([
             "slug" => "DELETE-THING", "name" => "حذف شی"
         ]);
         DB::collection('permissions')->insert([
             "slug" => "DELETE-PROJECT", "name" => "حذف پروژه"
+        ]);
+        DB::collection('permissions')->insert([
+            "slug" => "CREATE-SCENARIO", "name" => "ساخت سناریو"
+        ]);
+        DB::collection('permissions')->insert([
+            "slug" => "UPDATE-SCENARIO", "name" => "ویرایش سناریو"
+        ]);
+        DB::collection('permissions')->insert([
+            "slug" => "DELETE-SCENARIO", "name" => "حذف سناریو"
         ]);
     }
 }
