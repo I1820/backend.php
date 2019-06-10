@@ -63,7 +63,8 @@ class AuthController extends Controller
             throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
         }
 
-        $access_token = $this->userService->generateAccessToken($request);
+        $credentials = $request->only('email', 'password');
+        $access_token = $this->userService->generateAccessTokenByCredentials($credentials);
 
         // check user activation status
         $user = auth()->user();
@@ -76,20 +77,19 @@ class AuthController extends Controller
         return Response::body(compact('user', 'access_token', 'refresh_token', 'config'));
     }
 
+
+    /**
+     * @param $request
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
     public function loginValidator($request)
     {
-        $captcha = env('CAPTCHA_ENABLE', 0);
-        $data = $request->only(['email', 'password', 'g-recaptcha-response']);
+        $data = $request->only(['email', 'password']);
         return Validator::make($data, [
             'email' => 'required|string|email',
             'password' => 'required|string',
-            'g-recaptcha-response' => $captcha ? 'required|captcha' : ''
         ]);
     }
-
-    /*
-     * @return Validator
-     */
 
     /**
      * refresh API

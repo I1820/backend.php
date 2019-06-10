@@ -91,12 +91,24 @@ class UserController extends Controller
     }
 
 
-    public function impersonate($user, Request $request)
+    /**
+     * Impersonate for given user in context of logged in user or find out the main user based on
+     * impersonated token
+     * @param User $user
+     * @param Request $request
+     * @return array
+     * @throws GeneralException
+     */
+    public function impersonate(User $user, Request $request)
     {
-        $user = User::where('_id', $user)->first();
         if ($request->get('active') && $user) {
-            $user['impersonated'] = true;
-            return Response::body($this->userService->activateImpersonate($user));
+            $user->impersonated = true;
+            $tokens = $this->userService->activateImpersonate($user);
+            return Response::body([
+                'user' => $user,
+                'access_token' => $tokens['access_token'],
+                'refresh_token' => $tokens['refresh_token'],
+            ]);
         }
 
         return Response::body($this->userService->deactivateImpersonate());

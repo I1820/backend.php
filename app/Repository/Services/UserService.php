@@ -14,11 +14,9 @@ use App\Repository\Traits\RegisterUser;
 use App\Repository\Traits\UpdateUser;
 use App\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Excel;
 use MongoDB\BSON\UTCDateTime;
-use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
 
 class UserService
 {
@@ -26,72 +24,90 @@ class UserService
     use UpdateUser;
 
     /**
-     * @param Request $request
+     * @param array $credentials
+     * @param array $claims
      * @return string
      * @throws AuthException
      */
-    public function generateAccessToken(Request $request): string
+    public function generateAccessTokenByCredentials(array $credentials, array $claims = []): string
     {
         // verify user with db and generate access token
-        $credentials = $request->only('email', 'password');
-        $token = auth()->attempt($credentials);
-
+        $token = auth()->claims($claims)->attempt($credentials);
         if (!$token) {
             throw new AuthException(AuthException::M_INVALID_CREDENTIALS, AuthException::UNAUTHORIZED);
         }
 
+        return $token;
+    }
+
+    /**
+     * @param string $id
+     * @param array $claims
+     * @return string
+     */
+    public function generateAccessTokenByID(string $id, array $claims = []): string
+    {
+        $token = auth()->claims($claims)->tokenById($id);
         return $token;
     }
 
     /**
      * @param string $sub is a refresh token subject
      * @return string
-     * @throws AuthException
      */
     public function generateRefreshToken(string $sub): string
     {
         $token = auth()->setTTL(7200)->tokenById($sub); // token is valid for 5 days!
-
-        if (!$token) {
-            throw new AuthException(AuthException::M_INVALID_CREDENTIALS, AuthException::UNAUTHORIZED);
-        }
-
         return $token;
     }
 
 
-    public function activateImpersonate(User $user)
+    /**
+     * Generate impersonate token based on given user identification for authenticated user
+     * @param string $userID
+     * @return array
+     * @throws GeneralException
+     */
+    public function activateImpersonate(string $userID)
     {
-        $main_user_id = auth()->payload()->toArray();
-        $main_user = isset($main_user_id['impersonate_id']) ? User::where('_id', $main_user_id['impersonate_id'])->first() : null;
-        if (!$main_user)
-            $main_user = Auth::user();
-        $token = auth()->claims(['impersonate_id' => $main_user['_id']])->tokenById($user->_id);
-        return ['user' => $user, 'access_token' => $token];
+        $main_user_claims = auth()->payload()->toArray();
+        if (in_array('impersonate_id', $main_user_claims)) {
+            throw new GeneralException('حالت سوم شخص فعال است', 400);
+        } else {
+            $main_user = Auth::user()['_id'];
+        }
+        $access_token = $this->generateAccessTokenByID($userID, ['impersonate_id' => $main_user]);
+        $refresh_token = $this->generateRefreshToken($userID);
+        return ['access_token' => $access_token, 'refresh_token' => $refresh_token];
     }
 
+    /**
+     * @return array
+     * @throws GeneralException
+     */
     public function deactivateImpersonate()
     {
-        $main_user_id = auth()->payload()->toArray();
-        $main_user = isset($main_user_id['impersonate_id']) ? User::where('_id', $main_user_id['impersonate_id'])->first() : null;
-        if (!$main_user)
-            $main_user = Auth::user();
+        $main_user_claims = auth()->payload()->toArray();
+        if (in_array('impersonate_id', $main_user_claims)) {
+            $main_user = User::where('_id', $main_user_claims['impersonate_id'])->first();
+        } else {
+            throw new GeneralException('حالت سوم شخص فعال است', 400);
+        }
         $main_user['impersonated'] = false;
-        return ['user' => $main_user, 'access_token' => auth()->tokenById($main_user->_id)];
+        return [
+            'user' => $main_user,
+            'access_token' => $this->generateAccessTokenByID($main_user['_id']),
+            'refresh_token' => $this->generateRefreshToken($main_user['_id']),
+        ];
     }
 
 
     /**
      * @return string
-     * @throws GeneralException
      */
     public function refreshToken(string $sub): string
     {
-        try {
-            return auth()->tokenById($sub);
-        } catch (TokenBlacklistedException $exception) {
-            throw new GeneralException(GeneralException::M_UNKNOWN, 701);
-        }
+        return auth()->tokenById($sub);
     }
 
     public function updatePackage(User $user, $package)
