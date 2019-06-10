@@ -62,17 +62,17 @@ class UserService
 
     public function activateImpersonate(User $user)
     {
-        $main_user_id = JWTAuth::getPayload()->toArray();
+        $main_user_id = auth()->payload()->toArray();
         $main_user = isset($main_user_id['impersonate_id']) ? User::where('_id', $main_user_id['impersonate_id'])->first() : null;
         if (!$main_user)
             $main_user = Auth::user();
-        $token = JWTAuth::fromUser($user, ['impersonate_id' => $main_user['_id']]);
+        $token = auth()->claims(['impersonate_id' => $main_user['_id']])->tokenById($user->_id);
         return ['user' => $user, 'token' => $token];
     }
 
     public function deactivateImpersonate()
     {
-        $main_user_id = JWTAuth::getPayload()->toArray();
+        $main_user_id = auth()->payload()->toArray();
         $main_user = isset($main_user_id['impersonate_id']) ? User::where('_id', $main_user_id['impersonate_id'])->first() : null;
         if (!$main_user)
             $main_user = Auth::user();
