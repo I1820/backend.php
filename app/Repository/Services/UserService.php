@@ -70,8 +70,8 @@ class UserService
      */
     public function activateImpersonate(string $userID)
     {
-        $main_user_claims = auth()->payload()->toArray();
-        if (in_array('impersonate_id', $main_user_claims)) {
+        $main_user_claims = auth()->payload();
+        if ($main_user_claims->hasKey('impersonate_id')) {
             throw new GeneralException('حالت سوم شخص فعال است', 400);
         } else {
             $main_user = Auth::user()['_id'];
@@ -87,8 +87,8 @@ class UserService
      */
     public function deactivateImpersonate()
     {
-        $main_user_claims = auth()->payload()->toArray();
-        if (in_array('impersonate_id', $main_user_claims)) {
+        $main_user_claims = auth()->payload();
+        if ($main_user_claims->hasKey('impersonate_id')) {
             $main_user = User::where('_id', $main_user_claims['impersonate_id'])->first();
         } else {
             throw new GeneralException('حالت سوم شخص فعال است', 400);

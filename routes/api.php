@@ -25,14 +25,7 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
 
     Route::post('/password/email', 'PasswordController@sendLink')->name('send-password-email');
 
-
     Route::post('/decrypt-phy-payload', 'OtherController@decryptPhyPayload');
-
-
-    Route::group(['prefix' => 'authorization', 'middleware' => ['auth.jwt']], function () {
-        Route::get('/permissions', 'PermissionController@permissionsList');
-        Route::get('/roles', 'PermissionController@rolesList');
-    });
 
     Route::group(['prefix' => 'user', 'middleware' => ['auth.jwt']], function () {
         Route::patch('/update', 'UserController@update');
@@ -150,11 +143,10 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
 
 
 Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
-
-
     Route::group(['prefix' => 'users', 'middleware' => ['auth.jwt', 'admin']], function () {
         Route::get('/', 'UserController@list');
         Route::get('/excel', 'UserController@excel');
+        Route::get('/impersonate', 'UserController@deimpersonate');
         Route::get('/{user}', 'UserController@get');
         Route::get('/{user}/ban', 'UserController@ban');
         Route::post('/{user}/password', 'UserController@setPassword');
