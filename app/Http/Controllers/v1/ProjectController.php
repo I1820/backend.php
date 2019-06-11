@@ -99,15 +99,14 @@ class ProjectController extends Controller
     public function things(Project $project, Request $request)
     {
         $things = $project->things()->with('profile');
-        try {
-            $data = ['sorted' => json_decode($request->get('sorted'), true), 'filtered' => json_decode($request->get('filtered'), true)];
-        } catch (Error $e) {
-            $data = ['sorted' => [], 'filtered' => []];
-        }
+        $data = [
+            'sorted' => $request->get('sorted', []),
+            'filtered' => $request->get('filtered', []),
+        ];
         foreach ($data['filtered'] as $item)
             $things->where($item['id'], 'like', '%' . $item['value'] . '%');
-        if (count($data['sorted']))
-            $things->orderBy($data['sorted'][0]['id'], $data['sorted'][0]['desc'] ? 'DESC' : 'ASC');
+        foreach ($data['sorted'] as $item)
+            $things->orderBy($item['id'], $item['desc'] ? 'DESC' : 'ASC');
 
         $pages = ceil($things->count() / (intval($request->get('limit')) ?: 10));
         $things = $things->skip(intval($request->get('offset')))->take(intval($request->get('limit')) ?: 10)->get();
