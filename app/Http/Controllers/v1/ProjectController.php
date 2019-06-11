@@ -160,7 +160,7 @@ class ProjectController extends Controller
         $project['active'] = $active;
         $project->save();
 
-        return Response::body(['success' => true]);
+        return Response::body(compact('project'));
     }
 
 
