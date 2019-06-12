@@ -168,6 +168,10 @@ return [
          * Package Service Providers...
          */
         Ixudra\Curl\CurlServiceProvider::class,
+        Jenssegers\Mongodb\MongodbServiceProvider::class,
+        Jenssegers\Mongodb\Auth\PasswordResetServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
+        Zarinpal\ZarinpalServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -177,12 +181,6 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
-        Jenssegers\Mongodb\MongodbServiceProvider::class,
-        Anhskohbo\NoCaptcha\NoCaptchaServiceProvider::class,
-        Maatwebsite\Excel\ExcelServiceProvider::class,
-        Zarinpal\ZarinpalServiceProvider::class,
-
     ],
 
     /*
