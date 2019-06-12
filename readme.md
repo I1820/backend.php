@@ -36,6 +36,9 @@ php artisan key:generate
 php artisan config:cache
 php artisan jwt:secret
 
+php artisan migrate:fresh
+php artisan db:seed
+
 php artisan serve --host=0.0.0.0 --port=7070
 ```
 
