@@ -37,6 +37,8 @@ class PasswordController extends Controller
             throw new  GeneralException('کاربر یافت نشد', 700);
 
         $token = base64_encode(random_bytes(64));
+        // usually replace + and / with - and _, so it doesn’t need encoding anywhere
+        $token = strtr($token, '+/', '-_');
         ResetPasswordToken::create([
             'token' => $token,
             'email' => $request->get('email'),
@@ -47,10 +49,9 @@ class PasswordController extends Controller
         return Response::body(['success' => true]);
     }
 
-    public function showResetForm($token)
+    public function showResetForm(string $token)
     {
         $token = ResetPasswordToken::where('token', $token)->first();
-        // TODO check time
         if (!$token || $token['status'] != 'new')
             return view('error', ['error' => 'لینک استفاده شده است']);
         $token['status'] = 'seen';
@@ -58,10 +59,9 @@ class PasswordController extends Controller
         return view('auth.passwords.reset', compact('token'));
     }
 
-    public function reset($token, Request $request)
+    public function reset(string $token, Request $request)
     {
         $token = ResetPasswordToken::where('token', $token)->first();
-        // TODO check time
         if (!$token || $token['status'] != 'seen')
             return view('error', ['error' => 'مهلت استفاده از لینک تمام شده یا لینک خراب است']);
         $user = User::where('email', $token['email'])->first();
