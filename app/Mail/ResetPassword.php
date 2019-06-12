@@ -11,6 +11,9 @@ class ResetPassword extends Mailable
     use Queueable, SerializesModels;
     protected $token;
 
+    public $subject = 'فراموشی رمز عبور';
+    public $locale = 'fa';
+
     /**
      * Create a new message instance.
      *
