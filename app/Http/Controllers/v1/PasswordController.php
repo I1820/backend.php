@@ -8,12 +8,19 @@ use App\Mail\ResetPassword;
 use App\Repository\Helper\Response;
 use App\ResetPasswordToken;
 use App\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class PasswordController extends Controller
 {
+    /**
+     * @param Request $request
+     * @return array
+     * @throws GeneralException
+     * @throws Exception
+     */
     public function sendLink(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -24,20 +31,19 @@ class PasswordController extends Controller
         ]);
         if ($validator->fails())
             throw new  GeneralException($validator->errors()->first(), 700);
-        $token = ResetPasswordToken::where('email', $request->get('email'))->orderBy('created_at', 'DESC')->first();
         // TODO denial attack
         $user = User::where('email', $request->get('email'))->first();
         if (!$user)
             throw new  GeneralException('کاربر یافت نشد', 700);
 
-        $token = md5(str_random());
+        $token = base64_encode(random_bytes(64));
         ResetPasswordToken::create([
             'token' => $token,
             'email' => $request->get('email'),
             'status' => 'new'
         ]);
 
-        Mail::to($request->get('email'))->send(new ResetPassword($token));
+        Mail::to($request->get('email'))->send(new ResetPassword($token, $user->name));
         return Response::body(['success' => true]);
     }
 

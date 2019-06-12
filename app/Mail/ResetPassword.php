@@ -10,6 +10,7 @@ class ResetPassword extends Mailable
 {
     use Queueable, SerializesModels;
     protected $token;
+    protected $name;
 
     public $subject = 'فراموشی رمز عبور';
     public $locale = 'fa';
@@ -19,9 +20,10 @@ class ResetPassword extends Mailable
      *
      * @param $token
      */
-    public function __construct($token)
+    public function __construct(string $token, string $name)
     {
         $this->token = $token;
+        $this->name = $name;
     }
 
     /**
@@ -33,6 +35,6 @@ class ResetPassword extends Mailable
     {
 
         $link = route('reset-password', ['token' => $this->token]);
-        return $this->view('emails.reset_password', ['link' => $link]);
+        return $this->view('emails.reset_password', ['link' => $link, 'name' => $this->name]);
     }
 }
