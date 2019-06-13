@@ -112,8 +112,6 @@ class UserService
 
     public function updatePackage(User $user, $package)
     {
-        $remaining = ($user['package']['time'] - Carbon::createFromTimestamp($user['package']['start_date']->toDateTime()->getTimestamp())->diffInDays()) * $user['package']['node_num'];
-        $package['time'] += (int)$remaining / $package['node_num'];
         $package['start_date'] = new UTCDateTime(Carbon::now());
         $user['package'] = $package;
         $user->save();

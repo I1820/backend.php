@@ -40,14 +40,14 @@ class ZarinPalService
             'user_id' => $user['_id'],
             'price' => ($package['price'] - $discount) >= 0 ? $package['price'] - $discount : 0,
             'discount' => $discount,
-            'gate' => 'zarinpal',
+            'gate' => 'زرین پال',
             'package' => $package->toArray(),
             'status' => false,
         ]);
         $payment = [
             'CallbackURL' => route('payment.verify', $invoice['_id']),
-            'Amount' => $invoice['price'],
-            'Description' => 'پرداخت بسته ' . $package['name'],
+            'Amount' => $invoice['price'] / 10, // convert rial to toman
+            'Description' => 'پرداخت ' . $package['name'],
             'Email' => $user['email'],    // Optional
         ];
         if ($invoice['price'] == 0) {
@@ -73,7 +73,7 @@ class ZarinPalService
         $payment = [
             'Authority' => $request->get('Authority'),
             'Status' => $request->get('Status'),
-            'Amount' => $invoice['price']
+            'Amount' => $invoice['price'] / 10 // convert rial to toman
         ];
         $response = $this->zarinpal->verify($payment);
         if ($response['Status'] === 100) {
