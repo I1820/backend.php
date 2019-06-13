@@ -7,7 +7,7 @@ use App\Invoice;
 use App\PaymentPortal;
 use App\Repository\Helper\Response;
 use App\Repository\Services\Payment\PaymentService;
-use Carbon\Carbon;
+use \DateTime;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
@@ -46,7 +46,7 @@ class PaymentController extends Controller
     public function overview()
     {
         $all_invoices = Invoice::get();
-        $last_week_invoices = Invoice::where('created_at', Carbon::now()->subDays(7))->get();
+        $last_week_invoices = Invoice::where('created_at', '>', new DateTime('-7 days'))->get();
         $overview = [
             'all_transactions_sum' => $all_invoices->sum('price'),
             'all_transactions_num' => $all_invoices->count(),
