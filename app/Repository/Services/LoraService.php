@@ -89,7 +89,11 @@ class LoraService
         Log::debug(print_r($new_response, true));
         Log::debug('-----------------------------------------------------');
         */
-        if ($new_response->status == 401 | $new_response->status == 403) {
+        if (
+            $new_response->status == 401 || // http Unauthorized code
+            $new_response->status == 403 || // http Forbidden code
+            $new_response->content->code == 16 // gprc Unauthenticated code
+        ) {
             $this->authenticate();
             $response = $response->withHeader('Authorization: ' . $this->token);
             $new_response = $this->sendMethods($method, $response);
