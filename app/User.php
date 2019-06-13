@@ -13,6 +13,8 @@ class User extends Authenticatable implements JWTSubject
 {
     use Notifiable;
 
+    protected $dates = ['package.start_date'];
+
     /**
      * The attributes that are mass assignable.
      *
