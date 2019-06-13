@@ -180,8 +180,6 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
         Route::get('/', 'PaymentController@list');
         Route::get('/to-excel', 'PaymentController@exportToExcel');
         Route::get('/overview', 'PaymentController@overview');
-        Route::get('/portals', 'PaymentController@portals');
-        Route::get('/portals/{paymentPortal}/active', 'PaymentController@activatePortal');
     });
 
     Route::group(['prefix' => 'permission', 'middleware' => ['auth.jwt', 'admin']], function () {
