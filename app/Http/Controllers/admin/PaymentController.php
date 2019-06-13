@@ -54,18 +54,4 @@ class PaymentController extends Controller
         ];
         return Response::body(compact('overview'));
     }
-
-    public function portals()
-    {
-        $portals = PaymentPortal::get();
-        return Response::body(compact('portals'));
-    }
-
-    public function activatePortal(PaymentPortal $paymentPortal, Request $request)
-    {
-        $active = $request->get('active') ? true : false;
-        $paymentPortal['active'] = $active;
-        $paymentPortal->save();
-        return Response::body(['success' => true]);
-    }
 }
