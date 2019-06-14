@@ -154,7 +154,7 @@ class GatewayController extends Controller
 
 
     /**
-     * @return ThingService|Model
+     * @return array
      */
     public function exportToExcel()
     {
