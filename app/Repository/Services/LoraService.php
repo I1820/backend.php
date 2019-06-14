@@ -91,8 +91,7 @@ class LoraService
         */
         if (
             $new_response->status == 401 || // http Unauthorized code
-            $new_response->status == 403 || // http Forbidden code
-            $new_response->content->code == 16 // gprc Unauthenticated code
+            $new_response->status == 403 // http Forbidden code
         ) {
             $this->authenticate();
             $response = $response->withHeader('Authorization: ' . $this->token);
