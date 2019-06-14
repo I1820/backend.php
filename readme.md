@@ -27,7 +27,7 @@ Almost Done! Install the mongodb extension for php with the following command.
 
 ```bash
 sudo pecl install mongodb
-# remember to enable mongodb extention on php.ini [extension=mongodb.so]
+# remember to enable mongodb extension on php.ini [extension=mongodb.so]
 ```
 
 You have the php environment so let's run this shit!
