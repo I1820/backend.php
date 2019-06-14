@@ -142,8 +142,8 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
 });
 
 
-Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
-    Route::group(['prefix' => 'users', 'middleware' => ['auth.jwt', 'admin']], function () {
+Route::group(['namespace' => 'admin', 'prefix' => 'admin', 'middleware' => ['auth.jwt', 'admin']], function () {
+    Route::group(['prefix' => 'users'], function () {
         Route::get('/', 'UserController@list');
         Route::get('/excel', 'UserController@excel');
         Route::get('/impersonate', 'UserController@deimpersonate');
@@ -153,7 +153,7 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
         Route::get('/{user}/transactions', 'UserController@transactions');
         Route::get('/{user}/impersonate', 'UserController@impersonate');
     });
-    Route::group(['prefix' => 'codec', 'middleware' => ['auth.jwt', 'admin']], function () {
+    Route::group(['prefix' => 'codec'], function () {
         Route::post('/', 'CodecController@create');
         Route::get('/', 'CodecController@list');
         Route::delete('/{codec}', 'CodecController@delete');
@@ -162,7 +162,7 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
     });
 
 
-    Route::group(['prefix' => 'packages', 'middleware' => ['auth.jwt', 'admin']], function () {
+    Route::group(['prefix' => 'packages'], function () {
         Route::post('/', 'PackageController@create');
         Route::get('/', 'PackageController@all');
         Route::delete('/{package}', 'PackageController@delete');
@@ -170,19 +170,19 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
         Route::get('/{package}/activate', 'PackageController@activate');
     });
 
-    Route::group(['prefix' => 'discount', 'middleware' => ['auth.jwt']], function () {
+    Route::group(['prefix' => 'discount'], function () {
         Route::post('/', 'DiscountController@create');
         Route::get('/', 'DiscountController@all');
         Route::delete('/{discount}', 'DiscountController@delete');
     });
 
-    Route::group(['prefix' => 'payment', 'middleware' => ['auth.jwt', 'admin']], function () {
+    Route::group(['prefix' => 'payment'], function () {
         Route::get('/', 'PaymentController@list');
         Route::get('/to-excel', 'PaymentController@exportToExcel');
         Route::get('/overview', 'PaymentController@overview');
     });
 
-    Route::group(['prefix' => 'permission', 'middleware' => ['auth.jwt', 'admin']], function () {
+    Route::group(['prefix' => 'permission'], function () {
         Route::get('/', 'PermissionController@permissionsList');
         Route::get('/role', 'PermissionController@rolesList');
         Route::post('/role', 'PermissionController@createRole');
@@ -193,5 +193,3 @@ Route::group(['namespace' => 'admin', 'prefix' => 'admin'], function () {
         Route::get('/admin/{user}', 'PermissionController@admin');
     });
 });
-
-
