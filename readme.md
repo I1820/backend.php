@@ -3,9 +3,9 @@
 
 ## Introduction
 Every microservice architecture must have a glue and its our glue for I1820 Platform.
-This service handles authentication, authorization, and acts as a proxy between frontend and other services.
+This service handles authentication, authorization, and acts as a proxy between frontend and other services. It also caches the additional information about projects and things.
 
-## Installation (without Docker)
+## Up and Running
 Let's up and run this piece of shit on ubuntu 18.04 with nginx.
 First of all you must install the php.
 
@@ -30,7 +30,11 @@ sudo pecl install mongodb
 # remember to enable mongodb extension on php.ini [extension=mongodb.so]
 ```
 
-You have the php environment so let's run this shit!
+You have the php environment so let's run this shit and its requirements!
+
+```bash
+docker-compose up -d
+```
 
 ```bash
 composer install
@@ -44,20 +48,10 @@ php artisan db:seed
 php artisan serve --host=0.0.0.0 --port=7070
 ```
 
-## Installation (with Docker)
-Let's up and run this piece of shit on Docker.
-
-```bash
-docker-compose build
-docker-compose up
-docker-compose exec app php artisan key:generate
-docker-compose exec app php artisan config:cache
-```
-
 ## Errors Numbers
-sjd-backend returns the following error codes:
+sjd-backend returns the following error codes with HTTP 200 OK:
 
-* 701 UnAuthorized     
+* 701 UnAuthorized
 * 704 Not Found
-* 706 Already Existed  
+* 706 Already Existed
 * 707 Validation Error
