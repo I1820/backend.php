@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Http\Middleware;
+namespace App\Http\Middleware;
 
 use App\Exceptions\GeneralException;
 use Closure;
@@ -29,6 +29,9 @@ class Admin
      */
     private function authenticate()
     {
+        /**
+         * @var \App\User|null
+         */
         $user = Auth::user();
         if (!$user || !$user->isAdmin())
             throw new GeneralException(GeneralException::M_ACCESS_DENIED, GeneralException::ACCESS_DENIED);

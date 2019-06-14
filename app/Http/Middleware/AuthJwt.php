@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Http\Middleware;
+namespace App\Http\Middleware;
 
 use App\Exceptions\AuthException;
 use Closure;
@@ -12,8 +12,6 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthJwt
 {
-    protected $loggerService;
-
     public function __construct()
     {
     }
