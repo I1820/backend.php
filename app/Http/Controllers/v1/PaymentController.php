@@ -7,7 +7,6 @@ use App\Exceptions\GeneralException;
 use App\Http\Controllers\Controller;
 use App\Invoice;
 use App\Package;
-use App\PaymentPortal;
 use App\Repository\Helper\Response;
 use App\Repository\Services\Payment\PaymentService;
 use App\Repository\Services\Payment\ZarinPalService;
@@ -85,11 +84,5 @@ class PaymentController extends Controller
     {
         $invoices = Auth::user()->invoices()->with('user')->get();
         return $this->paymentService->toExcel($invoices);
-    }
-
-    public function portals()
-    {
-        $portals = PaymentPortal::where('active', true)->get();
-        return Response::body(compact('portals'));
     }
 }
