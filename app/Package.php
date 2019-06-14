@@ -4,6 +4,9 @@ namespace App;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
+/**
+ * @property boolean $is_active
+ */
 class Package extends Eloquent
 {
 
