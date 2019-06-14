@@ -38,7 +38,7 @@ class PackageController extends Controller
         ], [
             'name.required' => 'لطفا نام بسته را وارد کنید',
             'time.required' => 'لطفا زمان بسته را وارد کنید', 'time.integer' => 'لطفا زمان بسته را درست وارد کنید',
-            'project_num.required' => 'لطفا تعداد پروژه‌ها را وارد کنید', 'time.integer' => 'لطفا تعداد پروژه‌ها را درست وارد کنید',
+            'project_num.required' => 'لطفا تعداد پروژه‌ها را وارد کنید', 'project_num.integer' => 'لطفا تعداد پروژه‌ها را درست وارد کنید',
             'node_num.required' => 'لطفا تعداد نودها را وارد کنید', 'node_num.integer' => 'لطفا تعداد نودها را درست وارد کنید',
             'price.required' => 'لطفا قیمت را وارد کنید', 'price.integer' => 'لطفا قیمت را درست وارد کنید',
         ]);
@@ -69,7 +69,7 @@ class PackageController extends Controller
         ], [
             'name.required' => 'لطفا نام بسته را وارد کنید',
             'time.required' => 'لطفا زمان بسته را وارد کنید', 'time.integer' => 'لطفا زمان بسته را درست وارد کنید',
-            'project_num.required' => 'لطفا تعداد پروژه‌ها را وارد کنید', 'time.integer' => 'لطفا تعداد پروژه‌ها را درست وارد کنید',
+            'project_num.required' => 'لطفا تعداد پروژه‌ها را وارد کنید', 'project_num.integer' => 'لطفا تعداد پروژه‌ها را درست وارد کنید',
             'node_num.required' => 'لطفا تعداد نودها را وارد کنید', 'node_num.integer' => 'لطفا تعداد نودها را درست وارد کنید',
             'price.required' => 'لطفا قیمت را وارد کنید', 'price.integer' => 'لطفا قیمت را درست وارد کنید',
         ]);
