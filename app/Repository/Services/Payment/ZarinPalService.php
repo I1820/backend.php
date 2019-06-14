@@ -30,12 +30,18 @@ class ZarinPalService
 
     /**
      * @param Package $package
-     * @param $discount
-     * @return void
+     * @param int $discount
+     * @return Invoice|boolean
      */
-    public function createInvoice(Package $package, $discount)
+    public function createInvoice(Package $package, int $discount)
     {
+        /**
+         * @var \App\User
+         */
         $user = Auth::user();
+        /**
+         * @var Invoice
+         */
         $invoice = Invoice::create([
             'user_id' => $user['_id'],
             'price' => ($package['price'] - $discount) >= 0 ? $package['price'] - $discount : 0,
@@ -65,7 +71,6 @@ class ZarinPalService
             return $invoice;
         }
         return false;
-
     }
 
     public function verify(Invoice $invoice, Request $request)
