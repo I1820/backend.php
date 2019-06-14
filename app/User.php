@@ -72,7 +72,6 @@ class User extends Authenticatable implements JWTSubject
 
     public function isAdmin()
     {
-
         $main_user = auth()->getPayload()->toArray();
         $main_user = isset($main_user['impersonate_id']) ? User::where('_id', $main_user['impersonate_id'])->first() : null;
         if ($main_user)
