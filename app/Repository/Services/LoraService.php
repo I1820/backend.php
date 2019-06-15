@@ -99,7 +99,7 @@ class LoraService
         $response = $this->curlService->to($url)
             ->withData($data)
             ->withOption('SSL_VERIFYHOST', false)
-            ->withHeader('Authorization: ' . $this->token)
+            ->withHeader('Authorization: Bearer ' . $this->token)
             ->returnResponseObject();
         $new_response = $this->sendMethods($method, $response);
         /*
@@ -113,7 +113,7 @@ class LoraService
             $new_response->status == 403 // http Forbidden code
         ) {
             $this->authenticate();
-            $response = $response->withHeader('Authorization: ' . $this->token);
+            $response = $response->withHeader('Authorization: Bearer ' . $this->token);
             $new_response = $this->sendMethods($method, $response);
         }
         if ($new_response->status == 0) {
