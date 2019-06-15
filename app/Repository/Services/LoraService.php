@@ -96,16 +96,6 @@ class LoraService
 
     private function send($url, $data, $method = 'get', $accept = 200)
     {
-        if (env('LORA_TEST'))
-            return (object)[
-                'status' => 200,
-                'content' => [
-                    'key' => 'value'
-                ],
-                'id' => 'SajjadRahnamaId',
-                'lastSeenAt' => ''
-            ];
-
         $response = $this->curlService->to($url)
             ->withData($data)
             ->withOption('SSL_VERIFYHOST', false)
@@ -135,8 +125,8 @@ class LoraService
     }
 
     /**
-     * @param $method string
-     * @param $response Builder
+     * @param string $method
+     * @param mixed $response
      * @return mixed
      */
     private function sendMethods($method, $response)
@@ -144,7 +134,7 @@ class LoraService
 
         switch ($method) {
             case 'get':
-                $new_response = $response->asJsonResponse()->get();
+                $new_response = $response->asJson()->get();
                 break;
             case 'post':
                 $new_response = $response->asJson()->post();
@@ -153,10 +143,10 @@ class LoraService
                 $new_response = $response->asJson()->put();
                 break;
             case 'delete':
-                $new_response = $response->asJsonResponse()->delete();
+                $new_response = $response->asJson()->delete();
                 break;
             default:
-                $new_response = $response->asJsonResponse()->get();
+                $new_response = $response->asJson()->get();
                 break;
         }
         return $new_response;
@@ -168,7 +158,7 @@ class LoraService
             ->withData(['username' => 'admin', 'password' => 'admin'])
             ->asJson()
             ->withOption('SSL_VERIFYHOST', false)
-            ->post();;
+            ->post();
         $this->token = $response->jwt;
         Storage::put('jwt.token', $this->token);
     }
