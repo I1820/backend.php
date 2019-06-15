@@ -23,8 +23,8 @@ class LoraService
 {
     protected $token;
     protected $base_url;
-    protected $organization_id;
     protected $curlService;
+    protected $organizationID;
     protected $networkServerID;
     protected $serviceProfileID;
 
@@ -34,11 +34,40 @@ class LoraService
             $this->token = Storage::get('jwt.token');
         }
         $this->base_url = config('iot.lora.serverBaseUrl');
-        $this->organization_id = config('iot.lora.organizationID');
+        $this->organizationID = config('iot.lora.organizationID');
         $this->networkServerID = config('iot.lora.networkServerID');
         $this->serviceProfileID = config('iot.lora.serviceProfileID');
         $this->curlService = $curlService;
     }
+
+    /**
+     * @param string $server
+     * @throws LoraException
+     */
+    public function createNetworkServer(string $server) {
+        $url = $this->base_url . '/api/network-servers';
+        $data = [
+            'server' => $server,
+            'name' => 'i1820-network-server',
+        ];
+        return $this->send($url, $data, 'post');
+    }
+
+    /**
+     * @param string $serverID
+     * @throws LoraException
+     */
+    public function createServiceProfile(string $serverID) {
+        $url = $this->base_url . '/api/service-profiles';
+        $data = [
+            'networkServerID' => $serverID,
+            'organizationID' => $this->organizationID,
+            'name' => 'i1820-service-profile',
+            'serviceProfile' => new \stdClass(),
+        ];
+        return $this->send($url, $data, 'post');
+    }
+
 
     /**
      * @param Collection $data
@@ -257,7 +286,7 @@ class LoraService
      */
     public function getOrganizationId()
     {
-        return $this->organization_id;
+        return $this->organizationID;
     }
 
     /**
@@ -279,7 +308,7 @@ class LoraService
         Log::debug("Lora Create Project\t" . $id);
         $url = $this->base_url . '/api/applications';
         $data = [
-            'organizationID' => $this->organization_id,
+            'organizationID' => $this->organizationID,
             'serviceProfileID' => $this->serviceProfileID,
             'name' => (string)$id,
             'description' => $description
