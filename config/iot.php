@@ -21,7 +21,7 @@ return [
             'url'=> env('CORE_TM_URL', '127.0.0.1:1995')
         ],
         'serverBaseUrl' => env('CORE_BASE_URL', '172.23.132.50'),
-        'pmPort' => '8080',
+        'pmPort' => '1375',
         'dmPort' => '1373',
         'downLinkPort' => '1372',
         'gmPort' => '1374'
