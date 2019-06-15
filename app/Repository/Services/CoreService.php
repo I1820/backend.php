@@ -46,7 +46,7 @@ class CoreService
         $url = '/api/projects';
         $data = [
             'name' => (string)$id,
-            'envs' => Auth::user()->only(['email', 'name', '_id'])
+            'owner' => Auth::user()['email'],
         ];
         $response = $this->_send($url, $data, 'post', $this->pmPort);
         return $response;
