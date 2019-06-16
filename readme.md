@@ -42,8 +42,12 @@ php artisan key:generate
 php artisan config:cache
 php artisan jwt:secret
 
+# setup database
 php artisan migrate:fresh
 php artisan db:seed
+
+# setup the loraserver.io as a lora connectivity
+php artisan loraserver:setup
 
 php artisan serve --host=0.0.0.0 --port=7070
 ```
