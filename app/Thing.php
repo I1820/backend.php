@@ -23,7 +23,7 @@ use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 class Thing extends Eloquent
 {
 
-    protected $appends = ['last_seen_at', 'last_parsed_at', 'keys', 'owner'];
+    protected $appends = ['keys', 'owner'];
     protected $lora_thing;
     protected $last_parsed;
     protected $lora_activation;
@@ -74,49 +74,6 @@ class Thing extends Eloquent
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function getLastSeenAtAttribute($value)
-    {
-        try {
-            if (!$this->lora_thing) {
-                $loraService = resolve('App\Repository\Services\LoraService');
-                $this->lora_thing = $loraService->getDevice($this->dev_eui);
-            }
-        } catch (Exception $e) {
-            Log::error("Lora Get Thing\t" . $this['dev_eui']);
-            return "";
-        }
-        try {
-            $time = new DateTime($this->lora_thing->lastSeenAt);
-        } catch (Exception $e) {
-            $status = 'secondary';
-            return ['status' => $status, 'time' => ''];
-        }
-        $status = 'success';
-        if (Carbon::now()->subMinutes(2 * $this->period)->gt($time))
-            $status = 'warning';
-        if (Carbon::now()->subMinutes(3 * $this->period)->gt($time))
-            $status = 'danger';
-        if (Carbon::now()->subMinutes(4 * $this->period)->gt($time))
-            $status = 'secondary';
-
-        return ['status' => $status, 'time' => $time->format(Carbon::RFC3339)];
-    }
-
-    public function getLastParsedAtAttribute($value)
-    {
-        try {
-            if (!$this->core_thing) {
-                $coreService = resolve('App\Repository\Services\CoreService');
-                $this->last_parsed = $coreService->getThingLastParsed($this);
-            }
-            return $this->last_parsed ?
-                $this->last_parsed : 0;
-        } catch (Exception $e) {
-            Log::error("Core Get Thing\t" . $this['dev_eui']);
-            return "";
-        }
     }
 
     public function getKeysAttribute()
