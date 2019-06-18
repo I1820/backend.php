@@ -59,7 +59,7 @@ class ProjectService
     public function insertProject(Request $request)
     {
         $id = new ObjectId();
-        $application_id = $this->loraService->postApp($request->get('description'), $id);
+        // $application_id = $this->loraService->postApp($request->get('description'), $id);
         $container = $this->coreService->createProject($id);
         $project = Project::create([
             '_id' => $id,
@@ -67,7 +67,7 @@ class ProjectService
             'description' => $request->get('description'),
             'active' => true,
             'container' => $container,
-            'application_id' => $application_id
+            // 'application_id' => $application_id
         ]);
         return $project;
     }

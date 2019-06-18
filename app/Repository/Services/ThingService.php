@@ -126,7 +126,7 @@ class ThingService
         if ($lora)
             $device = $this->loraService->postDevice(
                 $request,
-                $project['application_id'],
+                // $project['application_id'],
                 $thingProfile['device_profile_id']
             );
         else
