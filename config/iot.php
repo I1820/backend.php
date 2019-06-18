@@ -8,6 +8,7 @@ return [
         ),
         'organizationID' => env('LORA_ORG_ID', '1'),
         'networkServerID' => env('LORA_NET_SERVER_ID', '1'),
+        'applicationID' => env('LORA_APP_ID', '1'),
         'serviceProfileID' => env(
             'LORA_SERVICE_PROFILE_ID',
             '2dc02c2b-2be9-4bef-ade4-f3408e62a08c'
