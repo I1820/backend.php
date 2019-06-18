@@ -25,6 +25,7 @@ class LoraService
     protected $base_url;
     protected $curlService;
     protected $organizationID;
+    protected $applicationID;
     protected $networkServerID;
     protected $serviceProfileID;
 
@@ -35,6 +36,7 @@ class LoraService
         }
         $this->base_url = config('iot.lora.serverBaseUrl');
         $this->organizationID = config('iot.lora.organizationID');
+        $this->applicationID = config('iot.lora.applicationID');
         $this->networkServerID = config('iot.lora.networkServerID');
         $this->serviceProfileID = config('iot.lora.serviceProfileID');
         $this->curlService = $curlService;
@@ -76,7 +78,7 @@ class LoraService
      * @return string
      * @throws LoraException
      */
-    public function postDevice(Collection $data, $application_id, $deviceProfileID)
+    public function postDevice(Collection $data, $deviceProfileID)
     {
         Log::debug("Lora Send Device:\t" . $data['devEUI']);
         $url = $this->base_url . '/api/devices';
@@ -85,7 +87,7 @@ class LoraService
             'devEUI',
             'name',
         ])->merge([
-            'applicationID' => $application_id,
+            'applicationID' => $this->applicationID,
             'deviceProfileID' => $deviceProfileID
         ]);
         if (!$data['description'])
