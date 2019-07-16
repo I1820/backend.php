@@ -2,26 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Repository\Services\CoreService;
+use App\Repository\Services\Core\PMCoreService;
 
 class LogController extends Controller
 {
-    protected $coreService;
+    protected $pmService;
 
-    public function __construct(CoreService $coreService)
+    public function __construct(PMCoreService $pmService)
     {
-        $this->coreService = $coreService;
+        $this->pmService = $pmService;
     }
 
-    public function containers()
+    public function projects()
     {
-        $containers = $this->coreService->projectList();
-        return view('containers', ['containers' => $containers]);
+        $projects = $this->pmService->list();
+        return view('projects', ['projects' => $projects]);
     }
 
-    public function containerLog($id)
+    public function project(string $id)
     {
-        $logs = $this->coreService->projectLogs($id);
-        return view('containers-logs', ['logs' => $logs]);
+        $logs = $this->pmService->logs($id, 10);
+        return view('project', ['logs' => $logs]);
     }
 }
