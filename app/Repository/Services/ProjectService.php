@@ -13,20 +13,22 @@ use App\Exceptions\GeneralException;
 use App\Exceptions\LoraException;
 use App\Project;
 use App\Thing;
+use App\Repository\Services\Core\PMCoreService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use MongoDB\BSON\ObjectId;
 
 class ProjectService
 {
-    protected $coreService;
+    protected $pmService;
     protected $loraService;
 
 
-    public function __construct(CoreService $coreService, LoraService $loraService)
+    public function __construct(PMCoreService $pmService, LoraService $loraService)
     {
-        $this->coreService = $coreService;
+        $this->pmService = $pmService;
         $this->loraService = $loraService;
     }
 
@@ -59,15 +61,13 @@ class ProjectService
     public function insertProject(Request $request)
     {
         $id = new ObjectId();
-        // $application_id = $this->loraService->postApp($request->get('description'), $id);
-        $container = $this->coreService->createProject($id);
+        $container = $this->pmService->create($id, Auth::user()['email']);
         $project = Project::create([
             '_id' => $id,
             'name' => $request->get('name'),
             'description' => $request->get('description'),
             'active' => true,
             'container' => $container,
-            // 'application_id' => $application_id
         ]);
         return $project;
     }
@@ -95,7 +95,7 @@ class ProjectService
     /**
      * @param Request $request
      * @param Project $project
-     * @return $this|Model
+     * @return Project
      */
     public function updateProject(Request $request, Project $project)
     {
