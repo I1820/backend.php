@@ -21,6 +21,9 @@ return [
         'tm' => [
             'url'=> env('CORE_TM_URL', '127.0.0.1:1995')
         ],
+        'pm' => [
+            'url'=> env('CORE_PM_URL', '127.0.0.1:1375')
+        ],
         'serverBaseUrl' => env('CORE_BASE_URL', '172.23.132.50'),
         'pmPort' => '1375',
         'dmPort' => '1373',
