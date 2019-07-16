@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
+use App\Repository\Services\Core\PMCoreService;
 use App\Repository\Services\LoraService;
 use App\Repository\Services\ProjectService;
 use App\Repository\Services\ThingService;
@@ -24,6 +25,7 @@ class ProjectController extends Controller
     protected $coreService;
     protected $loraService;
     protected $thingService;
+    protected $pmService;
 
     /**
      * ProjectController constructor.
@@ -34,6 +36,7 @@ class ProjectController extends Controller
      */
     public function __construct(ProjectService $projectService,
                                 CoreService $coreService,
+                                PMCoreService $pmService,
                                 LoraService $loraService,
                                 ThingService $thingService)
     {
@@ -41,6 +44,7 @@ class ProjectController extends Controller
         $this->coreService = $coreService;
         $this->thingService = $thingService;
         $this->loraService = $loraService;
+        $this->pmService = $pmService;
 
         $this->middleware('can:view,project')->only(['get', 'things']);
         $this->middleware('can:update,project')->only(['update', 'aliases']);
@@ -76,8 +80,7 @@ class ProjectController extends Controller
         $things = $project->things()->get();
         if (count($things))
             throw new GeneralException('ابتدا اشیا این پروژه رو پاک کنید', 700);
-        $response = $this->coreService->deleteProject($project->container['name']);
-        $this->loraService->deleteApp($project['application_id']);
+        $response = $this->pmService->delete($project['_id']);
         $project->delete();
         return Response::body($response);
     }
@@ -155,7 +158,6 @@ class ProjectController extends Controller
     public function activate(Project $project, Request $request)
     {
         $active = $request->get('active') ? true : false;
-        $this->coreService->activateProject($project, $active);
         $project->things()->update(['active' => $active]);
         $project['active'] = $active;
         $project->save();
@@ -210,10 +212,7 @@ class ProjectController extends Controller
     public function log(Request $request, Project $project)
     {
         $limit = intval($request->get('limit')) ?: 10;
-        if ($request->get('type') == 'lora')
-            $logs = $this->coreService->loraLogs($project['_id'], $limit);
-        else
-            $logs = $this->coreService->projectLogs($project['_id'], $limit);
+        $logs = $this->pmService->logs($project['_id'], $limit);
         return Response::body(['logs' => $logs]);
     }
 
