@@ -36,12 +36,35 @@ class PMCoreService extends AbstractCoreService
     /**
      * @param string $project_id
      * @return array
-     * @throws GeneralException
+     * @throws CoreException
      */
-    public function delete($project_id)
+    public function delete(string $project_id)
     {
         $path = '/api/projects/' . $project_id;
         return $this->fetch($path, [], 'DELETE');
     }
+
+    /**
+     * @return array
+     * @throws CoreException
+     */
+    public function list()
+    {
+        $path = '/api/projects';
+        return $this->fetch($path, [], 'GET');
+    }
+
+    /**
+     * @param string $project_id
+     * @param int $limit
+     * @return array
+     * @throws CoreException
+     */
+    public function logs(string $project_id, int $limit)
+    {
+        $path = '/api/projects/' . $project_id . '/logs?limit=' . $limit;
+        return $this->fetch($path, [], 'GET');
+    }
+
 
 }
