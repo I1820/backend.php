@@ -36,23 +36,6 @@ class CoreService
     }
 
     /**
-     * @param $id
-     * @return array
-     * @throws GeneralException
-     */
-    public function createProject($id)
-    {
-        Log::debug("Core Send Project\t" . $id);
-        $url = '/api/projects';
-        $data = [
-            'name' => (string)$id,
-            'owner' => Auth::user()['email'],
-        ];
-        $response = $this->_send($url, $data, 'post', $this->pmPort);
-        return $response;
-    }
-
-    /**
      * General send function for core services that handles errors
      * @param $url
      * @param $data
@@ -128,38 +111,6 @@ class CoreService
             'port' => 1212,
             'lastSeenAt' => ''
         ];
-    }
-
-    /**
-     * @param Project $project
-     * @param bool $active
-     * @return array
-     * @throws GeneralException
-     */
-    public function activateProject(Project $project, $active = true)
-    {
-        if ($active) {
-            Log::debug("Core Activate Thing\t" . $project['container']['name']);
-            $url = '/api/projects/' . $project['container']['name'] . '/activate';
-        } else {
-            Log::debug("Core Deactivate Thing\t" . $project['container']['name']);
-            $url = '/api/projects/' . $project['container']['name'] . '/deactivate';
-        }
-        $response = $this->_send($url, [], 'get', $this->pmPort);
-        return $response;
-    }
-
-    /**
-     * @param $project_id
-     * @return array
-     * @throws GeneralException
-     */
-    public function deleteProject($project_id)
-    {
-        Log::debug("Core Delete Project\t" . $project_id);
-        $url = '/api/projects/' . $project_id;
-        $response = $this->_send($url, [], 'delete', $this->pmPort);
-        return $response;
     }
 
     /**
@@ -315,60 +266,6 @@ class CoreService
         Log::debug("Core Lint\t" . $project['_id']);
         $url = '/api/runners/' . $project['container']['name'] . '/api/lint';
         $response = $this->_send($url, $code, 'post', $this->pmPort);
-        return $response;
-    }
-
-    /**
-     * @return array
-     * @throws GeneralException
-     */
-    public function projectList()
-    {
-        Log::debug("Core Project List");
-        $url = '/api/projects';
-        $response = $this->_send($url, [], 'get', $this->pmPort);
-        return $response;
-    }
-
-    /**
-     * @param $project_id
-     * @param $limit
-     * @return array
-     * @throws GeneralException
-     */
-    public function projectLogs($project_id, $limit)
-    {
-        //Log::debug("Core Project Log");
-        $url = '/api/projects/' . $project_id . '/logs?limit=' . $limit;
-        $response = $this->_send($url, [], 'get', $this->pmPort);
-        return $response;
-    }
-
-    /**
-     * @param $project_id
-     * @param $limit
-     * @return array
-     * @throws GeneralException
-     */
-    public function loraLogs($project_id, $limit)
-    {
-        //Log::debug("Core Project Log");
-        $url = '/api/projects/' . $project_id . '/errors/lora?limit=' . $limit;
-        $response = $this->_send($url, [], 'get', $this->pmPort);
-        return $response;
-    }
-
-    /**
-     * @param $mac
-     * @param $since
-     * @return array
-     * @throws GeneralException
-     */
-    public function gatewayFrames($mac, $since)
-    {
-        //Log::debug("Core Project Log");
-        $url = '/api/gateway/' . $mac;
-        $response = $this->_send($url, ['since' => $since], 'get', $this->dmPort);
         return $response;
     }
 
