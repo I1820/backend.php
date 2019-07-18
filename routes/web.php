@@ -17,7 +17,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::group(['namespace' => 'ui'], function () {
+Route::group(['namespace' => 'UI', 'prefix' => 'ui'], function () {
     Route::get('/projects', 'ProjectController@projects');
     Route::get('/projects/{id}', 'ProjectController@project');
 });

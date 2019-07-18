@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\ui;
+namespace App\Http\Controllers\UI;
 
 use App\Http\Controllers\Controller;
 use App\Repository\Services\Core\PMCoreService;
