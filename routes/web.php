@@ -11,13 +11,15 @@
 |
 */
 
+use Illuminate\Support\Facades\Route;
+
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::group(['prefix' => 'ui'], function () {
-    Route::get('/projects', 'LogController@projects');
-    Route::get('/projects/{id}', 'LogController@project');
+Route::group(['namespace' => 'ui'], function () {
+    Route::get('/projects', 'ProjectController@projects');
+    Route::get('/projects/{id}', 'ProjectController@project');
 });
 
 Route::group(['namespace' => 'v1'], function () {
