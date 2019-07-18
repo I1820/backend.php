@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/delete-all-things', 'AboutController@delete')->middleware('auth.jwt');
 Route::get('/about', 'AboutController@index');
 Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
 
