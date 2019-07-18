@@ -9,6 +9,7 @@
 namespace App\Repository\Traits;
 
 use App\Exceptions\GeneralException;
+use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,6 +35,7 @@ trait UpdateUser
 
     private function updateRealUser(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
 
         if ($request->get('name')) {
