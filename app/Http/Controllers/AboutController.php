@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Repository\Helper\Response;
+
 class AboutController extends Controller
 {
-    public function index()
+    public function __invoke()
     {
-        return "18.20 is leaving us";
+        return Response::body('18.20 is leaving us');
     }
-
 }
