@@ -83,10 +83,10 @@ class Handler extends ExceptionHandler
      */
     private function otherExceptions($request, Exception $exception)
     {
-        if (env('APP_DEBUG') == 'true') { # debug true
+        if (env('APP_DEBUG') == 'true') {
             $response = parent::render($request, $exception);
-        } else { # debug false
-            $response = response()->json(Response::body($exception->getMessage(), 500));
+        } else {
+            $response = response()->json(Response::body($exception->getMessage(), $exception->getCode()));
         }
 
         return $response;
