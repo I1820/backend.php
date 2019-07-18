@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/delete-all-things', 'TestController@delete')->middleware('auth.jwt');
-Route::post('/itest', 'TestController@index');
+Route::get('/delete-all-things', 'AboutController@delete')->middleware('auth.jwt');
+Route::get('/about', 'AboutController@index');
 Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
 
     Route::post('/register', 'AuthController@register');
