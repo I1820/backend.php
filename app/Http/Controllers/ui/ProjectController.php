@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\ui;
 
+use App\Http\Controllers\Controller;
 use App\Repository\Services\Core\PMCoreService;
 
-class LogController extends Controller
+class ProjectController extends Controller
 {
     protected $pmService;
 
@@ -13,12 +14,21 @@ class LogController extends Controller
         $this->pmService = $pmService;
     }
 
+    /**
+     * @return \Illuminate\View\View
+     * @throws \App\Exceptions\CoreException
+     */
     public function projects()
     {
         $projects = $this->pmService->list();
         return view('projects', ['projects' => $projects]);
     }
 
+    /**
+     * @param string $id
+     * @return \Illuminate\View\View
+     * @throws \App\Exceptions\CoreException
+     */
     public function project(string $id)
     {
         $logs = $this->pmService->logs($id, 10);
