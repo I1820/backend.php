@@ -26,7 +26,3 @@ Route::group(['namespace' => 'v1'], function () {
     Route::get('/password/reset/{token}', 'PasswordController@showResetForm')->name('reset-password');
     Route::post('/password/reset/{token}', 'PasswordController@reset')->name('reset-password');
 });
-
-
-//Auth::routes();
-
