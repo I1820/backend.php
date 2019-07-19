@@ -88,7 +88,6 @@ Route::group(['namespace' => 'v1', 'prefix' => 'v1'], function () {
 
         Route::post('data', 'ThingController@mainData');
         Route::post('data/excel', 'ThingController@dataToExcel');
-        Route::post('data/sample', 'ThingController@sampleData');
 
         Route::patch('/{thing}', 'ThingController@update');
         Route::delete('/{thing}', 'ThingController@delete');
