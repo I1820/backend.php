@@ -6,7 +6,6 @@ use App\Repository\Helper\Response;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -50,49 +49,18 @@ class Handler extends ExceptionHandler
      * @param Request $request
      * @param Exception $exception
      * @return \Illuminate\Http\Response
+     *
      */
     public function render($request, Exception $exception)
     {
         if ($exception instanceof AuthorizationException) {
-            $response = response(Response::body(GeneralException::M_ACCESS_DENIED, GeneralException::ACCESS_DENIED), 403);
-        } else if ($exception instanceof IoTException) { # IoT sepcific exceptions
-            $response = $this->customException($exception);
-        } else if ( $exception instanceOf ValidationException) {
+            return response(Response::body(GeneralException::M_ACCESS_DENIED, GeneralException::ACCESS_DENIED), 403);
+        }
+        if ($exception instanceOf ValidationException) {
             $errs = $exception->errors(); // gets all validation errors
-            $response = response(Response::body($errs[array_key_first($errs)][0], 400), 400); // return the first validation error to the user
-        } else { # other exceptions
-            $response = $this->otherExceptions($request, $exception);
+            return response(Response::body($errs[array_key_first($errs)][0], 400), 400); // return the first validation error to the user
         }
 
-        return $response;
-    }
-
-    /**
-     * @param Exception $e
-     * @return Response
-     */
-    private function customException(Exception $e)
-    {
-        if ($e->getCode() == 701)
-            $code = 401;
-        else
-            $code = 200;
-        return response(Response::body($e->getMessage(), $e->getCode()), $code);
-    }
-
-    /**
-     * @param $request
-     * @param Exception $exception
-     * @return JsonResponse|\Illuminate\Http\Response
-     */
-    private function otherExceptions($request, Exception $exception)
-    {
-        if (env('APP_DEBUG') == 'true') {
-            $response = parent::render($request, $exception);
-        } else {
-            $response = response()->json(Response::body($exception->getMessage(), $exception->getCode()));
-        }
-
-        return $response;
+        return parent::render($request, $exception);
     }
 }
