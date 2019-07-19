@@ -175,7 +175,7 @@ class ThingController extends Controller
         }
 
         $thing_ids = $request->input('thing_ids.ids') ?: [];
-        $thing_ids = $project->things()->whereIn('_id', $thing_ids)->get(['dev_eui'])->all();
+        $thing_ids = $project->things()->whereIn('_id', $thing_ids)->get(['dev_eui'])->pluck('dev_eui')->all();
 
         $limit = (int)($request->get('limit')) ?: 0;
         $offset = (int)($request->get('offset')) ?: 0;
