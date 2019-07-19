@@ -33,8 +33,9 @@ class Admin
          * @var \App\User|null
          */
         $user = Auth::user();
-        if (!$user || !$user->isAdmin())
-            throw new GeneralException(GeneralException::M_ACCESS_DENIED, GeneralException::ACCESS_DENIED);
-
+        if (!$user)
+            throw new GeneralException(GeneralException::M_ACCESS_DENIED, 401);
+        if (!$user->isAdmin())
+            throw new GeneralException(GeneralException::M_ACCESS_DENIED, 403);
     }
 }

@@ -37,14 +37,14 @@ class AuthJwt
     {
         try {
             if (!$user = JWTAuth::parseToken()->authenticate()) {
-                throw new AuthException('user not found', AuthException::UNAUTHORIZED);
+                throw new AuthException('token not found', 401);
             }
         } catch (TokenExpiredException $e) {
-            throw new AuthException('token expired', AuthException::UNAUTHORIZED);
+            throw new AuthException('token expired', 401);
         } catch (TokenInvalidException $e) {
-            throw new AuthException('token invalid', AuthException::UNAUTHORIZED);
+            throw new AuthException('invalid token', 401);
         } catch (JWTException $e) {
-            throw new AuthException('unauthorized', AuthException::UNAUTHORIZED);
+            throw new AuthException('cannot validate token', 401);
         }
     }
 }
