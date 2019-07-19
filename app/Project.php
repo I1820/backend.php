@@ -19,7 +19,7 @@ class Project extends Eloquent
      * @var array
      */
     protected $fillable = [
-        'name', 'description', 'active', 'container', 'application_id', '_id',
+        'name', 'description', 'active', '_id',
     ];
     protected $appends = ['owner'];
 
