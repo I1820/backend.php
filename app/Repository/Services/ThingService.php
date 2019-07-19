@@ -44,47 +44,6 @@ class ThingService
     }
 
     /**
-     * @param $request
-     * @return void
-     * @throws GeneralException
-     */
-    public function validateCreateThing(Collection $request)
-    {
-        $messages = [
-            'name.required' => 'لطفا نام شی را وارد کنید',
-            'type.required' => 'نوع اینترفیس شی را وارد کنید',
-            'lat.numeric' => 'لطفا محل سنسور را درست وارد کنید',
-            'lat.required' => 'لطفا محل سنسور را درست کنید',
-            'long.numeric' => 'لطفا محل سنسور را درست وارد کنید',
-            'long.required' => 'لطفا محل سنسور را وارد کنید',
-            'period.required' => 'لطفا بازه ارسال داده سنسور را وارد کنید',
-            'period.numeric' => 'لطفا بازه ارسال داده سنسور را درست وارد کنید',
-            'devEUI.min' => 'لطفا devEUI سنسور را درست وارد کنید',
-            'devEUI.max' => 'لطفا devEUI سنسور را درست وارد کنید',
-            'devEUI.required' => 'لطفا devEUI سنسور را وارد کنید',
-            'thing_profile_slug.required' => 'لطفا شناسه پروفایل شی را وارد کنید',
-        ];
-        $rules = [
-            'name' => 'required|string|max:255',
-            'devEUI' => 'required|min:16|max:16',
-            'type' => 'required|',
-            'lat' => 'required|numeric',
-            'long' => 'required|numeric',
-            'period' => 'required|numeric',
-        ];
-        if ($request->get('type') == 'lora') {
-            $rules['thing_profile_slug'] = 'required';
-            $messages['thing_profile_slug.required'] = 'لطفا شناسه پروفایل شی را وارد کنید';
-        }
-
-        $validator = Validator::make($request->all(), $rules, $messages);
-        if ($validator->fails())
-            throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
-        if (Thing::where('dev_eui', $request->get('devEUI'))->first())
-            throw new  GeneralException('این DEV EUI قبلا ثبت شده است.', GeneralException::VALIDATION_ERROR);
-    }
-
-    /**
      * @param Request $request
      * @return void
      * @throws GeneralException
@@ -119,14 +78,13 @@ class ThingService
     {
         $lora = $request->get('type') == 'lora';
         if (!$thingProfile && $lora)
-            throw new GeneralException('پروفایل شی یافت نشد', 700);
+            throw new GeneralException('پروفایل شی یافت نشد', 404);
         if (!$project)
-            throw new GeneralException('پروژه یافت نشد', 700);
+            throw new GeneralException('پروژه یافت نشد', 404);
 
         if ($lora)
             $device = $this->loraService->postDevice(
                 $request,
-                // $project['application_id'],
                 $thingProfile['device_profile_id']
             );
         else
