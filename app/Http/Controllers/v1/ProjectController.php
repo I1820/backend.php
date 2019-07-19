@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\v1;
 
+use App\Exceptions\CoreException;
 use App\Exceptions\GeneralException;
-use App\Exceptions\LoraException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Project\CreateRequest;
+use App\Http\Requests\Project\UpdateRequest;
 use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\CoreService;
 use App\Repository\Services\Core\PMCoreService;
-use App\Repository\Services\LoraService;
 use App\Repository\Services\ProjectService;
 use App\Repository\Services\ThingService;
-use Error;
+use App\User;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -31,19 +32,16 @@ class ProjectController extends Controller
      * ProjectController constructor.
      * @param ProjectService $projectService
      * @param CoreService $coreService
-     * @param LoraService $loraService
      * @param ThingService $thingService
      */
     public function __construct(ProjectService $projectService,
                                 CoreService $coreService,
                                 PMCoreService $pmService,
-                                LoraService $loraService,
                                 ThingService $thingService)
     {
         $this->projectService = $projectService;
         $this->coreService = $coreService;
         $this->thingService = $thingService;
-        $this->loraService = $loraService;
         $this->pmService = $pmService;
 
         $this->middleware('can:view,project')->only(['get', 'things']);
@@ -54,16 +52,16 @@ class ProjectController extends Controller
 
 
     /**
-     * @param Request $request
+     * @param CreateRequest $request
      * @return array
-     * @throws GeneralException
-     * @throws LoraException
+     * @throws CoreException
      */
-    public function create(Request $request)
+    public function create(CreateRequest $request)
     {
+        /** @var User $user */
         $user = Auth::user();
-        $this->projectService->validateCreateProject($request);
-        $project = $this->projectService->insertProject($request);
+        $validated = $request->validated();
+        $project = $this->projectService->create($validated['name'], $validated['description'], $user->email);
         $user->projects()->save($project);
         return Response::body(compact('project'));
     }
@@ -79,8 +77,8 @@ class ProjectController extends Controller
     {
         $things = $project->things()->get();
         if (count($things))
-            throw new GeneralException('ابتدا اشیا این پروژه رو پاک کنید', 700);
-        $response = $this->pmService->delete($project['_id']);
+            throw new GeneralException('ابتدا اشیا این پروژه رو پاک کنید', 400);
+        $response = $this->pmService->delete($project->_id);
         $project->delete();
         return Response::body($response);
     }
@@ -167,22 +165,14 @@ class ProjectController extends Controller
 
 
     /**
-     * @param Request $request
+     * @param UpdateRequest $request
      * @param Project $project
      * @return array
-     * @throws GeneralException
      */
-    public function update(Request $request, Project $project)
+    public function update(UpdateRequest $request, Project $project)
     {
-        /* project name must be unique so remove it from the request if its equal with current project */
-        if ($request->get('name') == $project->name) {
-            $request->merge(['name' => '']);
-        }
-
-        $this->projectService->validateUpdateProject($request);
-
-        $project = $this->projectService->updateProject($request, $project);
-        $project->load('things');
+        $validated = $request->validated();
+        $project = $this->projectService->update($validated['name'], $validated['description'], $project);
 
         return Response::body(compact('project'));
     }
@@ -207,7 +197,7 @@ class ProjectController extends Controller
      * @param Request $request
      * @param Project $project
      * @return array
-     * @throws GeneralException
+     * @throws CoreException
      */
     public function log(Request $request, Project $project)
     {
