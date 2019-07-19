@@ -24,11 +24,12 @@ return [
         'pm' => [
             'url'=> env('CORE_PM_URL', '127.0.0.1:1375')
         ],
+        'dm' => [
+            'url'=> env('CORE_DM_URL', '127.0.0.1:1373')
+        ],
         'serverBaseUrl' => env('CORE_BASE_URL', '172.23.132.50'),
         'pmPort' => '1375',
-        'dmPort' => '1373',
         'downLinkPort' => '1372',
-        'gmPort' => '1374'
     ],
     'lan' => [
         'serverBaseUrl' => env('LAN_BASE_URL', '172.23.132.50:9000'),
