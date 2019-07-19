@@ -156,7 +156,6 @@ class ThingController extends Controller
 
     /**
      * @param Request $request
-     * @param bool $sample
      * @return array
      * @throws GeneralException
      * @throws CoreException
@@ -175,8 +174,8 @@ class ThingController extends Controller
             $until = $request->get('until') ?: Carbon::now()->getTimestamp();
         }
 
-        $thing_ids = $request->get('thing_ids')['ids'] ?: [];
-        $thing_ids = $project->things()->whereIn('_id', $thing_ids)->get()->pluck('dev_eui');
+        $thing_ids = $request->input('thing_ids.ids') ?: [];
+        $thing_ids = $project->things()->whereIn('_id', $thing_ids)->get(['dev_eui'])->all();
 
         $limit = (int)($request->get('limit')) ?: 0;
         $offset = (int)($request->get('offset')) ?: 0;
