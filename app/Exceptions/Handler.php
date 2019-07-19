@@ -53,9 +53,6 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        if ($exception instanceof AuthorizationException) {
-            return response(Response::body(GeneralException::M_ACCESS_DENIED, GeneralException::ACCESS_DENIED), 403);
-        }
         if ($exception instanceOf ValidationException) {
             $errs = $exception->errors(); // gets all validation errors
             return response(Response::body($errs[array_key_first($errs)][0], 400), 400); // return the first validation error to the user

@@ -18,11 +18,11 @@ class IoTException extends Exception
      * Render the exception into an HTTP response.
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function render(Request $request)
     {
-        return response(Response::body($this->getMessage(), $this->getCode()), $this->getCode());
+        return response()->json(Response::body($this->getMessage(), $this->getCode()), $this->getCode());
     }
 
 }
