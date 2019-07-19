@@ -6,7 +6,7 @@ use App\Exceptions\GeneralException;
 use App\Http\Controllers\Controller;
 use App\Repository\Helper\Response;
 use App\Repository\Services\ConfigService;
-use App\Repository\Services\CoreService;
+use App\Repository\Services\Core\DMCoreService;
 use App\Repository\Services\FileService;
 use App\Repository\Services\UserService;
 use App\Thing;
@@ -23,24 +23,24 @@ class UserController extends Controller
     protected $userService;
     protected $fileService;
     protected $configService;
-    protected $coreService;
+    protected $dmService;
 
     /**
      * UserController constructor.
      * @param userService $userService
      * @param FileService $fileService
-     * @param CoreService $coreService
+     * @param DMCoreService $dmService
      * @param ConfigService $configService
      */
     public function __construct(UserService $userService,
                                 FileService $fileService,
-                                CoreService $coreService,
+                                DMCoreService $dmService,
                                 ConfigService $configService)
     {
         $this->userService = $userService;
         $this->fileService = $fileService;
         $this->configService = $configService;
-        $this->coreService = $coreService;
+        $this->dmService = $dmService;
     }
 
     /**
@@ -135,7 +135,7 @@ class UserController extends Controller
                     'type' => $widget['type'],
                     'thing' => $thing,
                     'alias' => $widget['alias'],
-                    'data' => collect($this->coreService->thingData($thing, $since, $until))
+                    'data' => collect($this->dmService->fetchThing($thing['dev_eui'], $since, $until))
                         ->filter(function ($data) use ($widget) {
                             $data = json_decode(json_encode($data), True);
                             return isset($data['data'][$widget['key']]);
