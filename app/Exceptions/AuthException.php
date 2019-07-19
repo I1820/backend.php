@@ -10,12 +10,8 @@ namespace App\Exceptions;
 
 class AuthException extends IoTException
 {
-    # Exception Codes list
-    const UNAUTHORIZED = 701;
-
     const M_USER_NOT_ACTIVE = 'حساب شما فعال نیست';
     const M_INVALID_CREDENTIALS = 'اطلاعات وارد شده درست نیست';
-    const M_TOKEN_EXPIRED = 'توکن شما منقضی شده است';
 
     /**
      * AuthException constructor.
