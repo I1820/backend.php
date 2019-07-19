@@ -11,19 +11,26 @@ namespace App\Repository\Helper;
 
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Class Counter implements sequence counter in mongodb
+ * @package App\Repository\Helper
+ */
 class Counter
 {
 
+    /**
+     * @return int
+     */
     public static function thingProfile()
     {
+        /** @var $counter int */
         $counter = DB::collection('counters')->where('name', 'thing_profile')->first()['counter'];
         if (!$counter) {
-            $client = DB::getMongoDB();
-            $counter = [
+            $record = [
                 'name' => 'thing_profile',
                 'counter' => 1
             ];
-            $client->counters->insertOne($counter);
+            DB::collection('counters')->insert($record);
             return 1;
         }
         $counter++;
