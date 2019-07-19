@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\v1;
 
+use App\Exceptions\CoreException;
 use App\Exceptions\GeneralException;
 use App\Exceptions\LoraException;
 use App\Http\Controllers\Controller;
 use App\Project;
 use App\Repository\Helper\Response;
+use App\Repository\Services\Core\DMCoreService;
 use App\Repository\Services\CoreService;
 use App\Repository\Services\LanService;
 use App\Repository\Services\LoraService;
@@ -26,7 +28,7 @@ use Maatwebsite\Excel\Facades\Excel;
 class ThingController extends Controller
 {
     protected $thingService;
-    protected $permissionService;
+    protected $dmService;
     protected $coreService;
     protected $lanService;
     protected $loraService;
@@ -34,17 +36,20 @@ class ThingController extends Controller
     /**
      * ProjectController constructor.
      * @param ThingService $thingService
+     * @param DMCoreService $dmService
      * @param CoreService $coreService
      * @param LanService $lanService
      * @param LoraService $loraService
      */
     public function __construct(ThingService $thingService,
+                                DMCoreService $dmService,
                                 CoreService $coreService,
                                 LanService $lanService,
                                 LoraService $loraService)
     {
         $this->thingService = $thingService;
         $this->coreService = $coreService;
+        $this->dmService = $dmService;
         $this->lanService = $lanService;
         $this->loraService = $loraService;
 
@@ -151,25 +156,17 @@ class ThingController extends Controller
 
     /**
      * @param Request $request
-     * @return array
-     * @throws GeneralException
-     */
-    public function sampleData(Request $request)
-    {
-        $data = $this->data($request, true);
-        return Response::body(compact('data'));
-    }
-
-    /**
-     * @param Request $request
      * @param bool $sample
      * @return array
      * @throws GeneralException
+     * @throws CoreException
      */
-    private function data(Request $request, $sample = false)
+    private function data(Request $request)
     {
         $project = Project::where('_id', $request->get('project_id'))->first();
+
         $aliases = isset($project['aliases']) ? $project['aliases'] : null;
+
         if ($request->get('window')) {
             $since = Carbon::now()->subMinute((int)$request->get('window'))->getTimestamp();
             $until = Carbon::now()->getTimestamp();
@@ -177,16 +174,14 @@ class ThingController extends Controller
             $since = $request->get('since') ?: 0;
             $until = $request->get('until') ?: Carbon::now()->getTimestamp();
         }
-        $thing_ids = json_decode($request->get('thing_ids'), true)['ids'] ?: [];
+
+        $thing_ids = $request->get('thing_ids')['ids'] ?: [];
         $thing_ids = $project->things()->whereIn('_id', $thing_ids)->get()->pluck('dev_eui');
-        if ($sample) {
-            $cluster_number = (int)($request->get('cn')) ?: 50;
-            $data = $this->coreService->thingsSampleData($thing_ids, $since, $until, $cluster_number);
-        } else {
-            $limit = (int)($request->get('limit')) ?: 0;
-            $offset = (int)($request->get('offset')) ?: 0;
-            $data = $this->coreService->thingsMainData($thing_ids, $since, $until, $limit, $offset);
-        }
+
+        $limit = (int)($request->get('limit')) ?: 0;
+        $offset = (int)($request->get('offset')) ?: 0;
+
+        $data = $this->dmService->fetchThings($thing_ids, $since, $until, $limit, $offset);
         $data = $this->alias($data, $aliases);
 
         return $data;
@@ -215,7 +210,7 @@ class ThingController extends Controller
      */
     public function mainData(Request $request)
     {
-        $data = $this->data($request, false);
+        $data = $this->data($request);
         return Response::body(compact('data'));
 
     }
@@ -227,7 +222,7 @@ class ThingController extends Controller
      */
     public function dataToExcel(Request $request)
     {
-        $data = $this->data($request, false);
+        $data = $this->data($request);
         return $this->thingService->dataToExcel(collect($data));
 
     }
