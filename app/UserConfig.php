@@ -4,6 +4,10 @@ namespace App;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
+/**
+ * @property array $widgets
+ * @property string $user_id
+ */
 class UserConfig extends Eloquent
 {
     protected $appends = [''];

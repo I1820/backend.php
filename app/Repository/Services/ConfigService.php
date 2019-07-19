@@ -28,7 +28,10 @@ class ConfigService
         $this->validateWidgetChart($data);
         $config = Auth::user()->config()->first();
         if (!$config)
-            $config = UserConfig::create(['user_id' => Auth::user()['_id']]);
+            $config = UserConfig::create([
+                'user_id' => Auth::user()['_id'],
+                'widgets' => [],
+            ]);
         $config_widgets = isset($config['widgets']) ? $config['widgets'] : [];
 
         $thing = Auth::user()->things()->get()->where('dev_eui', $data->get('devEUI'))->first();
@@ -57,6 +60,10 @@ class ConfigService
 
     }
 
+    /**
+     * @param Collection $data
+     * @throws GeneralException
+     */
     public function validateWidgetChart($data)
     {
         $messages = [
@@ -74,23 +81,25 @@ class ConfigService
         ], $messages);
 
         if ($validator->fails())
-            throw new  GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
+            throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
     }
 
     /**
      * @param Collection $data
-     * @return string
+     * @return void
      */
     public function deleteWidgetChart(Collection $data)
     {
         $config = Auth::user()->config()->first();
         if (!$config)
-            $config = UserConfig::create(['user_id' => Auth::user()['_id']]);
+            $config = UserConfig::create([
+                'user_id' => Auth::user()['_id'],
+                'widgets' => [],
+            ]);
         $config_widgets = isset($config['widgets']) ? $config['widgets'] : [];
         unset($config_widgets[$data->get('id')]);
         $config['widgets'] = $config_widgets;
         $config->save();
-
     }
 
 }
