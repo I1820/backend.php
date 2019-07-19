@@ -9,9 +9,26 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 
+/**
+ * @OA\Schema()
+ */
 class User extends Authenticatable implements JWTSubject
 {
     use Notifiable;
+
+    /**
+     * Email Address
+     * @var string
+     * @OA\Property()
+     */
+    public $email;
+
+    /**
+     * Full Name
+     * @var string
+     * @OA\Property()
+     */
+    public $name;
 
     protected $dates = ['package.start_date'];
 
