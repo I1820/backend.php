@@ -13,6 +13,8 @@ use App\Exceptions\GeneralException;
 use App\Repository\Traits\RegisterUser;
 use App\Repository\Traits\UpdateUser;
 use App\User;
+use App\Package;
+use App\Role;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Excel;
@@ -20,8 +22,32 @@ use MongoDB\BSON\UTCDateTime;
 
 class UserService
 {
-    use RegisterUser;
     use UpdateUser;
+
+    /**
+     * @param string $name
+     * @param string $email
+     * @param string $password
+     * @return User
+     */
+    public function insertUser(string $name, string $email, string $password)
+    {
+        $package = Package::where('default', true)->first()->toArray();
+        $role = Role::where('default', true)->first()->toArray();
+        $package['start_date'] = new UTCDateTime(Carbon::now());
+        $user = User::create([
+            'legal' => false,
+            'active' => false,
+            'name' => $name,
+            'email' => $email,
+            'password' => bcrypt($password),
+            'package' => $package,
+            'role_id' => $role['_id']
+        ]);
+
+        return $user;
+    }
+
 
     /**
      * @param array $credentials
