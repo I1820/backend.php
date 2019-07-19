@@ -68,9 +68,9 @@
         <div class="flex-center position-ref full-height">
             <div class="content">
                 <div class="title m-b-md">
-                    Welcome to I1820 API Backend, It's a glue that connects
-                    backend services to the front.
+                    Welcome to I1820 API Backend
                 </div>
+                <img src="https://github.com/I1820.png" alt="I1820 Logo">
 
                 <div class="links">
                     <a href="https://github.com/I1820">GitHub</a>
