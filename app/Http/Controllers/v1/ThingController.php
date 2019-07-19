@@ -6,6 +6,7 @@ use App\Exceptions\CoreException;
 use App\Exceptions\GeneralException;
 use App\Exceptions\LoraException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Thing\CreateRequest;
 use App\Project;
 use App\Repository\Helper\Response;
 use App\Repository\Services\Core\DMCoreService;
@@ -62,20 +63,20 @@ class ThingController extends Controller
 
 
     /**
-     * @param Request $request
+     * @param CreateRequest $request
      * @return array
      */
-    public function create(Request $request)
+    public function create(CreateRequest $request)
     {
         $project = Project::where('_id', $request->get('project_id'))->first();
-        $thing = $this->createThing(collect($request->all()), $project);
+        $validated = $request->validated();
+        $thing = $this->createThing(collect($validated), $project);
         return Response::body(compact('thing'));
     }
 
     private function createThing(Collection $data, Project $project)
     {
         $user = Auth::user();
-        $this->thingService->validateCreateThing($data);
         if ($data->get('type') == 'lora')
             $thing_profile = ThingProfile::where('thing_profile_slug', (int)$data->get('thing_profile_slug'))->first();
         else
