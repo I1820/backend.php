@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Mail\EmailVerification;
 use App\Repository\Helper\Response;
 use App\Repository\Services\UserService;
+use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
 use App\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -15,6 +17,12 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
+/**
+ * @OA\Tag(
+ *     name="Auth",
+ *     description="Login/Register/Logout",
+ * )
+ */
 class AuthController extends Controller
 {
     private $userService;
@@ -29,20 +37,33 @@ class AuthController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param RegisterRequest $request
      * @return array
      * @throws GeneralException
+     * @OA\Post(
+     *      path="/v1/register",
+     *      operationId="register",
+     *      tags={"Auth"},
+     *      summary="Register the user",
+     *      description="Returns the user and sends him/her verification email",
+     *      @OA\RequestBody(
+     *          @OA\MediaType(
+     *              mediaType="application/json",
+     *              schema={"$ref": "#/components/schemas/RegisterRequest"}
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *       @OA\Response(response=400, description="Bad request"),
+     *       @OA\Response(response=500, description="Email operation failed (user is created but not activated)"),
+     *     )
      */
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        //AuthValidation::register($request);
-
-
-        $this->userService->validateRegisterUser($request);
-
-        $user = $this->userService->insertUser($request);
-        # generate token
-        # $token = JWTAuth::fromUser($user);
+        $validated = $request->validated();
+        $user = $this->userService->insertUser($validated['name'], $validated['email'], $validated['password']);
 
         Mail::to($user['email'])->send(new EmailVerification($user));
 
@@ -50,20 +71,36 @@ class AuthController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param LoginRequest $request
      * @return array
      * @throws AuthException
      * @throws GeneralException
+     * @OA\Post(
+     *      path="/v1/login",
+     *      operationId="login",
+     *      tags={"Auth"},
+     *      summary="Log in the user",
+     *      description="Check the user credentials and logs him/her in",
+     *      @OA\RequestBody(
+     *          @OA\MediaType(
+     *              mediaType="application/json",
+     *              schema={"$ref": "#/components/schemas/LoginRequest"}
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *      ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *     )
      */
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $request->merge($request->json()->all());
-        $validator = $this->loginValidator($request);
-        if ($validator->fails()) {
-            throw new GeneralException($validator->errors()->first(), GeneralException::VALIDATION_ERROR);
-        }
-
-        $credentials = $request->only('email', 'password');
+        $validated = $request->validated();
+        $credentials = [
+            'email' => $validated['email'],
+            'password' => $validated['password']
+        ];
         $access_token = $this->userService->generateAccessTokenByCredentials($credentials);
 
         // check user activation status
@@ -75,20 +112,6 @@ class AuthController extends Controller
 
         $config = ['portainer_url' => env('PORTAINER_URL'), 'prometheus_url' => env('PROMETHEUS_URL')];
         return Response::body(compact('user', 'access_token', 'refresh_token', 'config'));
-    }
-
-
-    /**
-     * @param $request
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    public function loginValidator($request)
-    {
-        $data = $request->only(['email', 'password']);
-        return Validator::make($data, [
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
     }
 
     /**
