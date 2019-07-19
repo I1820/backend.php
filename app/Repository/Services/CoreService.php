@@ -30,7 +30,6 @@ class CoreService
     {
         $this->base_url = config('iot.core.serverBaseUrl');
         $this->pmPort = config('iot.core.pmPort');
-        $this->dmPort = config('iot.core.dmPort');
         $this->downLinkPort = config('iot.core.downLinkPort');
         $this->curlService = $curlService;
     }
@@ -46,10 +45,6 @@ class CoreService
      */
     private function _send($url, $data, $method, $port)
     {
-        if (env('CORE_TEST') == 1) {
-            return $this->fake();
-        }
-
         $url = $this->base_url . ':' . $port . $url;
 
         $response = $this->curlService->to($url)
@@ -100,32 +95,6 @@ class CoreService
         }
     }
 
-    public function fake()
-    {
-        return (object)[
-            'status' => 200,
-            'content' => [
-                'key' => 'value'
-            ],
-            'name' => 'project',
-            'port' => 1212,
-            'lastSeenAt' => ''
-        ];
-    }
-
-    /**
-     * @param Thing $thing
-     * @return array
-     * @throws GeneralException
-     */
-    public function getThingLastParsed(Thing $thing)
-    {
-        Log::debug("Core Get Thing\t" . $thing['dev_eui']);
-        $url = '/api/queries/things/' . $thing['dev_eui'] . '/parsed';
-        $response = $this->_send($url, [], 'get', $this->dmPort);
-        return $response;
-    }
-
     /**
      * @param Project $project
      * @param Thing $thing
@@ -166,78 +135,6 @@ class CoreService
     {
         $url = '/api/runners/' . $project['container']['name'] . '/api/codecs/' . $thing['interface']['devEUI'] . '/decode';
         $response = $this->_send($url, $data, 'post', $this->pmPort);
-        return $response;
-    }
-
-    public function gatewayEvent($gateway, $timestamp, $limit)
-    {
-        $url = '/api/gateway/' . $gateway . '?since=' . $timestamp . '&limit=' . $limit;
-        $response = $this->_send($url, [], 'get', $this->dmPort);
-        return $response;
-    }
-
-    /**
-     * @param Thing $thing
-     * @param $since
-     * @param $until
-     * @param $limit
-     * @return array
-     * @throws GeneralException
-     */
-    public function thingData(Thing $thing, $since, $until, $limit = 0)
-    {
-        Log::debug("Core Thing Data");
-        $url = '/api/queries/things/' . $thing['interface']['devEUI'] . '/fetch';
-        $data = ['since' => (int)$since];
-        if ($until)
-            $data['until'] = (int)$until;
-        else
-            $data['limit'] = (int)$limit;
-        $response = $this->_send($url, $data, 'get', $this->dmPort);
-        return $response;
-    }
-
-    /**
-     * @param array $ids
-     * @param $since
-     * @param $until
-     * @param int $cluster_number
-     * @return array
-     * @throws GeneralException
-     */
-    public function thingsSampleData($ids, $since, $until, $cluster_number = 200)
-    {
-        Log::debug("Core Things Sample Data");
-        $url = '/api/things/w';
-        $response = $this->_send($url, [
-            'since' => (int)$since,
-            'until' => (int)$until,
-            'thing_ids' => $ids,
-            'cn' => $cluster_number
-        ], 'post', $this->dmPort);
-        return $response;
-    }
-
-    /**
-     * @param array $ids
-     * @param $since
-     * @param $until
-     * @param $limit
-     * @param $offset
-     * @return array
-     * @throws GeneralException
-     */
-    public function thingsMainData($ids, $since, $until, $limit, $offset)
-    {
-        Log::debug("Core Things Data");
-        $url = '/api/queries/fetch';
-        $data = ['since' => (int)$since, 'thing_ids' => $ids];
-        if ($limit) {
-            $data['limit'] = (int)$limit;
-            $data['offset'] = (int)$offset;
-        } else
-            $data['until'] = (int)$until;
-        $response = $this->_send($url, $data, 'post', $this->dmPort);
         return $response;
     }
 
