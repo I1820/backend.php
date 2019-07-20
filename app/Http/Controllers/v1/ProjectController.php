@@ -24,7 +24,6 @@ class ProjectController extends Controller
 {
     protected $projectService;
     protected $coreService;
-    protected $loraService;
     protected $thingService;
     protected $pmService;
 
