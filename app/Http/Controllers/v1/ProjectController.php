@@ -172,7 +172,7 @@ class ProjectController extends Controller
     public function update(UpdateRequest $request, Project $project)
     {
         $validated = $request->validated();
-        $project = $this->projectService->update($validated['name'], $validated['description'], $project);
+        $project = $this->projectService->update($project, $validated['name'], $validated['description']);
 
         return Response::body(compact('project'));
     }
