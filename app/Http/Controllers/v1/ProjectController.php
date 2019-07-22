@@ -60,7 +60,7 @@ class ProjectController extends Controller
         /** @var User $user */
         $user = Auth::user();
         $validated = $request->validated();
-        $project = $this->projectService->create($validated['name'], $validated['description'], $user->email);
+        $project = $this->projectService->create($validated['name'], $validated['description'], $user['email']);
         $user->projects()->save($project);
         return Response::body(compact('project'));
     }
