@@ -16,20 +16,17 @@ return [
     ],
     'core' => [
         'gm' => [
-            'url'  => env('CORE_GM_URL', '127.0.0.1:1374')
+            'url'  => env('CORE_GM_URL', '127.0.0.1:1995')
         ],
         'tm' => [
-            'url'=> env('CORE_TM_URL', '127.0.0.1:1995')
+            'url'=> env('CORE_TM_URL', '127.0.0.1:1378')
         ],
         'pm' => [
-            'url'=> env('CORE_PM_URL', '127.0.0.1:1375')
+            'url'=> env('CORE_PM_URL', '127.0.0.1:1999')
         ],
         'dm' => [
             'url'=> env('CORE_DM_URL', '127.0.0.1:1373')
         ],
-        'serverBaseUrl' => env('CORE_BASE_URL', '172.23.132.50'),
-        'pmPort' => '1375',
-        'downLinkPort' => '1372',
     ],
     'lan' => [
         'serverBaseUrl' => env('LAN_BASE_URL', '172.23.132.50:9000'),
